@@ -243,8 +243,8 @@
   .note-h3 { font-size: 1.02rem; font-weight: 700; margin: 20px 0 8px; color: var(--accent-strong); }
   .note-def { background: var(--accent-soft); border-left: 3px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin: 12px 0; font-size: 0.92rem; }
   .note-def strong { color: var(--accent-strong); }
-  .note-formula { display: inline-block; font-family: var(--font-mono); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; margin: 8px 0; font-size: 0.88rem; }
-  .note-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.86rem; }
+  .note-formula { display: inline-block; max-width: 100%; box-sizing: border-box; white-space: normal; overflow-wrap: break-word; font-family: var(--font-mono); background: var(--bg-soft); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; margin: 8px 0; font-size: 0.88rem; }
+  .note-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.86rem; }
   .note-table th, .note-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
   .note-table th { color: var(--text-muted); font-weight: 700; }
   .note-list { margin: 10px 0; padding-left: 20px; font-size: 0.92rem; }
@@ -260,6 +260,7 @@
   .manage-filter select {
     font-family: var(--font-mono); font-size: 0.82rem; padding: 6px 10px; border-radius: 6px;
     border: 1.5px solid var(--border); background: var(--card-bg); color: var(--text);
+    width: 100%; max-width: 100%; box-sizing: border-box;
   }
   .qlist { display: flex; flex-direction: column; gap: 10px; }
   .qrow { display: flex; align-items: center; gap: 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
@@ -311,9 +312,9 @@
   <!-- ================= Sidebar ================= -->
   <aside class="sidebar">
     <div>
-      <div class="brand-name">Course Reviewer</div>
+      <div class="brand-name">ACT 501 Reviewer</div>
       <!-- BRAND: replace name + tagline per course -->
-      <div class="brand-tag">Flashcards &amp; session notes</div>
+      <div class="brand-tag">Financing, cash flows &amp; financial analysis</div>
     </div>
     <nav class="nav-tabs">
       <button class="nav-tab" data-tab="reviewer" id="tab-btn-reviewer">Reviewer</button>
@@ -504,15 +505,20 @@
   // One entry per course session/unit. Keys must match `topic`
   // values used in QUESTIONS below.
   var SESSIONS = {
-    sessionA: {
-      label: 'Session 1',
-      name: 'Session 1 — Encoding & Retrieval',
-      desc: 'How memories are formed and recalled, and why that matters for studying.'
+    session5: {
+      label: 'Session 5',
+      name: 'Session 5 — Debt, Financing & Capital Structure',
+      desc: 'Current vs. noncurrent liabilities, contingent liabilities, and solvency ratios.'
     },
-    sessionB: {
-      label: 'Session 2',
-      name: 'Session 2 — Spacing & Retrieval Practice',
-      desc: 'Spaced repetition, testing effect, and building a review schedule.'
+    session7: {
+      label: 'Session 7',
+      name: 'Session 7 — Cash Flows & Financial Statement Analysis',
+      desc: 'The Statement of Cash Flows, horizontal & vertical analysis, and the DuPont Framework.'
+    },
+    formulaSheet: {
+      label: 'Formula Sheet',
+      name: 'Formula Sheet — Finals Reference',
+      desc: 'Cumulative formula reference spanning liquidity, solvency, cash flow, and DuPont.'
     }
   };
 
@@ -525,17 +531,142 @@
   // opts:  4 options for mcq; ['True','False'] for tf
   // ans:   0-based index of the correct option
   // exp:   1-3 sentence explanation shown after the question is answered
+  //
+  // Mock exam question bank (CC-4). Design decisions from the owner:
+  // all multiple-choice (no true/false), mostly definition/recall with
+  // a minor share of applied computation questions, weighted toward
+  // Session 5 and Session 7 with a smaller pool for the Formula Sheet.
   var QUESTIONS = [
-    { id: 'sA-1', topic: 'sessionA', type: 'mcq', q: 'What is "encoding" in the context of memory formation?', opts: ['The process of converting perceived information into a form the brain can store', 'The act of physically writing notes by hand', 'The process of forgetting unused information', 'A technique for speed-reading textbooks'], ans: 0, exp: 'Encoding is the first stage of memory formation — turning sensory input into a storable internal representation. Deeper, more meaningful encoding produces stronger memories.' },
-    { id: 'sA-2', topic: 'sessionA', type: 'mcq', q: 'Which of these is an example of "elaborative encoding"?', opts: ['Rereading a sentence five times without pausing', 'Explaining a new concept in your own words and linking it to something you already know', 'Highlighting text in a textbook', 'Listening to a lecture recording at 2x speed'], ans: 1, exp: 'Elaborative encoding connects new material to existing knowledge, which creates more retrieval paths later. Passive rereading and highlighting create weaker, more fragile memories.' },
-    { id: 'sA-3', topic: 'sessionA', type: 'tf', q: 'Testing yourself on material (retrieval practice) strengthens memory more than simply rereading it.', opts: ['True', 'False'], ans: 0, exp: 'This is the "testing effect": producing an answer from memory reinforces the retrieval pathway, while rereading only builds a weaker sense of familiarity.' },
-    { id: 'sA-4', topic: 'sessionA', type: 'mcq', q: 'What is a "retrieval cue"?', opts: ['A hint written directly on an exam', 'Any stimulus that helps trigger recall of a stored memory', 'The final grade on a test', 'A type of short-term memory'], ans: 1, exp: 'A retrieval cue is anything — a word, an image, a context — that helps activate a stored memory trace. Well-encoded material tends to have richer, more numerous retrieval cues.' },
-    { id: 'sA-5', topic: 'sessionA', type: 'tf', q: 'Recognizing an answer on a multiple-choice test is generally easier than freely recalling it without options.', opts: ['True', 'False'], ans: 0, exp: 'Recognition relies on cues already present (the options); free recall requires reconstructing the memory from scratch, which is a stronger test of retention.' },
-    { id: 'sB-1', topic: 'sessionB', type: 'mcq', q: 'What is the "spacing effect"?', opts: ['The tendency to forget material studied in a quiet room', 'The finding that information is better retained when study sessions are spread out over time rather than massed together', 'The idea that longer study sessions are always better', 'A method for organizing a study desk'], ans: 1, exp: 'The spacing effect describes how distributing study sessions over days or weeks produces stronger long-term retention than cramming the same total time into one sitting.' },
-    { id: 'sB-2', topic: 'sessionB', type: 'mcq', q: 'In spaced repetition systems, what typically happens to the review interval after a card is answered correctly?', opts: ['It stays exactly the same every time', 'It resets to zero', 'It increases, so well-known material is reviewed less often', 'It is chosen at random'], ans: 2, exp: 'Spaced repetition algorithms lengthen the interval before the next review each time a card is recalled correctly, concentrating review time on harder material.' },
-    { id: 'sB-3', topic: 'sessionB', type: 'tf', q: 'Cramming the night before a test produces better long-term retention than spacing the same study time across several days.', opts: ['True', 'False'], ans: 1, exp: 'Cramming (massed practice) can feel productive short-term, but retention decays quickly. Spacing the same time across days produces stronger long-term retention.' },
-    { id: 'sB-4', topic: 'sessionB', type: 'mcq', q: 'What is "desirable difficulty" in learning theory?', opts: ['Making study material intentionally confusing', 'A level of challenge in practice that slows initial performance but improves long-term retention', 'Choosing the hardest possible textbook', 'Studying without any breaks'], ans: 1, exp: 'Desirable difficulties — like spacing, interleaving, and retrieval practice — feel harder in the moment but produce more durable, flexible long-term memory than easier methods.' },
-    { id: 'sB-5', topic: 'sessionB', type: 'mcq', q: 'What is "interleaving" as a study technique?', opts: ['Studying one topic exhaustively before moving to the next', 'Mixing different topics or problem types within a single study session instead of blocking them separately', 'Taking notes in two different colors', 'Studying only at night'], ans: 1, exp: 'Interleaving mixes related-but-distinct topics within a session rather than studying in blocks. It feels harder but improves the ability to discriminate between and apply different concepts.' }
+    { id: 's5-1', topic: 'session5', type: 'mcq', q: 'What does the accounting equation state?', opts: ['Assets = Liabilities + Equity', 'Revenue = Expenses + Net Income', 'Assets = Liabilities − Equity', 'Equity = Assets + Liabilities'], ans: 0, exp: 'Every asset a business owns is financed by either debt (liabilities) or ownership investment (equity).' },
+    { id: 's5-2', topic: 'session5', type: 'mcq', q: 'Every asset a business owns must ultimately be financed by which two sources?', opts: ['Debt and equity', 'Revenue and expenses', 'Cash and inventory', 'Profit and loss'], ans: 0, exp: 'There is no third source — every peso of assets traces back to either borrowed money or owner investment.' },
+    { id: 's5-3', topic: 'session5', type: 'mcq', q: 'As used in this session, what is a liability?', opts: ['A present obligation to another party', 'Any decrease in cash', 'An asset that has lost value', 'A future plan to raise financing'], ans: 0, exp: 'A liability is a present obligation owed to a bank, supplier, employees, the government, or customers.' },
+    { id: 's5-4', topic: 'session5', type: 'mcq', q: 'Which of the following is a typical party a business can owe a liability to?', opts: ['A supplier', "A competitor's shareholder", 'An unrelated charity', 'A potential future customer'], ans: 0, exp: 'The session lists banks, suppliers, employees, the government, and customers as parties a business can owe.' },
+    { id: 's5-5', topic: 'session5', type: 'mcq', q: 'In the scenario where an investor offers ₱20,000,000 for 40% ownership versus a bank offering the same ₱20,000,000 at 8% interest, choosing the bank loan is financing through:', opts: ['Debt', 'Equity', 'Retained earnings', 'A contingent liability'], ans: 0, exp: "Borrowing from a bank at a stated interest rate is debt financing — it must be repaid but doesn't dilute ownership." },
+    { id: 's5-6', topic: 'session5', type: 'mcq', q: 'Current liabilities are obligations due within:', opts: ['1 year', '90 days', '5 years', 'The life of the asset'], ans: 0, exp: 'Current liabilities are due within 1 year, unlike noncurrent liabilities, which are due beyond that.' },
+    { id: 's5-7', topic: 'session5', type: 'mcq', q: 'Which of these is classified as a current liability?', opts: ['Accounts Payable', 'Bonds Payable', 'Pension Obligations', 'Other Post-Retirement Benefits'], ans: 0, exp: 'Accounts Payable is due within a year; the other three are noncurrent liabilities.' },
+    { id: 's5-8', topic: 'session5', type: 'mcq', q: 'A supplier delivers nets to a pickleball facility today, with payment due in 30 days. What liability does this create?', opts: ['Accounts Payable', 'Unearned Revenue', 'Salaries Payable', 'Notes Payable'], ans: 0, exp: 'Receiving goods or services before paying for them creates Accounts Payable.' },
+    { id: 's5-9', topic: 'session5', type: 'mcq', q: "Employees worked this week but won't be paid until next Friday. What liability does this create?", opts: ['Salaries Payable', 'Accounts Payable', 'Unearned Revenue', 'Bonds Payable'], ans: 0, exp: 'Wages earned but not yet paid are recorded as Salaries Payable.' },
+    { id: 's5-10', topic: 'session5', type: 'mcq', q: 'A club member prepays for an annual membership but is still owed a full year of court access. What liability does this create?', opts: ['Unearned Revenue', 'Accounts Payable', 'Salaries Payable', 'Notes Payable'], ans: 0, exp: 'Cash received before the service is delivered is Unearned Revenue — an obligation to provide future service.' },
+    { id: 's5-11', topic: 'session5', type: 'mcq', q: 'What is the "Current Portion of Long-Term Debt"?', opts: ['The part of a long-term loan due within the next 12 months', 'Interest owed on a long-term loan', 'A loan that has just been fully repaid', 'A liability that never has to be repaid'], ans: 0, exp: "It reclassifies the portion of a long-term loan's principal that falls due within the next year as a current liability." },
+    { id: 's5-12', topic: 'session5', type: 'mcq', q: 'Which of the following is NOT a current liability?', opts: ['Bonds Payable', 'Accounts Payable', 'Salaries Payable', 'Unearned Revenue'], ans: 0, exp: 'Bonds Payable is a noncurrent liability; the other three are all due within a year.' },
+    { id: 's5-13', topic: 'session5', type: 'mcq', q: 'Noncurrent liabilities are obligations due:', opts: ['Beyond 1 year', 'Within 1 year', 'Within 30 days', 'Immediately'], ans: 0, exp: 'Noncurrent liabilities are due beyond the 1-year mark, unlike current liabilities.' },
+    { id: 's5-14', topic: 'session5', type: 'mcq', q: 'Which of these is a noncurrent liability?', opts: ['Notes Payable', 'Accounts Payable', 'Salaries Payable', 'Current Portion of Long-Term Debt'], ans: 0, exp: 'Notes Payable (e.g. a bank loan to build courts) is a long-term, noncurrent obligation.' },
+    { id: 's5-15', topic: 'session5', type: 'mcq', q: 'What are Pension Obligations?', opts: ['Future retirement benefits owed to employees', 'Cash borrowed from a bank', 'Money owed to suppliers', 'A short-term tax liability'], ans: 0, exp: "Pension Obligations represent the company's promise to pay employees retirement benefits in the future." },
+    { id: 's5-16', topic: 'session5', type: 'mcq', q: 'What are Other Post-Retirement Benefits (OPEB)?', opts: ['Retiree healthcare and life insurance benefits', 'Salaries owed to current employees', 'A type of bond issued to investors', "A current-year tax obligation"], ans: 0, exp: 'OPEB covers non-pension retirement benefits such as retiree healthcare and life insurance.' },
+    { id: 's5-17', topic: 'session5', type: 'mcq', q: 'Which noncurrent liability arises from a promise made to employees rather than from borrowing money?', opts: ['Pension Obligations', 'Bonds Payable', 'Notes Payable', 'A bank loan'], ans: 0, exp: 'Not all noncurrent liabilities are loans — pension obligations come from promises to employees, not borrowing.' },
+    { id: 's5-18', topic: 'session5', type: 'mcq', q: 'Bonds Payable represents financing raised from:', opts: ['Borrowing from many investors at once', 'A single bank loan', 'Retained earnings', 'Owner investment'], ans: 0, exp: 'Bonds are a way of borrowing from a large pool of investors simultaneously, rather than from one lender.' },
+    { id: 's5-19', topic: 'session5', type: 'mcq', q: "A company borrows ₱500,000 on a 5-year loan; the first ₱100,000 principal payment now falls due within the next 12 months. How should that ₱100,000 be classified?", opts: ['Current Portion of Long-Term Debt', 'Fully noncurrent', 'Accounts Payable', 'Unearned Revenue'], ans: 0, exp: 'Once a principal payment falls due within the next 12 months, that portion moves to Current Portion of Long-Term Debt.' },
+    { id: 's5-20', topic: 'session5', type: 'mcq', q: "If a company's next loan principal payment isn't due for more than 12 months, how is the loan balance classified?", opts: ['Entirely as a noncurrent liability', 'Entirely as a current liability', 'Split evenly between current and noncurrent', 'Not recorded as a liability yet'], ans: 0, exp: 'With no payment due within a year, the full balance stays classified as noncurrent.' },
+    { id: 's5-21', topic: 'session5', type: 'mcq', q: 'Why can the exact same long-term loan appear entirely under Noncurrent Liabilities one year and be split between Current and Noncurrent the next?', opts: ["Because the classification depends on how close the next principal payment is", 'Because interest rates changed', 'Because the loan was renegotiated', 'Because the company changed accounting methods'], ans: 0, exp: "As the loan's payment schedule moves forward, whichever portion becomes due within the next 12 months reclassifies as current." },
+    { id: 's5-22', topic: 'session5', type: 'mcq', q: 'What must a company do with debt financing that it does not have to do with equity financing?', opts: ['Repay it', 'Report it on the income statement', 'Disclose it publicly', 'Pay corporate taxes on it'], ans: 0, exp: 'Debt must be repaid with interest; equity requires no repayment, though it dilutes ownership.' },
+    { id: 's5-23', topic: 'session5', type: 'mcq', q: 'What happens to ownership when a company raises money through equity rather than debt?', opts: ['Ownership is diluted', 'Ownership stays exactly the same', 'Ownership converts to a liability', 'Ownership is eliminated'], ans: 0, exp: "Bringing in equity investors dilutes existing owners' stake, unlike debt, which leaves ownership unchanged." },
+    { id: 's5-24', topic: 'session5', type: 'mcq', q: 'What is the return paid to equity investors typically called?', opts: ['Dividends', 'Interest', 'Principal', 'Amortization'], ans: 0, exp: 'Equity investors are compensated through dividends, not interest — interest is the cost of debt.' },
+    { id: 's5-25', topic: 'session5', type: 'mcq', q: 'What is the return paid to debt lenders called?', opts: ['Interest', 'Dividends', 'Retained earnings', 'Equity multiplier'], ans: 0, exp: 'Debt financing carries an interest cost, in exchange for which lenders do not receive an ownership stake.' },
+    { id: 's5-26', topic: 'session5', type: 'mcq', q: 'According to this session, which financing mix (debt vs. equity) is universally "correct" for every company?', opts: ['There is no universally correct mix', '100% debt', '100% equity', 'Exactly 50/50'], ans: 0, exp: "The deck illustrates three companies using very different mixes, with no single \"right\" answer." },
+    { id: 's5-27', topic: 'session5', type: 'mcq', q: 'What is a contingent liability?', opts: ['A potential obligation that depends on a future event', 'A liability that has already been fully paid', 'An asset with uncertain value', 'A liability guaranteed never to occur'], ans: 0, exp: 'Contingent liabilities are possible obligations whose existence depends on how a future event turns out.' },
+    { id: 's5-28', topic: 'session5', type: 'mcq', q: 'Which of these is an example of a contingent liability discussed in this session?', opts: ['A pending lawsuit', 'Salaries Payable', 'Accounts Payable', 'Unearned Revenue'], ans: 0, exp: "Pending lawsuits, warranty claims, product recalls, and loan guarantees are this session's contingent liability examples." },
+    { id: 's5-29', topic: 'session5', type: 'mcq', q: 'When is a contingent liability recognized as an actual liability on the balance sheet?', opts: ['When the outcome is probable and the amount is reasonably estimable', 'As soon as any lawsuit is filed', 'Only after the company loses in court', 'Never — contingent liabilities are always just disclosed'], ans: 0, exp: 'Recognition requires both conditions together: a probable outcome and a reasonably estimable amount.' },
+    { id: 's5-30', topic: 'session5', type: 'mcq', q: 'When a contingent liability\'s outcome is only "reasonably possible" (not probable), how is it typically handled?', opts: ['Disclosed in the notes, not recognized as a liability', 'Recognized as a liability at full value', 'Ignored entirely', 'Recorded as an asset'], ans: 0, exp: 'Reasonably possible (but not probable) contingencies are disclosed in the notes rather than recognized on the balance sheet.' },
+    { id: 's5-31', topic: 'session5', type: 'mcq', q: 'A company is sued for ₱5,000,000, but management believes the outcome is uncertain and no reasonable estimate can be made. What is the most likely accounting treatment?', opts: ['Disclose the lawsuit in the notes without recording a liability', 'Immediately record a ₱5,000,000 liability', 'Ignore it completely since no cash has changed hands', 'Record it as revenue'], ans: 0, exp: 'Without a probable outcome and a reasonable estimate, the lawsuit is disclosed rather than recognized.' },
+    { id: 's5-32', topic: 'session5', type: 'mcq', q: "Beyond what accounting recognizes on the balance sheet, who evaluates whether a company can actually handle its financial obligations?", opts: ['Management', 'The government', 'Customers', 'Competitors'], ans: 0, exp: 'Accounting decides what belongs on the balance sheet; management still has to judge whether the company can handle both recognized and disclosed obligations.' },
+    { id: 's5-33', topic: 'session5', type: 'mcq', q: "Which of these is NOT one of this session's contingent liability examples?", opts: ['Employee salaries', 'A pending lawsuit', 'A warranty claim', 'A loan guarantee'], ans: 0, exp: 'Employee salaries are a routine, certain obligation (Salaries Payable) — not a contingent one.' },
+    { id: 's5-34', topic: 'session5', type: 'mcq', q: 'What does the Debt-to-Assets ratio measure?', opts: ["What percentage of a company's assets were financed by debt", 'How quickly a company collects receivables', 'How much profit a company earns per sale', 'How efficiently a company uses its equipment'], ans: 0, exp: 'Debt-to-Assets shows how much of the asset base is funded by borrowing rather than equity.' },
+    { id: 's5-35', topic: 'session5', type: 'mcq', q: 'What does the Debt-to-Equity ratio measure?', opts: ['How much financing came from creditors relative to owners', 'How much cash a company has on hand', 'How fast inventory turns over', 'How much a company spends on interest each year'], ans: 0, exp: "Debt-to-Equity compares what creditors have contributed to what owners have contributed." },
+    { id: 's5-36', topic: 'session5', type: 'mcq', q: 'What does the Interest Coverage Ratio (Times Interest Earned) measure?', opts: ['How comfortably a company can pay its interest expense from operating income', 'How much debt a company has relative to its assets', 'How much profit a company keeps per peso of sales', 'How quickly a company pays its suppliers'], ans: 0, exp: 'Interest Coverage compares operating income (EBIT) to interest expense, showing the margin of safety on interest payments.' },
+    { id: 's5-37', topic: 'session5', type: 'mcq', q: 'What is the formula for the Debt-to-Assets Ratio?', opts: ['Total Debt ÷ Total Assets', 'Total Assets ÷ Total Debt', 'Total Debt ÷ Total Equity', 'Total Equity ÷ Total Assets'], ans: 0, exp: 'Debt-to-Assets Ratio = Total Debt ÷ Total Assets.' },
+    { id: 's5-38', topic: 'session5', type: 'mcq', q: 'What is the formula for the Interest Coverage Ratio?', opts: ['Operating Income (EBIT) ÷ Interest Expense', 'Interest Expense ÷ Operating Income', 'Net Income ÷ Interest Expense', 'Total Debt ÷ Interest Expense'], ans: 0, exp: 'Interest Coverage Ratio = Operating Income (EBIT) ÷ Interest Expense.' },
+    { id: 's5-39', topic: 'session5', type: 'mcq', q: 'Which question does "liquidity" answer?', opts: ["Can we pay next month's bills?", 'Can we survive the next decade?', 'How profitable are we?', 'How much do we owe in total?'], ans: 0, exp: 'Liquidity is about meeting near-term obligations, unlike solvency, which looks much further out.' },
+    { id: 's5-40', topic: 'session5', type: 'mcq', q: 'Which question does "solvency" answer?', opts: ['Can we survive the next decade?', "Can we pay next month's bills?", 'What is our gross margin?', 'How much cash do we have today?'], ans: 0, exp: 'Solvency is about the total long-term debt burden, not just near-term obligations.' },
+    { id: 's5-41', topic: 'session5', type: 'mcq', q: 'Debt-to-Assets, Debt-to-Equity, and Interest Coverage are all examples of which type of ratio?', opts: ['Solvency ratios', 'Liquidity ratios', 'Profitability ratios', 'Efficiency ratios'], ans: 0, exp: "These ratios all assess total debt burden and a company's ability to sustain it — solvency, not short-term liquidity." },
+    { id: 's5-42', topic: 'session5', type: 'mcq', q: 'A very high debt ratio is most likely to be considered normal in which type of industry?', opts: ['Utilities, airlines, or telecommunications', 'Small local retail shops', 'Freelance consulting', 'Handmade crafts businesses'], ans: 0, exp: 'Capital-intensive industries with stable cash flows, like utilities, airlines, and telecom, typically carry more debt than most sectors.' },
+    { id: 's5-43', topic: 'session5', type: 'mcq', q: 'Why might an 85% Debt-to-Assets ratio be less alarming for a utility company than for most other businesses?', opts: ['Utilities are capital-intensive with stable, predictable cash flows that support heavier debt loads', 'Utilities never have to repay their debt', 'Utilities are exempt from solvency analysis', 'Utilities always have zero interest expense'], ans: 0, exp: 'High leverage is more sustainable in industries with steady, predictable cash flows, which is why industry context matters.' },
+    { id: 's5-44', topic: 'session5', type: 'mcq', q: 'Lob Pickleball Club has Total Liabilities of ₱12,000,000 and Total Assets of ₱30,000,000. What is its Debt-to-Assets ratio?', opts: ['40%', '25%', '60%', '12%'], ans: 0, exp: '₱12,000,000 ÷ ₱30,000,000 = 40%.' },
+    { id: 's5-45', topic: 'session5', type: 'mcq', q: "Lob Pickleball Club has Total Liabilities of ₱12,000,000 and Shareholders' Equity of ₱18,000,000. What is its Debt-to-Equity ratio?", opts: ['0.67×', '1.50×', '0.40×', '2.00×'], ans: 0, exp: '₱12,000,000 ÷ ₱18,000,000 ≈ 0.67×.' },
+    { id: 's5-46', topic: 'session5', type: 'mcq', q: 'Lob Pickleball Club has Operating Income (EBIT) of ₱5,500,000 and Interest Expense of ₱1,100,000. What is its Interest Coverage Ratio?', opts: ['5.0×', '0.2×', '6.6×', '1.1×'], ans: 0, exp: '₱5,500,000 ÷ ₱1,100,000 = 5.0×.' },
+    { id: 's5-47', topic: 'session5', type: 'mcq', q: 'In Exercise B-13.13, Company A has Debt of ₱1,000,000 and Total Assets of ₱10,000,000. What is its Debt-to-Assets ratio?', opts: ['10.00%', '1.00%', '100.00%', '9.00%'], ans: 0, exp: '₱1,000,000 ÷ ₱10,000,000 = 10.00%, the lowest (safest) of the five companies ranked in the exercise.' },
+    { id: 's5-48', topic: 'session5', type: 'mcq', q: "In Exercise B-16.02, DotBanc's loan screening requires a Times Interest Earned ratio of at least:", opts: ['5', '1', '10', '0.5'], ans: 0, exp: 'To qualify, an applicant needs Debt-to-Assets < 0.5, Debt-to-Equity < 1.0, and TIE of at least 5.' },
+    { id: 's5-49', topic: 'session5', type: 'mcq', q: 'In Exercise B-16.02, applicant Jordanson has an acceptable Debt-to-Assets (0.49) but still fails to qualify for the loan. Why?', opts: ['Its Times Interest Earned ratio (0.81×) is far below the required minimum of 5', 'Its Debt-to-Equity ratio is negative', 'It has no total assets on record', 'It already has an existing loan with DotBanc'], ans: 0, exp: "A single failing ratio — Jordanson's weak 0.81× TIE — is enough to disqualify an otherwise reasonable-looking applicant." },
+    { id: 's5-50', topic: 'session5', type: 'mcq', q: 'Company V has Debt-to-Assets of 40% and Interest Coverage of 10×; Company JK has 85% and 1.2×. Which company is showing signs of being over-leveraged?', opts: ['Company JK', 'Company V', 'Both equally', "Neither — leverage doesn't affect risk"], ans: 0, exp: "Company JK's much higher debt load and interest coverage barely above 1× suggest far less cushion to absorb a downturn." },
+
+    { id: 's7-1', topic: 'session7', type: 'mcq', q: 'Which financial statement answers "did we make money?"', opts: ['Income Statement', 'Balance Sheet', 'Statement of Cash Flows', 'Statement of Retained Earnings'], ans: 0, exp: 'The Income Statement reports revenue and expenses to show whether the company was profitable.' },
+    { id: 's7-2', topic: 'session7', type: 'mcq', q: 'Which financial statement answers "what do we own and owe?"', opts: ['Balance Sheet', 'Income Statement', 'Statement of Cash Flows', 'Statement of Retained Earnings'], ans: 0, exp: 'The Balance Sheet reports assets, liabilities, and equity at a point in time.' },
+    { id: 's7-3', topic: 'session7', type: 'mcq', q: 'Which financial statement answers "where did cash go?"', opts: ['Statement of Cash Flows', 'Income Statement', 'Balance Sheet', 'Statement of Retained Earnings'], ans: 0, exp: 'The Statement of Cash Flows tracks cash inflows and outflows during the period.' },
+    { id: 's7-4', topic: 'session7', type: 'mcq', q: 'A company sells goods worth ₱100,000 on credit; the customer will pay next month. What happens to revenue and cash right away?', opts: ['Revenue increases immediately; cash does not increase yet', 'Both revenue and cash increase immediately', 'Neither revenue nor cash increases until payment', 'Cash increases immediately; revenue is recorded later'], ans: 0, exp: 'Under accrual accounting, revenue is recorded when earned, not when cash is received.' },
+    { id: 's7-5', topic: 'session7', type: 'mcq', q: 'What is the relationship this session draws between profit and cash?', opts: ['Profit keeps the business attractive; cash keeps the business alive', 'Profit and cash always move together', 'Cash is irrelevant if profit is positive', "Profit is calculated directly from the cash balance"], ans: 0, exp: 'A business can be profitable on paper yet run out of cash, which is why the Statement of Cash Flows matters separately.' },
+    { id: 's7-6', topic: 'session7', type: 'mcq', q: 'What is the purpose of the Statement of Cash Flows?', opts: ['Evaluate liquidity and how operating, investing, and financing activities affect cash', 'Report total assets and liabilities at year-end', "Calculate the company's tax liability", "Show shareholders' voting rights"], ans: 0, exp: "It tracks where cash came from and went, helping assess liquidity and the company's ability to generate cash." },
+    { id: 's7-7', topic: 'session7', type: 'mcq', q: 'Which of the three cash flow categories includes customer payments, salaries, and rent?', opts: ['Operating', 'Investing', 'Financing', 'Non-cash'], ans: 0, exp: "Operating activities relate to the company's core, income-producing activities." },
+    { id: 's7-8', topic: 'session7', type: 'mcq', q: 'Which of the three cash flow categories includes buying or selling equipment, vehicles, and buildings?', opts: ['Investing', 'Operating', 'Financing', 'Non-cash'], ans: 0, exp: 'Investing activities involve cash used to buy or sell long-term assets.' },
+    { id: 's7-9', topic: 'session7', type: 'mcq', q: 'Which of the three cash flow categories includes loans, owner investment, and dividends?', opts: ['Financing', 'Operating', 'Investing', 'Non-cash'], ans: 0, exp: "Financing activities are cash flows that change the company's capital structure." },
+    { id: 's7-10', topic: 'session7', type: 'mcq', q: 'Collecting cash from customers is classified under which cash flow activity?', opts: ['Operating', 'Investing', 'Financing', 'Non-cash'], ans: 0, exp: "Collections from customers are part of the company's core income-producing activity." },
+    { id: 's7-11', topic: 'session7', type: 'mcq', q: 'Purchasing machinery is classified under which cash flow activity?', opts: ['Investing', 'Operating', 'Financing', 'Non-cash'], ans: 0, exp: 'Buying long-term productive assets like machinery is an investing activity.' },
+    { id: 's7-12', topic: 'session7', type: 'mcq', q: 'Paying dividends is classified under which cash flow activity?', opts: ['Financing', 'Operating', 'Investing', 'Non-cash'], ans: 0, exp: "Dividends change the company's capital structure by returning cash to owners, so they're a financing activity." },
+    { id: 's7-13', topic: 'session7', type: 'mcq', q: 'Borrowing from a bank is classified under which cash flow activity?', opts: ['Financing', 'Operating', 'Investing', 'Non-cash'], ans: 0, exp: 'Taking on new debt is a financing activity — it changes how the company is capitalized.' },
+    { id: 's7-14', topic: 'session7', type: 'mcq', q: 'What defines a "non-cash investing and financing activity"?', opts: ['An investing or financing transaction that involves no cash at all', 'Any transaction under ₱10,000', 'A transaction that occurs outside the fiscal year', 'A transaction that only affects the income statement'], ans: 0, exp: 'These transactions change assets, liabilities, or equity without any cash being received or paid.' },
+    { id: 's7-15', topic: 'session7', type: 'mcq', q: 'A company issues common shares directly to purchase land, with no cash changing hands. How is this reported?', opts: ['Separately, as a non-cash investing & financing activity', 'Under Operating Activities', 'Under Investing Activities', 'Under Financing Activities'], ans: 0, exp: "Since no cash moved, it's excluded from the three main sections and disclosed separately as non-cash." },
+    { id: 's7-16', topic: 'session7', type: 'mcq', q: 'What is "the simple rule" this session uses to decide where a transaction belongs?', opts: ['Did cash move? If yes, classify as Operating/Investing/Financing; if no, it\'s non-cash', 'Is the transaction over ₱1,000,000?', 'Did the transaction involve a bank?', 'Was the transaction approved by the board?'], ans: 0, exp: 'Whether cash actually moved is the deciding factor between the three main sections and the non-cash category.' },
+    { id: 's7-17', topic: 'session7', type: 'mcq', q: 'Acquiring equipment by issuing a note payable (no cash paid) is an example of:', opts: ['A non-cash investing & financing activity', 'An operating activity', 'A standard investing activity', 'A standard financing activity'], ans: 0, exp: "No cash was exchanged, so it's reported separately as non-cash, even though it affects an asset and a liability." },
+    { id: 's7-18', topic: 'session7', type: 'mcq', q: 'A company shows +Operating, −Investing, and −Financing cash flow. What does this pattern most likely suggest?', opts: ['Strong operations, reinvesting in growth', "Operations aren't generating enough cash", 'Rapid expansion funded entirely by debt', 'The company is likely near bankruptcy'], ans: 0, exp: 'Positive operating cash funding both investing and financing outflows generally signals a healthy, self-funding company.' },
+    { id: 's7-19', topic: 'session7', type: 'mcq', q: 'A company shows −Operating and +Financing cash flow. What does this pattern most likely suggest?', opts: ['Operations are not generating enough cash on their own', 'The company is extremely profitable', 'The company has no debt', 'Cash is not being used at all'], ans: 0, exp: "Relying on financing to offset negative operating cash flow can signal the core business isn't self-sustaining yet." },
+    { id: 's7-20', topic: 'session7', type: 'mcq', q: 'Is negative investing cash flow always a bad sign?', opts: ['No — it can simply mean the company is investing in growth', 'Yes — it always signals financial trouble', 'Yes — investing activities should never use cash', 'No — investing cash flow is never meaningful'], ans: 0, exp: 'Buying equipment or expanding operations shows up as negative investing cash flow even when the company is healthy.' },
+    { id: 's7-21', topic: 'session7', type: 'mcq', q: 'What does horizontal analysis compare?', opts: ['The same account across different periods', 'Different accounts within the same period', "A company's stock price to its competitors", 'Net income to the industry average'], ans: 0, exp: 'Horizontal analysis tracks how a single account changes from one period to the next.' },
+    { id: 's7-22', topic: 'session7', type: 'mcq', q: 'What is the formula for horizontal analysis (% change)?', opts: ['(Current Year − Prior Year) ÷ Prior Year × 100%', '(Prior Year − Current Year) ÷ Current Year × 100%', 'Current Year ÷ Prior Year', '(Current Year + Prior Year) ÷ 2'], ans: 0, exp: '% Change = (Current − Prior) ÷ Prior × 100%.' },
+    { id: 's7-23', topic: 'session7', type: 'mcq', q: 'What does horizontal analysis fail to tell you on its own?', opts: ['Whether the underlying numbers are large or small', 'Whether an account increased or decreased', 'The direction of change', 'The account name'], ans: 0, exp: 'Horizontal analysis shows what changed, but not the scale, which is why it is paired with a common base for comparison.' },
+    { id: 's7-24', topic: 'session7', type: 'mcq', q: 'In the horizontal analysis example, Revenue grew 20% and COGS grew 30%, while Net Income changed by:', opts: ['−6%', '+20%', '+30%', '0%'], ans: 0, exp: 'Even though revenue grew, costs grew faster, so net income actually fell.' },
+    { id: 's7-25', topic: 'session7', type: 'mcq', q: 'What does the horizontal analysis example (Revenue +20%, COGS +30%, Net Income −6%) illustrate?', opts: ["Growth doesn't always mean better performance", 'Revenue and net income always move together', 'COGS has no effect on net income', 'A 20% revenue increase guarantees profitability'], ans: 0, exp: 'Costs outpacing revenue growth can shrink net income even while the top line grows.' },
+    { id: 's7-26', topic: 'session7', type: 'mcq', q: 'What does vertical analysis express each line item as?', opts: ['A percentage of a common base (e.g. Net Sales or Total Assets)', 'A percentage change from the prior year', 'A dollar amount adjusted for inflation', 'A ratio to the industry average'], ans: 0, exp: 'Vertical analysis expresses each account as a percentage of a common base within the same statement.' },
+    { id: 's7-27', topic: 'session7', type: 'mcq', q: 'What is the common base used for vertical analysis of the income statement?', opts: ['Net Sales', 'Total Assets', 'Total Equity', 'Net Income'], ans: 0, exp: 'Vertical Analysis (Income Statement) = Line Item ÷ Net Sales × 100%.' },
+    { id: 's7-28', topic: 'session7', type: 'mcq', q: 'What is the common base used for vertical analysis of the balance sheet?', opts: ['Total Assets', 'Net Sales', 'Net Income', 'Total Liabilities'], ans: 0, exp: 'Vertical Analysis (Balance Sheet) = Line Item ÷ Total Assets × 100%.' },
+    { id: 's7-29', topic: 'session7', type: 'mcq', q: 'In the common-size income statement example, Cost of Goods Sold is 60% of Net Sales. What does that mean?', opts: ['₱60 of every ₱100 in sales goes toward the cost of the product', 'The company loses money on every sale', 'Gross profit is 60%', 'Net income is 60%'], ans: 0, exp: 'A 60% COGS common-size figure means 60 cents of every sales peso is consumed by production cost.' },
+    { id: 's7-30', topic: 'session7', type: 'mcq', q: 'A common-size balance sheet shows PPE at 48% of Total Assets and Inventory at 20%, with Cash at only 7%. What kind of business does this most likely describe?', opts: ['A manufacturer', 'A pure cash-based retailer', 'A software/service company with no physical assets', 'A bank'], ans: 0, exp: 'High PPE and Inventory with low Cash points to a company that owns production equipment and holds physical goods.' },
+    { id: 's7-31', topic: 'session7', type: 'mcq', q: 'Two restaurants both earn ₱100M revenue. Blue Bayou has 35% COGS; Cafe Orleans has 60% COGS. Which has the higher gross margin?', opts: ['Blue Bayou', 'Cafe Orleans', 'They are equal', 'Cannot be determined'], ans: 0, exp: "Blue Bayou's lower COGS percentage (35% vs. 60%) means a higher gross margin (65% vs. 40%)." },
+    { id: 's7-32', topic: 'session7', type: 'mcq', q: 'What is the purpose of the DuPont Framework?', opts: ['To break Return on Equity into its underlying drivers', "To calculate a company's total tax liability", 'To classify cash flows into three categories', 'To adjust financial statements for inflation'], ans: 0, exp: "DuPont decomposes ROE into profitability, efficiency, and leverage so you can see what's driving the return." },
+    { id: 's7-33', topic: 'session7', type: 'mcq', q: 'What are the three components of the DuPont Framework?', opts: ['Net Profit Margin, Asset Turnover, Equity Multiplier', 'Current Ratio, Quick Ratio, Cash Ratio', 'Horizontal Analysis, Vertical Analysis, Ratio Analysis', 'Revenue, Expenses, Net Income'], ans: 0, exp: 'ROE = Net Profit Margin × Asset Turnover × Equity Multiplier.' },
+    { id: 's7-34', topic: 'session7', type: 'mcq', q: 'In the DuPont Framework, what does Net Profit Margin measure?', opts: ['How much profit is earned from each peso of sales', 'How efficiently assets generate sales', 'How much of assets are financed by equity vs. debt', 'How much cash the company holds'], ans: 0, exp: 'Net Profit Margin = Net Income ÷ Net Sales — the profitability driver of ROE.' },
+    { id: 's7-35', topic: 'session7', type: 'mcq', q: 'In the DuPont Framework, what does Asset Turnover measure?', opts: ['How efficiently assets are used to generate sales', 'How much profit is kept per sale', 'How much of assets are financed by debt', 'How quickly a loan is repaid'], ans: 0, exp: 'Asset Turnover = Net Sales ÷ Average Total Assets — the efficiency driver of ROE.' },
+    { id: 's7-36', topic: 'session7', type: 'mcq', q: 'In the DuPont Framework, what does the Equity Multiplier measure?', opts: ["How much of the company's assets are financed by equity versus debt", 'How much profit is earned per sale', 'How fast inventory is sold', 'How much cash is collected from customers'], ans: 0, exp: 'Equity Multiplier = Average Total Assets ÷ Average Total Equity — the leverage driver of ROE.' },
+    { id: 's7-37', topic: 'session7', type: 'mcq', q: 'Two companies both report ROE of 18%. Does the DuPont Framework consider them equally good investments?', opts: ['Not necessarily — the same ROE can come from very different combinations of margin, turnover, and leverage', 'Yes, always — identical ROE means identical performance', 'No — ROE alone can never be compared across companies', 'Yes, because ROE is the only metric that matters'], ans: 0, exp: 'DuPont exists precisely because identical ROE figures can be driven by very different underlying strengths or risks.' },
+    { id: 's7-38', topic: 'session7', type: 'mcq', q: 'A company has Net Income of ₱10,000,000 and Net Sales of ₱100,000,000. What is its Net Profit Margin?', opts: ['10%', '16%', '32%', '1.6%'], ans: 0, exp: '₱10,000,000 ÷ ₱100,000,000 = 10%.' },
+    { id: 's7-39', topic: 'session7', type: 'mcq', q: 'A company has Net Sales of ₱100,000,000 and Total Assets of ₱62,500,000. What is its Asset Turnover?', opts: ['1.6×', '0.625×', '10×', '2.0×'], ans: 0, exp: '₱100,000,000 ÷ ₱62,500,000 = 1.6×.' },
+    { id: 's7-40', topic: 'session7', type: 'mcq', q: 'A company has Total Assets of ₱62,500,000 and Equity of ₱31,250,000. What is its Equity Multiplier?', opts: ['2.0×', '1.6×', '0.5×', '31.25×'], ans: 0, exp: '₱62,500,000 ÷ ₱31,250,000 = 2.0×.' },
+    { id: 's7-41', topic: 'session7', type: 'mcq', q: 'Combining a 10% Net Profit Margin, 1.6× Asset Turnover, and 2.0× Equity Multiplier, what is the resulting ROE?', opts: ['32%', '13.6%', '3.2%', '20%'], ans: 0, exp: '10% × 1.6 × 2.0 = 32% ROE.' },
+    { id: 's7-42', topic: 'session7', type: 'mcq', q: 'Company MM has a 16% profit margin and 1.0× asset turnover; Company DD has an 8% profit margin and 2.0× asset turnover. Both have a 2.0× equity multiplier. What is true about their ROE?', opts: ['Both companies have the same 32% ROE, driven differently', 'Company MM has a higher ROE', 'Company DD has a higher ROE', 'Their ROE cannot be compared'], ans: 0, exp: '16% × 1.0 × 2.0 = 32%, and 8% × 2.0 × 2.0 = 32% — identical ROE from very different mixes.' },
+    { id: 's7-43', topic: 'session7', type: 'mcq', q: 'In the "Which CEO deserves the bonus" example, Aurora raised ROE by:', opts: ['Using assets more efficiently (higher turnover)', 'Improving profit margins', 'Borrowing more money', 'Cutting all expenses to zero'], ans: 0, exp: "Aurora's improvement came from the efficiency (asset turnover) driver, distinct from Ella's margin gain or Zel's added leverage." },
+    { id: 's7-44', topic: 'session7', type: 'mcq', q: 'In Exercise I-16.01 (Weaver Corporation), Net Income is ₱160,000 and Revenue is ₱1,685,000. What is the Net Profit Margin?', opts: ['9.50%', '58.16%', '41.84%', '100%'], ans: 0, exp: '₱160,000 ÷ ₱1,685,000 ≈ 9.50%.' },
+    { id: 's7-45', topic: 'session7', type: 'mcq', q: 'In Exercise I-16.01, Cost of Goods Sold is ₱980,000 on Revenue of ₱1,685,000. What is the vertical-analysis percentage for COGS?', opts: ['58.16%', '41.84%', '9.50%', '100%'], ans: 0, exp: '₱980,000 ÷ ₱1,685,000 ≈ 58.16% of revenue.' },
+    { id: 's7-46', topic: 'session7', type: 'mcq', q: "In Exercise I-16.01, Weaver Corporation's Cash increased by 35.14% while Inventory decreased by 18.18% year over year. This is an example of:", opts: ['Horizontal analysis', 'Vertical analysis', 'The DuPont Framework', 'A non-cash financing activity'], ans: 0, exp: 'Comparing the same accounts across two periods (% change) is horizontal analysis.' },
+    { id: 's7-47', topic: 'session7', type: 'mcq', q: 'In Exercise I-16.01, Total Liabilities are ₱1,000,000 and Total Assets are ₱2,375,000. What is Total Liabilities as a percentage of Total Assets?', opts: ['42.11%', '57.89%', '23.68%', '100%'], ans: 0, exp: '₱1,000,000 ÷ ₱2,375,000 ≈ 42.11%.' },
+    { id: 's7-48', topic: 'session7', type: 'mcq', q: 'In Exercise I-16.01, the final DuPont computation combines a 9.50% profit margin, 0.74× asset turnover, and 1.73× equity multiplier. What is the resulting ROE?', opts: ['≈12.16%', '9.50%', '0.74%', '1.73%'], ans: 0, exp: '9.50% × 0.74 × 1.73 ≈ 12.16% ROE.' },
+    { id: 's7-49', topic: 'session7', type: 'mcq', q: 'What is the correct order of the three financial statement analysis tools this session introduces?', opts: ['Horizontal Analysis, Vertical Analysis, DuPont Framework', 'DuPont Framework, Horizontal Analysis, Vertical Analysis', 'Vertical Analysis, DuPont Framework, Horizontal Analysis', 'They have no particular order'], ans: 0, exp: 'The session moves from "what changed" (horizontal) to "where does every peso go" (vertical) to "why did ROE move" (DuPont).' },
+    { id: 's7-50', topic: 'session7', type: 'mcq', q: 'What is the overarching lesson connecting the Statement of Cash Flows, Horizontal Analysis, Vertical Analysis, and DuPont in this session?', opts: ['Great financial decisions come from using all of these tools together, not any single one alone', 'Only the Statement of Cash Flows actually matters', 'DuPont replaces the need for a Statement of Cash Flows', 'Horizontal analysis alone is sufficient for investment decisions'], ans: 0, exp: 'The key takeaway: great decisions come from using all three financial statements — and the tools built on them — together.' },
+
+    { id: 'fs-1', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Working Capital?', opts: ['Current Assets − Current Liabilities', 'Current Assets ÷ Current Liabilities', 'Total Assets − Total Liabilities', 'Cash − Current Liabilities'], ans: 0, exp: 'Working Capital = Current Assets − Current Liabilities.' },
+    { id: 'fs-2', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Current Ratio?', opts: ['Current Assets ÷ Current Liabilities', 'Current Liabilities ÷ Current Assets', 'Quick Assets ÷ Current Liabilities', 'Cash ÷ Current Liabilities'], ans: 0, exp: 'Current Ratio = Current Assets ÷ Current Liabilities.' },
+    { id: 'fs-3', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Quick Ratio?', opts: ['Quick Assets ÷ Current Liabilities', 'Current Assets ÷ Current Liabilities', 'Cash ÷ Current Assets', 'Quick Assets ÷ Total Liabilities'], ans: 0, exp: 'Quick Ratio = Quick Assets ÷ Current Liabilities.' },
+    { id: 'fs-4', topic: 'formulaSheet', type: 'mcq', q: 'What makes up "Quick Assets" in the Quick Ratio formula?', opts: ['Cash + Cash Equivalents + Short-term Investments + Accounts Receivable', 'Cash + Inventory + Accounts Receivable', 'Total Current Assets minus Accounts Payable', 'Cash and Inventory only'], ans: 0, exp: 'Quick Assets excludes inventory and prepaid expenses — only the most liquid current assets count.' },
+    { id: 'fs-5', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Cash Ratio?', opts: ['(Cash + Cash Equivalents) ÷ Current Liabilities', 'Cash ÷ Total Liabilities', 'Cash ÷ Current Assets', '(Cash + Inventory) ÷ Current Liabilities'], ans: 0, exp: 'Cash Ratio = (Cash + Cash Equivalents) ÷ Current Liabilities — the strictest liquidity measure.' },
+    { id: 'fs-6', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Inventory Turnover?', opts: ['Cost of Goods Sold ÷ Average Inventory', 'Average Inventory ÷ Cost of Goods Sold', 'Net Sales ÷ Average Inventory', 'Cost of Goods Sold ÷ Ending Inventory'], ans: 0, exp: 'Inventory Turnover = COGS ÷ Average Inventory.' },
+    { id: 'fs-7', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Days Inventory Outstanding?', opts: ['(Average Inventory ÷ COGS) × 365', '(COGS ÷ Average Inventory) × 365', 'Average Inventory × 365', 'COGS ÷ 365'], ans: 0, exp: 'Days Inventory Outstanding = (Average Inventory ÷ COGS) × 365.' },
+    { id: 'fs-8', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Accounts Receivable Turnover?', opts: ['Net Credit Sales ÷ Average Accounts Receivable', 'Average Accounts Receivable ÷ Net Credit Sales', 'Net Sales ÷ Ending Accounts Receivable', 'Cash Collected ÷ Average Accounts Receivable'], ans: 0, exp: 'Accounts Receivable Turnover = Net Credit Sales ÷ Average Accounts Receivable.' },
+    { id: 'fs-9', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Days Sales Outstanding?', opts: ['(Average Accounts Receivable ÷ Net Credit Sales) × 365', '(Net Credit Sales ÷ Average Accounts Receivable) × 365', 'Average Accounts Receivable × 365', 'Net Credit Sales ÷ 365'], ans: 0, exp: 'Days Sales Outstanding = (Average Accounts Receivable ÷ Net Credit Sales) × 365.' },
+    { id: 'fs-10', topic: 'formulaSheet', type: 'mcq', q: 'If Net Credit Sales is unavailable for a turnover ratio, what should be used instead?', opts: ['Total Sales', 'Gross Profit', 'Net Income', 'Cost of Goods Sold'], ans: 0, exp: 'The formula sheet specifies using Total Sales as a substitute when Net Credit Sales is unavailable.' },
+    { id: 'fs-11', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Days Payables Outstanding?', opts: ['(Average Accounts Payable ÷ COGS) × 365', '(COGS ÷ Average Accounts Payable) × 365', 'Average Accounts Payable × 365', 'COGS ÷ 365'], ans: 0, exp: 'Days Payables Outstanding = (Average Accounts Payable ÷ COGS) × 365.' },
+    { id: 'fs-12', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Cash Conversion Cycle?', opts: ['Days Inventory Outstanding + Days Sales Outstanding − Days Payables Outstanding', 'Days Inventory Outstanding − Days Sales Outstanding + Days Payables Outstanding', 'Days Sales Outstanding − Days Inventory Outstanding − Days Payables Outstanding', 'Days Payables Outstanding − Days Inventory Outstanding − Days Sales Outstanding'], ans: 0, exp: 'Cash Conversion Cycle = DIO + DSO − DPO.' },
+    { id: 'fs-13', topic: 'formulaSheet', type: 'mcq', q: 'How is an "average balance" (e.g. average inventory or average accounts receivable) calculated?', opts: ['(Beginning Balance + Ending Balance) ÷ 2', 'Ending Balance only', 'Beginning Balance only', '(Beginning Balance − Ending Balance) ÷ 2'], ans: 0, exp: 'Average = (Beginning + Ending) ÷ 2, per the formula sheet.' },
+    { id: 'fs-14', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Straight-Line Depreciation?', opts: ['(Cost − Salvage Value) ÷ Useful Life', 'Cost ÷ Useful Life', '(Cost + Salvage Value) ÷ Useful Life', 'Cost − Accumulated Depreciation'], ans: 0, exp: 'Straight-Line Depreciation = (Cost − Salvage Value) ÷ Useful Life.' },
+    { id: 'fs-15', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Book Value (Carrying Amount)?', opts: ['Cost − Accumulated Depreciation', 'Cost + Accumulated Depreciation', 'Cost ÷ Useful Life', 'Salvage Value − Accumulated Depreciation'], ans: 0, exp: 'Book Value = Cost − Accumulated Depreciation.' },
+    { id: 'fs-16', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Gross Margin?', opts: ['Gross Profit ÷ Net Sales', 'Net Sales ÷ Gross Profit', 'Gross Profit ÷ COGS', 'Net Income ÷ Net Sales'], ans: 0, exp: 'Gross Margin = Gross Profit ÷ Net Sales.' },
+    { id: 'fs-17', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Operating Margin?', opts: ['Operating Income ÷ Net Sales', 'Operating Income ÷ Operating Expenses', 'Gross Profit ÷ Net Sales', 'Net Income ÷ Net Sales'], ans: 0, exp: 'Operating Margin = Operating Income ÷ Net Sales.' },
+    { id: 'fs-18', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Net Profit Margin?', opts: ['(Net Income ÷ Net Sales) × 100%', '(Net Sales ÷ Net Income) × 100%', 'Net Income ÷ Total Assets', 'Gross Profit ÷ Net Sales'], ans: 0, exp: 'Net Profit Margin = (Net Income ÷ Net Sales) × 100%.' },
+    { id: 'fs-19', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Return on Assets?', opts: ['Net Income ÷ Average Total Assets', 'Net Income ÷ Average Total Equity', 'Net Sales ÷ Average Total Assets', 'Operating Income ÷ Average Total Assets'], ans: 0, exp: 'Return on Assets = Net Income ÷ Average Total Assets.' },
+    { id: 'fs-20', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Return on Equity (basic form)?', opts: ['Net Income ÷ Average Total Equity', 'Net Income ÷ Average Total Assets', 'Net Sales ÷ Average Total Equity', 'Net Income ÷ Total Liabilities'], ans: 0, exp: 'Return on Equity = Net Income ÷ Average Total Equity.' },
+    { id: 'fs-21', topic: 'formulaSheet', type: 'mcq', q: 'Which ratio is calculated as Total Liabilities ÷ Total Assets?', opts: ['Debt-to-Assets Ratio', 'Debt-to-Equity Ratio', 'Current Ratio', 'Interest Coverage Ratio'], ans: 0, exp: 'Debt-to-Assets Ratio = Total Liabilities ÷ Total Assets.' },
+    { id: 'fs-22', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Debt-to-Equity Ratio?', opts: ['Total Liabilities ÷ Total Equity', 'Total Equity ÷ Total Liabilities', 'Total Liabilities ÷ Total Assets', 'Total Assets ÷ Total Equity'], ans: 0, exp: 'Debt-to-Equity Ratio = Total Liabilities ÷ Total Equity.' },
+    { id: 'fs-23', topic: 'formulaSheet', type: 'mcq', q: 'What is excluded from "Total Liabilities" when computing solvency ratios?', opts: ['Contingent liabilities not yet recognized on the balance sheet', 'Accounts Payable', 'Long-term debt', 'Bonds Payable'], ans: 0, exp: 'The formula sheet notes that unrecognized contingent liabilities (e.g. a lawsuit only disclosed in the notes) are excluded.' },
+    { id: 'fs-24', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Net Financing Cash Flow?', opts: ['Loan Proceeds + Owner/Stock Issuance − Loan Repayments − Dividends Paid − Treasury Share Purchases', 'Cash Collected − Salaries Paid − Rent Paid', 'Proceeds from Asset Sales − Purchases of Equipment', 'Operating CF + Investing CF'], ans: 0, exp: 'Net Financing Cash Flow sums financing inflows minus financing outflows.' },
+    { id: 'fs-25', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Net Change in Cash?', opts: ['Operating CF + Investing CF + Financing CF', 'Operating CF − Investing CF − Financing CF', 'Net Income + Depreciation', 'Total Assets − Total Liabilities'], ans: 0, exp: 'Net Change in Cash = Operating CF + Investing CF + Financing CF.' },
+    { id: 'fs-26', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for Horizontal Analysis (% Change)?', opts: ['(Current Year − Prior Year) ÷ Prior Year × 100%', '(Prior Year − Current Year) ÷ Current Year × 100%', 'Current Year ÷ Prior Year', 'Current Year − Prior Year'], ans: 0, exp: 'Horizontal Analysis (% Change) = (Current Year − Prior Year) ÷ Prior Year × 100%.' },
+    { id: 'fs-27', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the DuPont ROE decomposition?', opts: ['Net Profit Margin × Asset Turnover × Equity Multiplier', 'Net Profit Margin ÷ Asset Turnover ÷ Equity Multiplier', 'Net Profit Margin + Asset Turnover + Equity Multiplier', 'Asset Turnover × Equity Multiplier only'], ans: 0, exp: 'ROE = Net Profit Margin × Asset Turnover × Equity Multiplier.' },
+    { id: 'fs-28', topic: 'formulaSheet', type: 'mcq', q: 'What is the formula for the Equity Multiplier?', opts: ['Total Assets ÷ Average Total Equity', 'Average Total Equity ÷ Total Assets', 'Total Assets ÷ Total Liabilities', 'Net Sales ÷ Total Equity'], ans: 0, exp: 'Equity Multiplier = Total Assets ÷ Average Total Equity — the leverage component of DuPont.' }
   ];
 
   /* Session notes vocabulary — reusable content-block classes so
@@ -552,80 +683,436 @@
      (with an "important points" sub-section, and a "key equations"
      sub-section only when applicable) -> outline of the topic. */
   var SESSION_NOTES = {
-    sessionA: '' +
-      '<div class="note-h2">Encoding &amp; Retrieval</div>' +
+    session5: '' +
+      '<div class="note-h2">Debt, Financing &amp; Capital Structure</div>' +
+      '<div class="note-aside">Source deck\'s own title slide labels this "ACT 501: Session 6" — filed here as Session 5 to match the course\'s file numbering. Running example throughout: a ₱20,000,000 pickleball facility that needs ₱18,000,000 in outside financing after the owner puts in ₱2,000,000 cash.</div>' +
 
       '<div class="note-h3">Key summary points</div>' +
       '<ul class="note-list">' +
-        '<li><strong>Encoding</strong> converts perceived information into a form the brain can store. Deeper, elaborative encoding (relating new material to what you already know) produces stronger memories than shallow encoding (e.g. rereading).</li>' +
-        '<li><strong>Retrieval practice</strong> — actively recalling information (flashcards, self-quizzing) — strengthens memory far more than passively reviewing it. This is the "testing effect."</li>' +
-        '<li><strong>Retrieval cues</strong> (words, images, context) help trigger recall; richer encoding creates more of them.</li>' +
-      '</ul>' +
-
-      '<div class="note-h3">Important points to remember</div>' +
-      '<ul class="note-list">' +
-        '<li>Recognizing an answer (multiple choice) is easier than freely recalling it — build in free-recall practice, not just recognition.</li>' +
-        '<li>Getting an answer wrong during practice, then seeing the correction, still strengthens memory ("productive failure").</li>' +
-      '</ul>' +
-
-      '<div class="note-h3">Key equations</div>' +
-      '<div class="note-formula">stronger memory ≈ f(retrieval effort)</div>' +
-
-      '<div class="note-h3">Outline of the topic</div>' +
-      '<ul class="note-list">' +
-        '<li>1. Encoding: shallow vs. elaborative</li>' +
-        '<li>2. Retrieval practice and the testing effect</li>' +
-        '<li>3. Retrieval cues and recognition vs. recall</li>' +
-      '</ul>' +
-
-      '<div class="note-takeaways">' +
-        '<div class="note-h3">Key takeaways</div>' +
-        '<ul class="note-list">' +
-          '<li>Encode deeply: explain, connect, and paraphrase rather than reread.</li>' +
-          '<li>Test yourself early and often — retrieval strengthens memory more than review.</li>' +
-        '</ul>' +
-      '</div>',
-
-    sessionB: '' +
-      '<div class="note-h2">Spacing &amp; Retrieval Practice</div>' +
-
-      '<div class="note-h3">Key summary points</div>' +
-      '<ul class="note-list">' +
-        '<li><strong>Spacing effect:</strong> information is retained better when study sessions are distributed over time rather than massed into one sitting.</li>' +
-        '<li><strong>Spaced repetition systems</strong> lengthen the interval before the next review each time a card is recalled correctly, concentrating time on the hardest material.</li>' +
-        '<li><strong>Interleaving</strong> mixes related topics within a session instead of blocking them, which improves the ability to discriminate between concepts.</li>' +
+        '<li>Every asset a business owns is financed by either debt or equity — the <strong>accounting equation</strong>: Assets = Liabilities + Equity. Every peso of assets must be financed by either debt or equity; there is no third source.</li>' +
+        '<li>A <strong>liability</strong> is a present obligation to another party — a bank, a supplier, employees, the government, or customers.</li>' +
+        '<li><strong>Current liabilities</strong> (due within 1 year), with the everyday trigger for each: Accounts Payable (supplier delivers today, you pay in 30 days), Salaries Payable (employees worked, paid next Friday), Unearned Revenue (member prepays an annual membership but still owes court access), and the Current Portion of Long-Term Debt (next year\'s loan payment on an otherwise long-term loan).</li>' +
+        '<li><strong>Noncurrent liabilities</strong> (due beyond 1 year): Notes Payable (e.g. a bank loan to build courts), Bonds Payable (borrowing from many investors at once), Pension Obligations (future retirement benefits for employees), and Other Post-Retirement Benefits (retiree healthcare and life insurance). Not all long-term liabilities are loans — some arise from promises made to employees or long-term contracts.</li>' +
+        '<li><strong>Current Portion of Long-Term Debt</strong> reclassifies part of a long-term loan as current the moment its next principal payment falls within 12 months — the same loan can sit entirely in Noncurrent Liabilities one year and split between Current and Noncurrent the next, purely based on the payment schedule.</li>' +
+        '<li><strong>Debt vs. equity trade-off:</strong> debt is borrowed money that must be repaid with interest but leaves ownership unchanged; equity is owner investment that pays dividends (not interest), requires no repayment, but dilutes ownership. Framed as a real choice: a wealthy investor offers ₱20,000,000 for 40% ownership, or the bank offers the same ₱20,000,000 at 8% interest — which do you choose?</li>' +
+        '<li>There is no universally "correct" debt/equity mix — the deck contrasts three fictional companies: one funded almost entirely with equity, one almost entirely with debt, and one using a blend of both, with no single answer for which is "best."</li>' +
+        '<li><strong>Hidden business obligations:</strong> a business can owe money even before an invoice arrives — customer lawsuits, warranty claims, environmental cleanup, and loan guarantees can all create obligations before they are formally billed.</li>' +
+        '<li><strong>Contingent liabilities</strong> are potential obligations that depend on a future event: warranties, a pending lawsuit, a product recall, or a loan guarantee are the deck\'s four running examples.</li>' +
+        '<li>Whether a contingent liability appears on the balance sheet depends on two factors together: how <em>probable</em> the outcome is, and whether the amount can be <em>reasonably estimated</em>.</li>' +
+        '<li>Recognizing a liability is an accounting judgment; separately, management has to evaluate whether the company can actually handle its obligations — both the ones recognized on the balance sheet and the risks only disclosed in the notes.</li>' +
+        '<li><strong>Liquidity</strong> ("can we pay next month\'s bills?") looks at current obligations; <strong>solvency</strong> ("can we survive the next decade?") looks at the total debt burden — today\'s session is about solvency.</li>' +
       '</ul>' +
 
       '<table class="note-table">' +
-        '<tr><th>Approach</th><th>Short-term feel</th><th>Long-term retention</th></tr>' +
-        '<tr><td>Massed (cramming)</td><td>Feels productive, fast</td><td>Decays quickly</td></tr>' +
-        '<tr><td>Spaced (distributed)</td><td>Feels slower, harder</td><td>Durable</td></tr>' +
+        '<tr><th>Current liabilities</th><th>Noncurrent liabilities</th></tr>' +
+        '<tr><td>Accounts Payable</td><td>Notes Payable</td></tr>' +
+        '<tr><td>Salaries Payable</td><td>Bonds Payable</td></tr>' +
+        '<tr><td>Unearned Revenue</td><td>Pension Obligations</td></tr>' +
+        '<tr><td>Current Portion of Long-Term Debt</td><td>Other Post-Retirement Benefits</td></tr>' +
+      '</table>' +
+
+      '<table class="note-table">' +
+        '<tr><th></th><th>Debt</th><th>Equity</th></tr>' +
+        '<tr><td>Source</td><td>Borrowed money</td><td>Owner investment</td></tr>' +
+        '<tr><td>Cost</td><td>Interest</td><td>Dividends</td></tr>' +
+        '<tr><td>Repayment</td><td>Must repay</td><td>No repayment</td></tr>' +
+        '<tr><td>Ownership</td><td>Stays the same</td><td>Diluted</td></tr>' +
       '</table>' +
 
       '<div class="note-h3">Important points to remember</div>' +
       '<ul class="note-list">' +
-        '<li>"Desirable difficulties" (spacing, interleaving, retrieval practice) feel harder in the moment — that discomfort is a sign they are working, not a sign to switch back.</li>' +
+        '<li>A contingent liability is <em>recognized</em> as a liability on the balance sheet only if the outcome is probable <em>and</em> the amount is reasonably estimable; if it is only reasonably possible, it is <em>disclosed in the notes</em> instead — it does not simply disappear from the financial statements.</li>' +
+        '<li>A high debt ratio isn\'t automatically a red flag — it depends heavily on the industry. Capital-intensive, stable-cash-flow industries (utilities, airlines, telecommunications) routinely carry more debt than most other sectors.</li>' +
+        '<li>Interest Coverage measures comfort, not just ability — "5.0×" means the company earns five times what it needs to cover its interest expense, which is a margin-of-safety framing, not a pass/fail test.</li>' +
+        '<li>A single ratio in isolation can mislead — the "Comparing Two Companies" exercise below shows why you read Debt-to-Assets, Debt-to-Equity, and Interest Coverage together, plus industry context, before judging which company is "financially healthier."</li>' +
       '</ul>' +
 
       '<div class="note-h3">Key equations</div>' +
-      '<div class="note-formula">next_interval = last_interval × ease_factor</div>' +
+      '<div class="note-formula">Debt-to-Assets Ratio = Total Debt ÷ Total Assets</div><br>' +
+      '<div class="note-formula">Debt-to-Equity Ratio = Total Debt ÷ Total Equity</div><br>' +
+      '<div class="note-formula">Interest Coverage (Times Interest Earned) = Operating Income (EBIT) ÷ Interest Expense</div>' +
+
+      '<div class="note-h3">Worked examples &amp; exercises</div>' +
+
+      '<p><strong>Comparing Two Companies</strong> — a single ratio can mislead; industry context matters.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Ratio</th><th>Company V</th><th>Company JK</th></tr>' +
+        '<tr><td>Debt-to-Assets</td><td>40%</td><td>85%</td></tr>' +
+        '<tr><td>Debt-to-Equity</td><td>0.7×</td><td>5.7×</td></tr>' +
+        '<tr><td>Interest Coverage</td><td>10×</td><td>1.2×</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">Company JK\'s 85% debt load only looks reasonable if it sits in an industry like utilities, airlines, or telecommunications — otherwise its 1.2× interest coverage (barely above break-even) is a warning sign.</div>' +
+
+      '<p><strong>Exercise B-13.13</strong> — Jacob Joseph is ranking five potential investments (A–E) from least to most risky. Each company faces a 30% tax rate and an assumed 8% average interest cost on total debt.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Company</th><th>Debt-to-Assets</th><th>Rank</th><th>Debt-to-Equity</th><th>Rank</th></tr>' +
+        '<tr><td>A</td><td>₱1,000,000 ÷ ₱10,000,000 = 10.00%</td><td>1</td><td>₱1,000,000 ÷ ₱9,000,000 = 0.11</td><td>1</td></tr>' +
+        '<tr><td>B</td><td>₱3,000,000 ÷ ₱20,000,000 = 15.00%</td><td>2</td><td>₱3,000,000 ÷ ₱17,000,000 = 0.18</td><td>2</td></tr>' +
+        '<tr><td>C</td><td>₱4,000,000 ÷ ₱6,000,000 = 66.67%</td><td>4</td><td>₱4,000,000 ÷ ₱2,000,000 = 2.00</td><td>4</td></tr>' +
+        '<tr><td>D</td><td>₱6,000,000 ÷ ₱15,000,000 = 40.00%</td><td>3</td><td>₱6,000,000 ÷ ₱9,000,000 = 0.67</td><td>3</td></tr>' +
+        '<tr><td>E</td><td>₱22,000,000 ÷ ₱30,000,000 = 73.33%</td><td>5</td><td>₱22,000,000 ÷ ₱8,000,000 = 2.75</td><td>5</td></tr>' +
+      '</table>' +
+      '<table class="note-table">' +
+        '<tr><th>Company</th><th>Interest Expense</th><th>Income Before Tax</th><th>EBIT</th><th>TIE</th><th>Rank</th></tr>' +
+        '<tr><td>A</td><td>₱80,000</td><td>₱285,714</td><td>₱365,714</td><td>4.57×</td><td>3</td></tr>' +
+        '<tr><td>B</td><td>₱240,000</td><td>₱1,428,571</td><td>₱1,668,571</td><td>6.95×</td><td>1</td></tr>' +
+        '<tr><td>C</td><td>₱320,000</td><td>₱357,143</td><td>₱677,143</td><td>2.12×</td><td>5</td></tr>' +
+        '<tr><td>D</td><td>₱480,000</td><td>₱2,285,714</td><td>₱2,765,714</td><td>5.76×</td><td>2</td></tr>' +
+        '<tr><td>E</td><td>₱1,760,000</td><td>₱5,714,286</td><td>₱7,474,286</td><td>4.25×</td><td>4</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">A company can rank differently across ratios (e.g. Company D is 3rd by Debt-to-Assets but 2nd safest by Times Interest Earned) — which is exactly why lenders check more than one ratio.</div>' +
+
+      '<p><strong>Exercise B-16.02</strong> — Billy Covington, a loan analyst for DotBanc, screens applicants against three thresholds: Debt-to-Assets &lt; 0.5, Debt-to-Equity &lt; 1.0, and Times Interest Earned ≥ 5. Assumptions: Total Equity = paid-in capital + retained earnings; Total Assets = Total Equity + Total Liabilities; interest cost = 7% of total liabilities.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Applicant</th><th>Debt-to-Assets</th><th>Debt-to-Equity</th><th>TIE</th><th>Qualifies?</th></tr>' +
+        '<tr><td>Berkley</td><td>0.56</td><td>1.25</td><td>4.57×</td><td>No</td></tr>' +
+        '<tr><td>Costnor</td><td>0.63</td><td>1.67</td><td>3.86×</td><td>No</td></tr>' +
+        '<tr><td>Dalia</td><td>0.35</td><td>0.54</td><td>3.90×</td><td>No</td></tr>' +
+        '<tr><td>Fergusen</td><td>0.11</td><td>0.12</td><td>26.43×</td><td>Yes</td></tr>' +
+        '<tr><td>Hernandez</td><td>0.69</td><td>2.22</td><td>5.82×</td><td>Yes</td></tr>' +
+        '<tr><td>Indio</td><td>0.15</td><td>0.17</td><td>3.68×</td><td>No</td></tr>' +
+        '<tr><td>Jordanson</td><td>0.49</td><td>0.96</td><td>0.81×</td><td>No</td></tr>' +
+        '<tr><td>Kervin</td><td>0.48</td><td>0.91</td><td>1.05×</td><td>No</td></tr>' +
+        '<tr><td>Lensmire</td><td>0.38</td><td>0.60</td><td>8.38×</td><td>Yes</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">Hernandez and Jordanson both pass Debt-to-Assets and Debt-to-Equity individually, but only Hernandez clears all three thresholds — a single failing ratio (Jordanson\'s 0.81× TIE) is enough to disqualify an otherwise reasonable-looking applicant.</div>' +
+
+      '<p><strong>Case: Lob Pickleball Club — "You\'re the Bank"</strong> — the club applies for a new ₱10,000,000 loan.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Balance sheet</th><th></th><th>Income statement</th><th></th></tr>' +
+        '<tr><td>Cash</td><td>₱2,000,000</td><td>Revenue</td><td>₱22,000,000</td></tr>' +
+        '<tr><td>Accounts Receivable</td><td>₱1,500,000</td><td>Cost of Sales &amp; Op. Expenses</td><td>(₱16,500,000)</td></tr>' +
+        '<tr><td>Equipment</td><td>₱8,500,000</td><td>Operating Income (EBIT)</td><td>₱5,500,000</td></tr>' +
+        '<tr><td>Building</td><td>₱18,000,000</td><td>Interest Expense</td><td>(₱1,100,000)</td></tr>' +
+        '<tr><td>Total Assets</td><td>₱30,000,000</td><td>Income Before Tax</td><td>₱4,400,000</td></tr>' +
+        '<tr><td>Accounts Payable</td><td>₱1,200,000</td><td></td><td></td></tr>' +
+        '<tr><td>Unearned Revenue</td><td>₱800,000</td><td></td><td></td></tr>' +
+        '<tr><td>Current Portion of LT Debt</td><td>₱1,000,000</td><td></td><td></td></tr>' +
+        '<tr><td>Long-Term Mortgage</td><td>₱9,000,000</td><td></td><td></td></tr>' +
+        '<tr><td>Total Liabilities</td><td>₱12,000,000</td><td></td><td></td></tr>' +
+        '<tr><td>Shareholders\' Equity</td><td>₱18,000,000</td><td></td><td></td></tr>' +
+      '</table>' +
+      '<div class="note-formula">Debt-to-Assets = 12,000,000 ÷ 30,000,000 = 40%</div><br>' +
+      '<div class="note-formula">Debt-to-Equity = 12,000,000 ÷ 18,000,000 = 0.67×</div><br>' +
+      '<div class="note-formula">Interest Coverage = 5,500,000 ÷ 1,100,000 = 5.0×</div>' +
+      '<div class="note-aside">Additional information the loan officer has to weigh: a customer filed a ₱3,000,000 lawsuit after slipping on a court (outcome uncertain, no liability recorded — a contingent liability); ₱800,000 of annual memberships are collected in advance as Unearned Revenue; and management plans to build two more indoor courts. As the loan officer: would you approve the ₱10,000,000 loan? Should the pending lawsuit change your answer? If you reject it, would you recommend issuing new shares, bringing in a partner, or delaying expansion instead?</div>' +
 
       '<div class="note-h3">Outline of the topic</div>' +
       '<ul class="note-list">' +
-        '<li>1. The spacing effect: massed vs. distributed practice</li>' +
-        '<li>2. How spaced repetition systems schedule reviews</li>' +
-        '<li>3. Interleaving and other desirable difficulties</li>' +
+        '<li>1. Financing a business: debt vs. equity, and the accounting equation</li>' +
+        '<li>2. Current liabilities: Accounts Payable, Salaries Payable, Unearned Revenue, Current Portion of Long-Term Debt</li>' +
+        '<li>3. Noncurrent liabilities: Notes Payable, Bonds Payable, Pension Obligations, OPEB</li>' +
+        '<li>4. Debt vs. equity trade-offs, and why there is no universally "correct" mix</li>' +
+        '<li>5. Contingent liabilities: recognize, disclose, or ignore</li>' +
+        '<li>6. Solvency ratios: Debt-to-Assets, Debt-to-Equity, Interest Coverage — and the liquidity-vs-solvency distinction</li>' +
+        '<li>7. Applied: Exercise B-13.13 (ranking five companies by risk)</li>' +
+        '<li>8. Applied: Exercise B-16.02 (DotBanc loan screening)</li>' +
+        '<li>9. Applied case: Lob Pickleball Club — "You\'re the Bank" loan decision</li>' +
       '</ul>' +
-
-      '<div class="note-aside">These techniques feel harder and slower than cramming or rereading — that is expected, not a sign something is wrong.</div>' +
 
       '<div class="note-takeaways">' +
         '<div class="note-h3">Key takeaways</div>' +
         '<ul class="note-list">' +
-          '<li>Spread review sessions across days rather than massing them the night before.</li>' +
-          '<li>Mix topics (interleave) instead of finishing one before starting the next.</li>' +
+          '<li>A business needs money to grow; financing comes from debt or equity, and debt creates liabilities.</li>' +
+          '<li>Liabilities can be current or long-term, and some obligations (contingent) may not be immediately obvious.</li>' +
+          '<li>Borrowing increases financial risk — managers use solvency ratios to assess whether debt is sustainable.</li>' +
+          '<li>Financial decisions require both calculation and business judgment.</li>' +
         '</ul>' +
-      '</div>'
+      '</div>',
+
+    session7: '' +
+      '<div class="note-h2">Cash Flows &amp; Financial Statement Analysis</div>' +
+      '<div class="note-aside">Opening scenario used throughout: CS Company earns ₱500,000,000 in revenue and ₱40,000,000 in net income. Should you invest? The session builds up the tools needed to actually answer that.</div>' +
+
+      '<div class="note-h3">Key summary points</div>' +
+      '<ul class="note-list">' +
+        '<li><strong>Looking at the whole picture:</strong> the Income Statement, Balance Sheet, and Cash Flow Statement feed into Financial Analysis, which feeds into Business Analysis — each layer needs the one below it.</li>' +
+        '<li><strong>One business, four questions:</strong> Did we make money? → Income Statement. Did equity change? → Statement of Retained Earnings. What do we own and owe? → Balance Sheet. Where did cash go? → Cash Flow Statement.</li>' +
+        '<li><strong>Profit and cash are not the same:</strong> a sale increases revenue under accrual accounting the moment it happens, even if the customer will only pay next month — revenue (and profit) can rise while cash does not move at all.</li>' +
+        '<li>The <strong>Statement of Cash Flows</strong> tracks where cash came from and where it went during the period. Purpose: evaluate liquidity, assess the ability to generate cash, and understand how operations, investing, and financing affect cash. As the deck puts it: "Profit keeps the business attractive. Cash keeps the business alive."</li>' +
+        '<li>The three activities: <strong>Operating</strong> (cash tied to income-producing activities — customer payments, salaries, rent), <strong>Investing</strong> (cash used to buy or sell long-term assets — equipment, vehicles, buildings), <strong>Financing</strong> (cash that changes the company\'s capital structure — loans, owner investment, dividends).</li>' +
+        '<li><strong>Non-cash investing &amp; financing activities</strong> involve no cash at all and are reported separately, outside the three main sections — common examples: issuing shares to purchase land, acquiring equipment by issuing a note payable, converting bonds into common shares, and exchanging equipment for equipment.</li>' +
+        '<li><strong>The simple rule:</strong> did cash move? Yes → classify as Operating, Investing, or Financing. No → it belongs under Non-cash Investing &amp; Financing instead.</li>' +
+        '<li><strong>Reading cash flow patterns:</strong> +Operating/−Investing/−Financing suggests strong operations reinvested for growth; −Operating/+Financing suggests operations aren\'t generating enough cash on their own; +Operating/+Investing/+Financing suggests rapid, debt/equity-funded expansion; −Operating/−Investing/+Financing is a potential warning sign. Negative investing cash flow on its own is not automatically bad — it can simply mean the company is investing in growth.</li>' +
+        '<li>Financial Statement Analysis has three tools, in order: <strong>Horizontal Analysis</strong> (what changed?), <strong>Vertical Analysis</strong> (where does every peso go?), and the <strong>DuPont Framework</strong> (why did ROE move?).</li>' +
+        '<li><strong>Horizontal analysis</strong> compares the same account across two periods to spot growth or decline — % Change = (Current − Prior) ÷ Prior. It tells you <em>what changed</em>, but not whether the underlying numbers are large or small, which is why it\'s paired with a common base for comparison.</li>' +
+        '<li><strong>Vertical analysis</strong> expresses every line item as a percentage of a common base — Net Sales for the income statement, Total Assets for the balance sheet — producing a "common-size" statement that lets you compare companies of very different sizes on equal footing.</li>' +
+        '<li>The <strong>DuPont Framework</strong> breaks Return on Equity into three drivers so you can identify the source of a company\'s ROE instead of just its size: Profitability (Net Profit Margin), Efficiency (Asset Turnover), and Leverage (Equity Multiplier).</li>' +
+      '</ul>' +
+
+      '<table class="note-table">' +
+        '<tr><th>Cash flow pattern</th><th>Possible interpretation</th></tr>' +
+        '<tr><td>+ Operating, − Investing, − Financing</td><td>Strong operations and investing for growth</td></tr>' +
+        '<tr><td>− Operating, + Financing</td><td>Operations not generating enough cash</td></tr>' +
+        '<tr><td>+ Operating, + Investing, + Financing</td><td>Rapid expansion funded by debt/equity</td></tr>' +
+        '<tr><td>− Operating, − Investing, + Financing</td><td>Potential cash flow problems</td></tr>' +
+      '</table>' +
+
+      '<div class="note-h3">Important points to remember</div>' +
+      '<ul class="note-list">' +
+        '<li>Growth doesn\'t always mean better performance — in the Horizontal Analysis example below, Revenue grew 20% but COGS grew 30% and Net Income actually <em>fell</em> 6%.</li>' +
+        '<li>Vertical analysis on the balance sheet can reveal what kind of business you\'re looking at purely from its cost/asset structure — e.g. a high PPE + Inventory mix with low Cash reads as a manufacturer, not a service business.</li>' +
+        '<li>Two companies can post the identical ROE for completely different reasons — one through pricing/margin discipline, another through turning over assets faster, another through leverage. DuPont exists to tell those stories apart, which matters when judging which CEO actually "deserves the bonus."</li>' +
+        '<li>Higher gross margin doesn\'t automatically mean more profitable in absolute terms — it depends on volume and the rest of the cost structure too (see the Blue Bayou vs. Cafe Orleans activity below).</li>' +
+      '</ul>' +
+
+      '<div class="note-h3">Key equations</div>' +
+      '<div class="note-formula">Horizontal Analysis (% Change) = (Current Year − Prior Year) ÷ Prior Year × 100%</div><br>' +
+      '<div class="note-formula">Vertical Analysis (Income Statement) = Line Item ÷ Net Sales × 100%</div><br>' +
+      '<div class="note-formula">Vertical Analysis (Balance Sheet) = Line Item ÷ Total Assets × 100%</div><br>' +
+      '<div class="note-formula">ROE = Net Profit Margin × Asset Turnover × Equity Multiplier</div><br>' +
+      '<div class="note-formula">Net Profit Margin = Net Income ÷ Net Sales</div><br>' +
+      '<div class="note-formula">Asset Turnover = Net Sales ÷ Average Total Assets</div><br>' +
+      '<div class="note-formula">Equity Multiplier = Average Total Assets ÷ Average Total Equity</div>' +
+
+      '<div class="note-h3">Worked examples &amp; exercises</div>' +
+
+      '<p><strong>Quick Check — classifying cash flows</strong></p>' +
+      '<table class="note-table">' +
+        '<tr><th>Transaction</th><th>Classification</th></tr>' +
+        '<tr><td>Collected cash from customers</td><td>Operating</td></tr>' +
+        '<tr><td>Purchased machinery</td><td>Investing</td></tr>' +
+        '<tr><td>Paid dividends</td><td>Financing</td></tr>' +
+        '<tr><td>Borrowed from a bank</td><td>Financing</td></tr>' +
+        '<tr><td>Paid employee salaries</td><td>Operating</td></tr>' +
+      '</table>' +
+
+      '<p><strong>Exercise B-16.06</strong> — classify each activity as Operating, Investing, Financing, or Non-cash I/F.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Activity</th><th>Classification</th></tr>' +
+        '<tr><td>(a) Issue common stock for land</td><td>Non-cash investing/financing activity</td></tr>' +
+        '<tr><td>(b) Issue common stock for cash</td><td>Financing activity</td></tr>' +
+        '<tr><td>(c) Pay interest on loan</td><td>Operating activity</td></tr>' +
+        '<tr><td>(d) Sell goods for cash</td><td>Operating activity</td></tr>' +
+        '<tr><td>(e) Pay employee salaries</td><td>Operating activity</td></tr>' +
+        '<tr><td>(f) Pay dividends to common shareholders</td><td>Financing activity</td></tr>' +
+        '<tr><td>(g) Receive dividend on an investment</td><td>Operating activity</td></tr>' +
+        '<tr><td>(h) Obtain proceeds of long-term loan</td><td>Financing activity</td></tr>' +
+        '<tr><td>(i) Acquire treasury shares</td><td>Financing activity</td></tr>' +
+        '<tr><td>(j) Purchase land for cash</td><td>Investing activity</td></tr>' +
+        '<tr><td>(k) Buy inventory for resale</td><td>Operating activity</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">Note the contrast between (a) and (j): issuing stock <em>for</em> land is non-cash (no cash moved), while purchasing land <em>for cash</em> is a normal investing activity.</div>' +
+
+      '<p><strong>Extra Cash Flow Statement exercise</strong> — a full period\'s transactions, classified and summed.</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Operating</th><th>Amount</th><th>Financing</th><th>Amount</th></tr>' +
+        '<tr><td>Cash collected from customers</td><td>₱250,000</td><td>Bank loan proceeds</td><td>₱200,000</td></tr>' +
+        '<tr><td>Salaries paid</td><td>(₱80,000)</td><td>Loan repayment</td><td>(₱50,000)</td></tr>' +
+        '<tr><td>Rent paid</td><td>(₱20,000)</td><td>Owner investment</td><td>₱100,000</td></tr>' +
+        '<tr><td>Utilities paid</td><td>(₱10,000)</td><td>Dividends paid</td><td>(₱25,000)</td></tr>' +
+        '<tr><td><strong>Net Operating Cash Flow</strong></td><td><strong>₱140,000</strong></td><td><strong>Net Financing Cash Flow</strong></td><td><strong>₱225,000</strong></td></tr>' +
+      '</table>' +
+      '<table class="note-table">' +
+        '<tr><th>Investing</th><th>Amount</th><th></th><th></th></tr>' +
+        '<tr><td>Purchase of delivery vans</td><td>(₱120,000)</td><td>Net Cash from Operating</td><td>₱140,000</td></tr>' +
+        '<tr><td>Purchase of computer equipment</td><td>(₱30,000)</td><td>Net Cash from Investing</td><td>(₱135,000)</td></tr>' +
+        '<tr><td>Sale of equipment</td><td>₱15,000</td><td>Net Cash from Financing</td><td>₱225,000</td></tr>' +
+        '<tr><td><strong>Net Investing Cash Flow</strong></td><td><strong>(₱135,000)</strong></td><td><strong>Net Increase in Cash</strong></td><td><strong>₱230,000</strong></td></tr>' +
+      '</table>' +
+      '<div class="note-aside">Discussion prompts from the deck: what does the positive ₱225,000 financing cash flow tell you? If financing cash flow were removed entirely, would the company still be increasing cash? (Operating + Investing alone = ₱140,000 − ₱135,000 = ₱5,000 — barely positive.)</div>' +
+
+      '<p><strong>Horizontal Analysis in action</strong></p>' +
+      '<table class="note-table">' +
+        '<tr><th>Account</th><th>2025</th><th>2026</th><th>% Change</th></tr>' +
+        '<tr><td>Revenue</td><td>$500</td><td>$600</td><td>20%</td></tr>' +
+        '<tr><td>COGS</td><td>$300</td><td>$390</td><td>30%</td></tr>' +
+        '<tr><td>Net Income</td><td>$80</td><td>$75</td><td>−6%</td></tr>' +
+      '</table>' +
+
+      '<p><strong>Common-size income statement</strong> (vertical analysis, base = Net Sales)</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Account</th><th>Amount</th><th>Common-size</th></tr>' +
+        '<tr><td>Net Sales</td><td>₱1,000,000</td><td>100%</td></tr>' +
+        '<tr><td>Cost of Goods Sold</td><td>₱600,000</td><td>60%</td></tr>' +
+        '<tr><td>Gross Profit</td><td>₱400,000</td><td>40%</td></tr>' +
+        '<tr><td>Operating Expenses</td><td>₱250,000</td><td>25%</td></tr>' +
+        '<tr><td>Operating Income</td><td>₱150,000</td><td>15%</td></tr>' +
+        '<tr><td>Income Tax Expense</td><td>₱30,000</td><td>3%</td></tr>' +
+        '<tr><td>Net Income</td><td>₱120,000</td><td>12%</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">Reading it: COGS = 60% means ₱60 of every ₱100 in sales goes to producing the product; Net Income = 12% means the company keeps ₱12 of every ₱100 in sales as profit.</div>' +
+
+      '<p><strong>Common-size balance sheet</strong> (vertical analysis, base = Total Assets)</p>' +
+      '<table class="note-table">' +
+        '<tr><th>Account</th><th>Common-size</th></tr>' +
+        '<tr><td>Cash</td><td>7%</td></tr>' +
+        '<tr><td>Accounts Receivable</td><td>25%</td></tr>' +
+        '<tr><td>Inventory</td><td>20%</td></tr>' +
+        '<tr><td>PPE</td><td>48%</td></tr>' +
+        '<tr><td>Liabilities</td><td>55%</td></tr>' +
+        '<tr><td>Equity</td><td>45%</td></tr>' +
+      '</table>' +
+      '<div class="note-aside">What kind of business is this? PPE at 48% (largest asset) plus significant Inventory (20%) points to a manufacturer that owns its production equipment and carries raw materials/WIP/finished goods — not a service business. AR at 25% suggests it sells to retailers or distributors on credit. Low Cash (7%) means most resources are tied up in operations rather than sitting idle.</div>' +
+
+      '<p><strong>Activity — Blue Bayou vs. Cafe Orleans</strong> (both ₱100M revenue)</p>' +
+      '<table class="note-table">' +
+        '<tr><th></th><th>Blue Bayou</th><th>Cafe Orleans</th></tr>' +
+        '<tr><td>COGS %</td><td>35%</td><td>60%</td></tr>' +
+        '<tr><td>Cost of Food</td><td>₱35M</td><td>₱60M</td></tr>' +
+        '<tr><td>Gross Profit</td><td>₱65M</td><td>₱40M</td></tr>' +
+        '<tr><td>Gross Margin</td><td>65%</td><td>40%</td></tr>' +
+      '</table>' +
+
+      '<p><strong>DuPont — worked numeric example</strong></p>' +
+      '<table class="note-table">' +
+        '<tr><th>Item</th><th>Amount</th></tr>' +
+        '<tr><td>Net Income</td><td>₱10,000,000</td></tr>' +
+        '<tr><td>Net Sales</td><td>₱100,000,000</td></tr>' +
+        '<tr><td>Total Assets</td><td>₱62,500,000</td></tr>' +
+        '<tr><td>Shareholders\' Equity</td><td>₱31,250,000</td></tr>' +
+      '</table>' +
+      '<div class="note-formula">Profit Margin = 10M ÷ 100M = 10%   ×   Asset Turnover = 100M ÷ 62.5M = 1.6×   ×   Equity Multiplier = 62.5M ÷ 31.25M = 2.0×   =   ROE 32%</div>' +
+      '<div class="note-aside">Interpretation: profitability — earns ₱0.10 profit per ₱1.00 of sales; efficiency — generates ₱1.60 of sales per ₱1.00 invested in assets; leverage — uses 2× financial leverage. The three drivers combine to a 32% ROE.</div>' +
+
+      '<p><strong>Same ROE, different stories</strong></p>' +
+      '<table class="note-table">' +
+        '<tr><th></th><th>Company MM</th><th>Company DD</th></tr>' +
+        '<tr><td>Profit Margin</td><td>16%</td><td>8%</td></tr>' +
+        '<tr><td>Asset Turnover</td><td>1.0×</td><td>2.0×</td></tr>' +
+        '<tr><td>Equity Multiplier</td><td>2.0×</td><td>2.0×</td></tr>' +
+        '<tr><td><strong>ROE</strong></td><td><strong>32%</strong></td><td><strong>32%</strong></td></tr>' +
+      '</table>' +
+      '<div class="note-aside">"Which CEO deserves the bonus?" — Ella improved margins, Aurora used assets more efficiently, Zel borrowed more money. All three raised ROE, but only some of those levers are sustainable or desirable depending on the industry (a grocery chain lives on thin margins and high turnover; a luxury brand lives on high margins and low turnover).</div>' +
+
+      '<p><strong>Exercise I-16.01 — Weaver Corporation</strong></p>' +
+      '<table class="note-table">' +
+        '<tr><th>Horizontal analysis (assets)</th><th>% Change</th><th>Horizontal analysis (liabilities &amp; equity)</th><th>% Change</th></tr>' +
+        '<tr><td>Cash</td><td>35.14%</td><td>Accounts Payable</td><td>−20.00%</td></tr>' +
+        '<tr><td>Accounts Receivable</td><td>20.69%</td><td>Interest Payable</td><td>33.33%</td></tr>' +
+        '<tr><td>Inventory</td><td>−18.18%</td><td>Total Current Liabilities</td><td>−13.04%</td></tr>' +
+        '<tr><td>Total Current Assets</td><td>22.08%</td><td>Long-term Note Payable</td><td>14.29%</td></tr>' +
+        '<tr><td>Land</td><td>0.00%</td><td>Total Liabilities</td><td>7.53%</td></tr>' +
+        '<tr><td>Building</td><td>0.00%</td><td>Common Stock</td><td>0.00%</td></tr>' +
+        '<tr><td>Equipment</td><td>5.56%</td><td>Paid-in Capital</td><td>0.00%</td></tr>' +
+        '<tr><td>Net PPE</td><td>0.70%</td><td>Retained Earnings</td><td>21.57%</td></tr>' +
+        '<tr><td>Total Assets</td><td>8.20%</td><td>Total Equity / Total L&amp;E</td><td>8.70% / 8.20%</td></tr>' +
+      '</table>' +
+      '<table class="note-table">' +
+        '<tr><th>Vertical analysis — balance sheet</th><th>Amount</th><th>% of Total Assets</th></tr>' +
+        '<tr><td>Cash</td><td>500,000</td><td>21.05%</td></tr>' +
+        '<tr><td>Accounts Receivable</td><td>350,000</td><td>14.74%</td></tr>' +
+        '<tr><td>Inventory</td><td>90,000</td><td>3.79%</td></tr>' +
+        '<tr><td>Net PPE</td><td>1,435,000</td><td>60.42%</td></tr>' +
+        '<tr><td>Total Assets</td><td>2,375,000</td><td>100.00%</td></tr>' +
+        '<tr><td>Total Liabilities</td><td>1,000,000</td><td>42.11%</td></tr>' +
+        '<tr><td>Total Equity</td><td>1,375,000</td><td>57.89%</td></tr>' +
+      '</table>' +
+      '<table class="note-table">' +
+        '<tr><th>Vertical analysis — income statement</th><th>Amount</th><th>% of Revenue</th></tr>' +
+        '<tr><td>Revenue</td><td>₱1,685,000</td><td>100.00%</td></tr>' +
+        '<tr><td>Cost of Goods Sold</td><td>₱980,000</td><td>58.16%</td></tr>' +
+        '<tr><td>Gross Profit</td><td>₱705,000</td><td>41.84%</td></tr>' +
+        '<tr><td>Total Operating Expenses</td><td>₱505,000</td><td>29.97%</td></tr>' +
+        '<tr><td>Income Before Income Taxes</td><td>₱200,000</td><td>11.87%</td></tr>' +
+        '<tr><td>Net Income</td><td>₱160,000</td><td>9.50%</td></tr>' +
+      '</table>' +
+      '<div class="note-formula">Net Profit Margin = 160,000 ÷ 1,685,000 = 9.50%   ×   Asset Turnover = 1,685,000 ÷ 2,285,000 (avg. assets) = 0.74×   ×   Equity Multiplier = 2,285,000 ÷ 1,320,000 (avg. equity) = 1.73×   =   ROE 12.16%</div>' +
+
+      '<div class="note-h3">Outline of the topic</div>' +
+      '<ul class="note-list">' +
+        '<li>1. Profit vs. cash, and why a Statement of Cash Flows matters</li>' +
+        '<li>2. Classifying activities: Operating, Investing, Financing — and non-cash items</li>' +
+        '<li>3. Reading cash flow patterns across the three categories</li>' +
+        '<li>4. Applied: Quick Check, Exercise B-16.06, and the extra Cash Flow Statement exercise</li>' +
+        '<li>5. Horizontal analysis: what changed over time</li>' +
+        '<li>6. Vertical analysis: where every peso goes (common-size income statement and balance sheet)</li>' +
+        '<li>7. The DuPont Framework: decomposing ROE into margin, turnover, and leverage</li>' +
+        '<li>8. Applied: Exercise I-16.01 (Weaver Corporation — full horizontal, vertical, and DuPont analysis)</li>' +
+      '</ul>' +
+
+      '<div class="note-takeaways">' +
+        '<div class="note-h3">Key takeaways</div>' +
+        '<ul class="note-list">' +
+          '<li>Profit and cash are not the same; healthy operating cash flow keeps businesses alive.</li>' +
+          '<li>Horizontal analysis shows change over time; vertical analysis reveals spending structure.</li>' +
+          '<li>DuPont explains <em>why</em> ROE is high or low.</li>' +
+          '<li>Great decisions come from using all three financial statements together.</li>' +
+        '</ul>' +
+      '</div>',
+
+    formulaSheet: '' +
+      '<div class="note-h2">Finals Formula Sheet</div>' +
+      '<div class="note-aside">A cumulative reference — it spans the whole course, not just Sessions 5 and 7, so several formulas below go beyond those two sessions\' notes.</div>' +
+
+      '<div class="note-h3">Key summary points</div>' +
+      '<ul class="note-list">' +
+        '<li>This session is a pure reference: every formula from the course\'s finals coverage, grouped by topic, with no narrative walkthrough.</li>' +
+        '<li>Use it to look up a formula fast, or to self-test by covering the right-hand side and reconstructing it from the label alone.</li>' +
+      '</ul>' +
+
+      '<div class="note-h3">Important points to remember</div>' +
+      '<ul class="note-list">' +
+        '<li>Average balances (Inventory, Accounts Receivable, Accounts Payable, Total Assets, Total Equity) = (Beginning Balance + Ending Balance) ÷ 2.</li>' +
+        '<li>If Net Credit Sales is unavailable for a turnover ratio, use Total Sales instead.</li>' +
+        '<li>Total Liabilities excludes contingent liabilities not yet recognized on the balance sheet (e.g. a lawsuit disclosed only in the notes).</li>' +
+        '<li>Non-cash investing &amp; financing activities (e.g. issuing shares to acquire land) are excluded from the three cash flow sections and disclosed separately.</li>' +
+      '</ul>' +
+
+      '<div class="note-h3">Key equations</div>' +
+
+      '<p><strong>Accounting equation &amp; financial statements</strong></p>' +
+      '<div class="note-formula">Assets = Liabilities + Equity</div><br>' +
+      '<div class="note-formula">Equity = Assets − Liabilities</div><br>' +
+      '<div class="note-formula">Net Income (Loss) = Revenue − Expenses</div><br>' +
+      '<div class="note-formula">Ending Retained Earnings = Beginning Retained Earnings +/− Net Income (Loss) − Dividends +/− Other Comprehensive Income +/− Prior Period Adjustments</div>' +
+
+      '<p><strong>Liquidity &amp; working capital</strong></p>' +
+      '<div class="note-formula">Working Capital = Current Assets − Current Liabilities</div><br>' +
+      '<div class="note-formula">Current Ratio = Current Assets ÷ Current Liabilities</div><br>' +
+      '<div class="note-formula">Quick Ratio = Quick Assets ÷ Current Liabilities  (Quick Assets = Cash + Cash Equivalents + Short-term Investments + Accounts Receivable)</div><br>' +
+      '<div class="note-formula">Cash Ratio = (Cash + Cash Equivalents) ÷ Current Liabilities</div><br>' +
+      '<div class="note-formula">Inventory Turnover = COGS ÷ Average Inventory</div><br>' +
+      '<div class="note-formula">Days Inventory Outstanding = (Average Inventory ÷ COGS) × 365</div><br>' +
+      '<div class="note-formula">Accounts Receivable Turnover = Net Credit Sales ÷ Average Accounts Receivable</div><br>' +
+      '<div class="note-formula">Days Sales Outstanding = (Average Accounts Receivable ÷ Net Credit Sales) × 365</div><br>' +
+      '<div class="note-formula">Accounts Payable Turnover = COGS ÷ Average Accounts Payable</div><br>' +
+      '<div class="note-formula">Days Payables Outstanding = (Average Accounts Payable ÷ COGS) × 365</div><br>' +
+      '<div class="note-formula">Cash Conversion Cycle = Days Inventory Outstanding + Days Sales Outstanding − Days Payables Outstanding</div>' +
+
+      '<p><strong>Long-term assets, capex &amp; depreciation</strong></p>' +
+      '<div class="note-formula">Straight-Line Depreciation = (Cost − Salvage Value) ÷ Useful Life</div><br>' +
+      '<div class="note-formula">Book Value (Carrying Amount) = Cost − Accumulated Depreciation</div>' +
+
+      '<p><strong>Income statement &amp; profitability</strong></p>' +
+      '<div class="note-formula">Gross Profit = Net Sales − COGS</div><br>' +
+      '<div class="note-formula">Gross Margin = Gross Profit ÷ Net Sales</div><br>' +
+      '<div class="note-formula">Operating Income = Gross Profit − Operating Expenses</div><br>' +
+      '<div class="note-formula">Operating Margin = Operating Income ÷ Net Sales</div><br>' +
+      '<div class="note-formula">Net Profit Margin = (Net Income ÷ Net Sales) × 100%</div><br>' +
+      '<div class="note-formula">Return on Assets = Net Income ÷ Average Total Assets</div><br>' +
+      '<div class="note-formula">Return on Equity = Net Income ÷ Average Total Equity</div><br>' +
+      '<div class="note-formula">Return on Equity (w/ preferred) = (Net Income − Preferred Dividends) ÷ Average Common Equity</div>' +
+
+      '<p><strong>Solvency ratios</strong></p>' +
+      '<div class="note-formula">Debt-to-Assets Ratio = Total Liabilities ÷ Total Assets</div><br>' +
+      '<div class="note-formula">Debt-to-Equity Ratio = Total Liabilities ÷ Total Equity</div><br>' +
+      '<div class="note-formula">Interest Coverage Ratio = Operating Income (EBIT) ÷ Interest Expense</div>' +
+
+      '<p><strong>Statement of cash flows</strong></p>' +
+      '<div class="note-formula">Net Operating Cash Flow = Cash Collected + Interest &amp; Dividends Received − Salaries/Rent/Utilities/Interest Paid − Inventory Purchases</div><br>' +
+      '<div class="note-formula">Net Investing Cash Flow = Proceeds from Asset Sales − Purchases of Equipment/Vehicles/Buildings/Land/Intangibles</div><br>' +
+      '<div class="note-formula">Net Financing Cash Flow = Loan Proceeds + Owner/Stock Issuance − Loan Repayments − Dividends Paid − Treasury Share Purchases</div><br>' +
+      '<div class="note-formula">Net Change in Cash = Operating CF + Investing CF + Financing CF</div>' +
+
+      '<p><strong>Financial statement analysis &amp; DuPont</strong></p>' +
+      '<div class="note-formula">Horizontal Analysis (% Change) = (Current Year − Prior Year) ÷ Prior Year × 100%</div><br>' +
+      '<div class="note-formula">Vertical Analysis (Income Statement) = Line Item ÷ Net Sales × 100%</div><br>' +
+      '<div class="note-formula">Vertical Analysis (Balance Sheet) = Line Item ÷ Total Assets × 100%</div><br>' +
+      '<div class="note-formula">ROE = Net Profit Margin × Asset Turnover × Equity Multiplier</div><br>' +
+      '<div class="note-formula">Asset Turnover = Net Sales ÷ Average Total Assets</div><br>' +
+      '<div class="note-formula">Equity Multiplier = Total Assets ÷ Average Total Equity</div>' +
+
+      '<div class="note-h3">Outline of the topic</div>' +
+      '<ul class="note-list">' +
+        '<li>1. Accounting equation &amp; financial statements</li>' +
+        '<li>2. Liquidity &amp; working capital</li>' +
+        '<li>3. Long-term assets, capex &amp; depreciation</li>' +
+        '<li>4. Income statement &amp; profitability</li>' +
+        '<li>5. Solvency ratios</li>' +
+        '<li>6. Statement of cash flows</li>' +
+        '<li>7. Financial statement analysis &amp; the DuPont Framework</li>' +
+      '</ul>'
   };
 
   /* ============================================================
