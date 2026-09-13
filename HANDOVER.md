@@ -274,3 +274,21 @@ Checklist before shipping a subject:
 **Verify every numeric answer independently.** Compute answers yourself rather than copying them, then check against any released solution. In STR 501 every figure matched the professor's workbook, which is what makes the mock exam trustworthy.
 
 **State the limits in the reviewer itself.** Where a source was unusable or a mark allocation unknown, say so on the page. A student needs to know which parts are authoritative.
+
+---
+
+## 12. Publishing
+
+The site deploys to GitHub Pages via `.github/workflows/pages.yml`, which uploads the repo as a static artifact on every push to the working branch. There is no build step.
+
+```
+https://johnlagac.github.io/CourseReviewer/                  home page
+https://johnlagac.github.io/CourseReviewer/subjects/str501/  a subject
+```
+
+Two things about this setup are worth knowing before you debug it:
+
+- **Pages must be enabled by hand, once.** Settings → Pages → Source → *GitHub Actions*. Until then the workflow fails in about two seconds with no logs and no steps run, because the `github-pages` environment does not exist yet. That signature means "Pages is off", not "the workflow is broken".
+- **The workflow does not appear in the Actions tab, and has no "Run workflow" button.** GitHub only lists workflows whose file exists on the *default* branch, and this repo's default branch (`template`) holds only the old starter file. Push-triggered runs work regardless — they run from the branch pushed to — so deploys happen normally. To get the manual-dispatch button, the workflow file has to live on the default branch.
+
+If a deploy needs re-running, push a commit or use **Re-run all jobs** on the run's own page.
