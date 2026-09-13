@@ -64,7 +64,9 @@ cp -r subjects/_template subjects/<code>
 
 Then, in that file:
 
-- Set `<title>`, the `.brand` block, the `#start` heading and the footer.
+- Set `<title>`, the `.brand` link, the `#start` heading and the footer. The brand is an
+  `<a href="../../index.html">` and the rail opens with `<a class="rail-home">` — two ways back
+  to the subject index. Keep both; the router ignores them because it only claims `href="#…"`.
 - Build the **rail** — one `<a href="#id">` per topic, in course order. The engine reads the rail to build the router, the prev/next pager and the page counter. Add a rail link and you have added a page.
 - Write one `<section id="t01">` per topic, matching the rail.
 - Fill `TOPIC_TITLES`, `BANKS`, and optionally `EXAM` and `MAP`.

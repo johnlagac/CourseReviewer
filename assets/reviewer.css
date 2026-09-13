@@ -49,6 +49,19 @@ kbd{background:var(--surface2);border:1px solid var(--line);border-bottom-width:
 .brand{font-family:var(--disp);font-weight:700;font-size:15px;white-space:nowrap;
   min-width:0;overflow:hidden;text-overflow:ellipsis}
 .brand span{color:var(--fg3);font-weight:500}
+/* The brand doubles as a link home, the usual web convention, and
+   costs no space in an already tight bar. */
+a.brand{text-decoration:none;color:var(--fg)}
+a.brand:hover{color:var(--accent)}
+a.brand:hover span{color:var(--accent)}
+/* Explicit, labelled way back to the subject index. Sits above the
+   rail groups. The router only claims href="#…", so this navigates
+   normally. */
+.rail-home{display:flex;align-items:center;gap:9px;padding:8px 11px;margin-bottom:14px;
+  border:1px solid var(--line);border-radius:8px;background:var(--surface);
+  color:var(--fg2);text-decoration:none;font-size:13.5px;line-height:1.3}
+.rail-home:hover{border-color:var(--accent-line);background:var(--accent-bg);color:var(--accent)}
+.rail-home b{font-family:var(--mono);font-size:13px;font-weight:600}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--fg2)}
 .pwrap{flex:1;max-width:230px;height:6px;background:var(--surface2);border-radius:99px;overflow:hidden}
 .pfill{height:100%;width:0;background:var(--accent);transition:width .3s}
