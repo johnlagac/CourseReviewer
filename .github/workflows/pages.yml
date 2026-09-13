@@ -3,12 +3,16 @@ name: Deploy to GitHub Pages
 # The site is already static HTML, CSS and JS — there is nothing to
 # build. This workflow just uploads the repo and hands it to Pages.
 #
-# NOTE: the branch below is the one line to change if this branch is
-# renamed, or if the work is later merged into main.
+# Deploys from the DEFAULT branch on purpose. The github-pages
+# environment restricts deployments to the default branch, and GitHub
+# only registers a workflow (sidebar entry, "Run workflow" button) if
+# its file exists there. Publishing from any other branch fails before
+# the job starts, with no logs — which looks like a broken workflow
+# but is really a branch restriction.
 
 on:
   push:
-    branches: ['claude/amazing-carson-h8i0aj']
+    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -279,16 +279,22 @@ Checklist before shipping a subject:
 
 ## 12. Publishing
 
-The site deploys to GitHub Pages via `.github/workflows/pages.yml`, which uploads the repo as a static artifact on every push to the working branch. There is no build step.
+The site deploys to GitHub Pages via `.github/workflows/pages.yml`, which uploads the repo as a static artifact on every push to `main`. There is no build step.
 
 ```
 https://johnlagac.github.io/CourseReviewer/                  home page
 https://johnlagac.github.io/CourseReviewer/subjects/str501/  a subject
 ```
 
-Two things about this setup are worth knowing before you debug it:
+Development happens on a working branch; **merge to `main` to publish**.
 
-- **Pages must be enabled by hand, once.** Settings → Pages → Source → *GitHub Actions*. Until then the workflow fails in about two seconds with no logs and no steps run, because the `github-pages` environment does not exist yet. That signature means "Pages is off", not "the workflow is broken".
-- **The workflow does not appear in the Actions tab, and has no "Run workflow" button.** GitHub only lists workflows whose file exists on the *default* branch, and this repo's default branch (`template`) holds only the old starter file. Push-triggered runs work regardless — they run from the branch pushed to — so deploys happen normally. To get the manual-dispatch button, the workflow file has to live on the default branch.
+### If a deploy fails in about a second with no logs and no steps run
 
-If a deploy needs re-running, push a commit or use **Re-run all jobs** on the run's own page.
+That is not a broken workflow. It is one of two branch restrictions, both of which key off the repository's **default branch**:
+
+- The `github-pages` environment only accepts deployments from the default branch, unless you add a rule under **Settings → Environments → github-pages → Deployment branches and tags**.
+- GitHub only registers a workflow — sidebar entry in the Actions tab, **Run workflow** button — if its file exists on the default branch. Push-triggered runs still happen from other branches, which is why runs can exist for a workflow that appears nowhere in the UI.
+
+This cost real time once already: the repo's default branch was `template`, a stale branch holding only the original starter file, so deploys from the working branch were rejected before any step executed. Keeping `main` as the default branch is what prevents it.
+
+Pages also has to be switched on by hand, once: **Settings → Pages → Source → GitHub Actions**.
