@@ -1,0 +1,49 @@
+name: Deploy to GitHub Pages
+
+# The site is already static HTML, CSS and JS — there is nothing to
+# build. This workflow just uploads the repo and hands it to Pages.
+#
+# NOTE: the branch below is the one line to change if this branch is
+# renamed, or if the work is later merged into main.
+
+on:
+  push:
+    branches: ['claude/amazing-carson-h8i0aj']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-way.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # Nothing secret in here — it is local tool permissions — but
+      # there is no reason to serve it either.
+      - name: Drop files that should not be published
+        run: rm -rf .claude
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
