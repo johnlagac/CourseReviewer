@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- EDIT: course code and title -->
+<title>XXX 000 — Subject Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/reviewer.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <button class="menu-t" id="mt" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <!-- EDIT: brand -->
+  <div class="brand">XXX 000 <span>· Subject Title</span></div>
+  <div class="tb-right">
+    <div class="pwrap" title="Concept checks answered"><div class="pfill" id="pbar"></div></div>
+    <span id="pscore">0 / 0</span>
+    <span id="pageidx"></span>
+    <button class="theme" id="theme" aria-label="Toggle dark mode">Dark</button>
+  </div>
+</header>
+
+<div class="shell">
+<!-- ============================================================
+     RAIL — the engine reads this to build the router, the pager
+     and the page counter. One <a href="#id"> per <section id="id">.
+     Order here is the order of the course.
+     ============================================================ -->
+<nav class="rail" id="rail" aria-label="Sections">
+  <div class="rgrp">Orientation</div>
+  <a href="#start"><em>00</em>Start here</a>
+  <div class="rgrp">Topics</div>
+  <a href="#t01"><em>01</em>First topic</a>
+  <a href="#t02"><em>02</em>Second topic</a>
+  <div class="rgrp">Practice</div>
+  <a href="#test"><em>✓</em>Comprehensive test</a>
+  <div class="rgrp">Reference</div>
+  <a href="#sheet"><em>ƒ</em>Formula sheet</a>
+</nav>
+
+<main id="main">
+
+<!-- ================= START ================= -->
+<section id="start">
+  <div class="eyebrow">XXX 000 · Course reviewer</div>
+  <h1>Subject Title</h1>
+  <p class="lede">One or two sentences on what this course is really about — the single idea a student should carry into the exam.</p>
+
+  <div class="note why"><span class="tag">What the exams look like</span>
+    <ul>
+      <li><strong>Midterm</strong> — format, duration, which topics, what you may bring.</li>
+      <li><strong>Final</strong> — same.</li>
+    </ul>
+  </div>
+
+  <div class="note scope"><span class="tag">Explicitly out of scope</span>
+    <p>Anything the professor ruled out, quoted from the slides. Delete this block if there is nothing.</p>
+  </div>
+
+  <h3>How each topic is built</h3>
+  <ol class="steps">
+    <li><strong>The idea in plain English</strong> — before any notation.</li>
+    <li><strong>The problem</strong> — a concrete case with real numbers.</li>
+    <li><strong>How to solve it</strong> — the formula or the exact tool route.</li>
+    <li><strong>Read the answer</strong> — which number matters and the sentence you write.</li>
+    <li><strong>Recap</strong> — three things to remember.</li>
+    <li><strong>Concept check</strong> — questions with revealable solutions.</li>
+  </ol>
+
+  <div class="note"><span class="tag">Honest limits of this reviewer</span>
+    <p>State anything the source material could not support. Delete if there is nothing.</p>
+  </div>
+</section>
+
+<!-- ================= TOPIC 1 — the full pattern ================= -->
+<section id="t01">
+  <div class="lessonhead"><span class="lnum">01</span><div class="eyebrow">Session N</div></div>
+  <h2>First topic</h2>
+  <span class="pill mid">Midterm</span><span class="pill tp">Final · tool</span><span class="pill fm">Typed formulas</span>
+
+  <!-- BEAT 1 — the idea in plain English -->
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">One memorable sentence that captures what this method really does.</div>
+    <p class="pana">A short paragraph relating it to something the reader already understands. No notation yet.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>What question does this answer?</span></div>
+      <div class="pcell"><b>It compares</b><span>What against what?</span></div>
+      <div class="pcell"><b>A big value means</b><span>How to read the result.</span></div>
+    </div>
+  </div>
+
+  <!-- BEAT 2 — the problem -->
+  <h3>The business problem</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Column</th><th class="n">Value</th></tr></thead>
+    <tbody>
+      <tr><td>Something</td><td class="n">123</td></tr>
+      <tr><td>Something else</td><td class="n">456</td></tr>
+    </tbody>
+  </table></div>
+
+  <!-- BEAT 3 — how to solve it -->
+  <h3>How to solve it</h3>
+  <div class="fx">formula = numerator / denominator
+
+Excel:  =SOMEFUNCTION(range)</div>
+
+  <div class="path"><span>Data</span><i>→</i><span>Data Analysis</span><i>→</i><span class="last">The Tool</span></div>
+
+  <div class="dlg">
+    <div class="bar">Dialog name</div>
+    <div class="bd">
+      <div class="fld key"><label>The box that matters</label><span class="inp">$A$1:$A$9</span></div>
+      <div class="fld"><label>Another box</label><span class="inp">0.05</span></div>
+    </div>
+  </div>
+
+  <ol class="steps">
+    <li>First step.</li>
+    <li>Second step.</li>
+  </ol>
+
+  <!-- BEAT 4 — read the answer -->
+  <h3>Read the answer</h3>
+  <div class="card">
+    <div class="fx">worked numbers → result</div>
+    <div class="ans"><small>Label</small>0.42</div>
+    <div class="verdict rej">Reject H₀</div>
+    <p style="margin-bottom:0">The sentence a student should write underneath.</p>
+  </div>
+
+  <div class="note watch"><span class="tag">The trap</span>
+    <p>The mistake people actually make here.</p>
+  </div>
+  <div class="note plain"><span class="tag">Say it in plain words</span>
+    <p>A one-line translation of the result into business language.</p>
+  </div>
+
+  <!-- BEAT 5 — recap -->
+  <div class="note recap"><span class="tag">Recap</span>
+    <ul>
+      <li><strong>First thing</strong> to remember.</li>
+      <li><strong>Second thing.</strong></li>
+      <li><strong>Third thing.</strong></li>
+    </ul>
+  </div>
+
+  <!-- BEAT 6 — concept check. The div id must match a key in banks. -->
+  <div class="quiz"><h3>Concept check</h3><div data-quiz="t01"></div></div>
+</section>
+
+<!-- ================= TOPIC 2 ================= -->
+<section id="t02">
+  <div class="lessonhead"><span class="lnum">02</span><div class="eyebrow">Session N</div></div>
+  <h2>Second topic</h2>
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">Another memorable sentence.</div>
+    <p class="pana">Short explanation.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>…</span></div>
+      <div class="pcell"><b>It compares</b><span>…</span></div>
+      <div class="pcell"><b>A big value means</b><span>…</span></div>
+    </div>
+  </div>
+  <div class="note recap"><span class="tag">Recap</span>
+    <ul><li>Point one.</li><li>Point two.</li><li>Point three.</li></ul>
+  </div>
+  <div class="quiz"><h3>Concept check</h3><div data-quiz="t02"></div></div>
+</section>
+
+<!-- ================= COMPREHENSIVE TEST =================
+     Leave this section exactly as it is. The engine fills it.
+     ====================================================== -->
+<section id="test">
+  <div class="eyebrow">All topics</div>
+  <h2>Comprehensive test</h2>
+  <p class="lede">Draws across whichever topics you select. Questions covering the same idea are grouped, and only one from each group appears per attempt.</p>
+
+  <div class="card">
+    <div class="cfg-label">Topics</div>
+    <div id="test-topics" class="chipwrap"></div>
+    <div class="cfg-label">Length</div>
+    <div id="test-size" class="chipwrap"></div>
+    <div class="cfg-label">When do you want the answers?</div>
+    <div id="test-fb" class="chipwrap"></div>
+    <div class="startrow">
+      <button class="btn" id="test-start">Start test</button>
+      <span class="hint" id="test-hint"></span>
+    </div>
+  </div>
+
+  <div id="test-run" hidden>
+    <div class="runbar">
+      <div><strong id="test-count">0 / 0</strong> <span class="hint" id="test-topicline"></span></div>
+      <div class="runbar-right">
+        <button class="btn ghost sm" id="test-abandon">End test</button>
+        <button class="btn sm" id="test-submit">Submit</button>
+      </div>
+    </div>
+    <div id="test-host"></div>
+    <div class="startrow"><button class="btn" id="test-submit2">Submit test</button></div>
+  </div>
+
+  <div id="test-result" hidden></div>
+</section>
+
+<!-- ================= FORMULA SHEET =================
+     Mark any row or card with data-f to make it filterable.
+     ================================================= -->
+<section id="sheet">
+  <div class="eyebrow">Print this</div>
+  <h2>Formula sheet</h2>
+  <p class="lede">Everything in one place. Type in the box to filter.</p>
+  <input class="fsearch" id="fs" placeholder="Filter…" autocomplete="off" aria-label="Filter the formula sheet">
+  <div id="fsnone" class="note hidden"><p style="margin-bottom:0">Nothing matches that. Try a shorter word.</p></div>
+
+  <div class="fsec" data-f>
+    <h3>Section heading</h3>
+    <div class="tw"><table class="dt">
+      <thead><tr><th>Quantity</th><th>Formula</th><th>Excel</th></tr></thead>
+      <tbody>
+        <tr data-f><td>Example</td><td class="m">a / b</td><td class="m">=AVERAGE(r)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<nav class="pager" id="pager" aria-label="Page navigation"></nav>
+<div class="foot">
+  XXX 000 · Subject Title · Programme · Course Leader<br>
+  Built from the course outline, session notes and slide decks.
+</div>
+
+<!-- ============================================================
+     ENGINE + CONFIG. Everything above is content; everything
+     below is data. See /HANDOVER.md for the full schema.
+     ============================================================ -->
+<script src="../../assets/reviewer.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* Rail label for each bank, used by the test's topic chips
+   and its per-topic result breakdown. Keys must match banks. */
+var TOPIC_TITLES = {
+  t01: 'First topic',
+  t02: 'Second topic'
+};
+
+/* One array per topic. The key must match a <div data-quiz="…">.
+   c: concept group — the test shows at most ONE item per group,
+   so a retake asks a different question about the same idea. */
+var BANKS = {};
+
+BANKS.t01 = [
+ /* --- multiple choice: a is the index of the correct option --- */
+ {t:'mc', c:'example-concept', q:'A multiple-choice question. Four options is the norm.',
+  opts:['A wrong option','The correct option','Another wrong option','A fourth option'], a:1,
+  sol:'Explain why the answer is right <b>and why the distractors are wrong</b>. That is the difference between a quiz and a reviewer.<div class="steps">Use this block for worked arithmetic.</div>'},
+
+ /* --- true/false: options stay in T,F order, never shuffled --- */
+ {t:'tf', c:'example-tf', q:'A statement that is either true or false.',
+  opts:['True','False'], a:1,
+  sol:'<b>False.</b> Then say why.'},
+
+ /* --- multi-select: a is an array of correct indices --- */
+ {t:'ms', c:'example-ms', q:'Which of these apply? (Select all.)',
+  opts:['Correct one','Wrong one','Also correct','Wrong again'], a:[0,2],
+  sol:'All-or-nothing by default.'},
+
+ /* --- numeric. Default tolerance is 0.5% relative.
+        tol  = absolute  (use for integers and exact answers)
+        rtol = relative  (use when rounding is expected)
+        unit:'%' stores a as a decimal and accepts 40, 40% or 0.40 --- */
+ {t:'num', c:'example-num', q:'A numeric question. Answer 27.75.',
+  a:27.75, rtol:0.01,
+  sol:'<div class="steps">Show the working, line by line.</div>'},
+
+ {t:'num', c:'example-int', q:'An integer answer, such as degrees of freedom.',
+  a:15, tol:0.5,
+  sol:'<div class="steps">df = N − k = 18 − 3 = 15</div>'},
+
+ /* --- free text. a is a list of accepted answers. Matching is
+        exact after normalising (case, punctuation, small words)
+        plus one typo. Never substring — so list real synonyms. --- */
+ {t:'text', c:'example-text', q:'A short free-text question. (Two words)',
+  a:['sample frame','sampling frame'],
+  sol:'Both spellings accepted.'}
+];
+
+BANKS.t02 = [
+ {t:'mc', c:'second-topic-concept', q:'Another question.',
+  opts:['One','Two','Three','Four'], a:0,
+  sol:'Explanation.'}
+];
+
+/* Optional. Delete the whole EXAM block and the exam <section>
+   if this subject has no mock paper. Weighted by pts per part. */
+var EXAM = null;
+
+/* Optional "which method do I use?" decision map.
+   Set to null if the subject has no genuine method-choice problem —
+   a three-node map is worse than no map. */
+var MAP = null;
+
+REVIEWER.init({
+  id: 'CHANGE-ME',          /* unique per subject — it namespaces localStorage */
+  topicTitles: TOPIC_TITLES,
+  banks: BANKS,
+  exam: EXAM,
+  map: MAP
+});
+
+})();
+</script>
+</body>
+</html>
