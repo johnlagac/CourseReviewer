@@ -22,7 +22,7 @@ A **reviewer** is a single-page study app for one university subject: topic note
 
 **Nothing in `assets/` is subject-specific.** Do not edit it to make one subject work; if a subject needs something the engine cannot do, that is an engine feature and every subject gets it.
 
-Folder names are lowercase (`str501`). URLs on GitHub Pages are case-sensitive, so lowercase avoids 404s from a mistyped capital. The page lives at `/subjects/str501/`.
+Folder names are lowercase (`str501`). Most web servers treat paths as case-sensitive, so lowercase avoids 404s from a mistyped capital if this is ever hosted.
 
 ### How a subject page loads
 
@@ -279,32 +279,31 @@ Checklist before shipping a subject:
 
 ---
 
-## 12. Publishing
+## 12. Using it
 
-The site is hosted on **Cloudflare Pages**, connected to this repository. Every push to `main` publishes automatically. There is no build step — Cloudflare serves the repo as-is.
+**There is no hosted copy.** The reviewers are opened from disk:
 
-```
-https://<project>.pages.dev/                  home page
-https://<project>.pages.dev/subjects/str501/  a subject
-```
+1. Download the repo — **Code → Download ZIP** on the `main` branch — and unzip it.
+2. Double-click **`index.html`** at the top level.
+3. Click a subject card.
 
-Development happens on a working branch; **merge to `main` to publish**.
+Everything works this way: navigation between subjects, every question type, the timed mock exam, dark mode, saved progress and printing. It has been tested end to end from a local folder with all network access blocked, and there is no degraded mode — the only thing that fails offline is the Google Fonts request, which falls back to system fonts.
 
-### Setup, if it ever needs redoing
+**Keep the folder together.** `index.html` needs `assets/` and `subjects/` beside it. That is the cost of the shared engine: a single page moved somewhere on its own loses its styling.
 
-Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → pick `CourseReviewer`. Then:
+Links point at `…/index.html` rather than at the folder, deliberately. A bare directory URL needs a server to resolve; an explicit filename works from `file://` too. Keep that convention when adding a subject card.
 
-| Setting | Value |
-|---|---|
-| Production branch | `main` |
-| Framework preset | None |
-| Build command | *(leave empty)* |
-| Build output directory | `/` |
+### If you ever want it hosted again
 
-Directory URLs such as `/subjects/str501/` resolve to `index.html` automatically, which is why the landing page can link either way.
+Any static host will serve this repo as-is, with no build step and no configuration: Cloudflare Pages, Netlify, Vercel, or a local `python3 -m http.server 8000`.
 
-### Why not GitHub Pages
+Two things are worth knowing before reaching for **GitHub Pages** specifically, because they cost an afternoon once:
 
-It was tried and abandoned after four failed deploys. Every run died in about a second with no logs and no steps executed — the job never reached a runner. Enabling Pages, switching the source to GitHub Actions, and moving the default branch from the stale `template` to `main` each fixed one layer without clearing the last: the `github-pages` environment keeps a deployment-branch rule pinned to whatever was default when Pages was first enabled, and changing the default branch afterwards does not rewrite it.
+- Deploys via the Actions workflow failed four times, each in about a second with no logs and no steps executed. That signature means the job never reached a runner — an environment or branch restriction, not a broken workflow.
+- The `github-pages` environment pins a deployment-branch rule to whatever was default when Pages was first enabled, and changing the default branch afterwards does not rewrite it. Enabling Pages, switching the source to GitHub Actions, and moving the default off the stale `template` branch each cleared one layer without clearing the last.
 
-If you ever want to go back, the **"Deploy from a branch"** source is the simpler path — it uses no Actions workflow and no environment, so none of the above applies. `.nojekyll` is kept in the repo for exactly that case, because `subjects/_template/` is underscore-prefixed and Jekyll would hide it.
+The **"Deploy from a branch"** source avoids all of it — no workflow, no environment. `.nojekyll` is kept in the repo for exactly that case, because `subjects/_template/` is underscore-prefixed and Jekyll would otherwise hide it.
+
+### A note on what is in here
+
+This repository is public, and the reviewers reproduce course material — worked examples, data tables, and a full mock exam with its released solutions — drawn from documents marked "Confidential. Not for distribution." That was a considered decision, not an oversight. Anyone adding a subject should make the same decision knowingly rather than by default.
