@@ -279,22 +279,30 @@ Checklist before shipping a subject:
 
 ## 12. Publishing
 
-The site deploys to GitHub Pages via `.github/workflows/pages.yml`, which uploads the repo as a static artifact on every push to `main`. There is no build step.
+The site is hosted on **Cloudflare Pages**, connected to this repository. Every push to `main` publishes automatically. There is no build step — Cloudflare serves the repo as-is.
 
 ```
-https://johnlagac.github.io/CourseReviewer/                  home page
-https://johnlagac.github.io/CourseReviewer/subjects/str501/  a subject
+https://<project>.pages.dev/                  home page
+https://<project>.pages.dev/subjects/str501/  a subject
 ```
 
 Development happens on a working branch; **merge to `main` to publish**.
 
-### If a deploy fails in about a second with no logs and no steps run
+### Setup, if it ever needs redoing
 
-That is not a broken workflow. It is one of two branch restrictions, both of which key off the repository's **default branch**:
+Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → pick `CourseReviewer`. Then:
 
-- The `github-pages` environment only accepts deployments from the default branch, unless you add a rule under **Settings → Environments → github-pages → Deployment branches and tags**.
-- GitHub only registers a workflow — sidebar entry in the Actions tab, **Run workflow** button — if its file exists on the default branch. Push-triggered runs still happen from other branches, which is why runs can exist for a workflow that appears nowhere in the UI.
+| Setting | Value |
+|---|---|
+| Production branch | `main` |
+| Framework preset | None |
+| Build command | *(leave empty)* |
+| Build output directory | `/` |
 
-This cost real time once already: the repo's default branch was `template`, a stale branch holding only the original starter file, so deploys from the working branch were rejected before any step executed. Keeping `main` as the default branch is what prevents it.
+Directory URLs such as `/subjects/str501/` resolve to `index.html` automatically, which is why the landing page can link either way.
 
-Pages also has to be switched on by hand, once: **Settings → Pages → Source → GitHub Actions**.
+### Why not GitHub Pages
+
+It was tried and abandoned after four failed deploys. Every run died in about a second with no logs and no steps executed — the job never reached a runner. Enabling Pages, switching the source to GitHub Actions, and moving the default branch from the stale `template` to `main` each fixed one layer without clearing the last: the `github-pages` environment keeps a deployment-branch rule pinned to whatever was default when Pages was first enabled, and changing the default branch afterwards does not rewrite it.
+
+If you ever want to go back, the **"Deploy from a branch"** source is the simpler path — it uses no Actions workflow and no environment, so none of the above applies. `.nojekyll` is kept in the repo for exactly that case, because `subjects/_template/` is underscore-prefixed and Jekyll would hide it.
