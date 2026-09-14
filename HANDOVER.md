@@ -12,12 +12,15 @@ A **reviewer** is a single-page study app for one university subject: topic note
 /
 ├── index.html                    landing page — one card per subject
 ├── HANDOVER.md                   this file
+├── build-standalone.py           generates the single-file copies
 ├── assets/
 │   ├── reviewer.css              all styling, ~295 lines
 │   └── reviewer.js               the engine, ~820 lines
+├── standalone/                   generated — one self-contained file per subject
 └── subjects/
     ├── _template/index.html      copy this to start a subject
-    └── str501/index.html         the worked reference — read it
+    ├── str501/index.html         the worked reference — read it
+    └── act501/index.html         the second subject
 ```
 
 **Nothing in `assets/` is subject-specific.** Do not edit it to make one subject work; if a subject needs something the engine cannot do, that is an engine feature and every subject gets it.
@@ -290,6 +293,32 @@ Checklist before shipping a subject:
 Everything works this way: navigation between subjects, every question type, the timed mock exam, dark mode, saved progress and printing. It has been tested end to end from a local folder with all network access blocked, and there is no degraded mode — the only thing that fails offline is the Google Fonts request, which falls back to system fonts.
 
 **Keep the folder together.** `index.html` needs `assets/` and `subjects/` beside it. That is the cost of the shared engine: a single page moved somewhere on its own loses its styling.
+
+That failure is silent and looks like a rendering bug rather than a missing file: the
+page loads in Times New Roman with every section stacked on one scroll, the progress
+counter stuck at `0 / 0` and the theme button dead. If someone reports "the visuals
+broke", check the folder before reading any CSS — the console will show
+`reviewer.css` and `reviewer.js` failing and `REVIEWER is not defined`.
+
+### Standalone single-file copies
+
+For when the folder cannot be kept together — emailing one subject, a phone, a
+study folder somewhere else on disk:
+
+```
+python3 build-standalone.py            # every subject
+python3 build-standalone.py act501     # just one
+```
+
+This inlines `reviewer.css` and `reviewer.js` into the subject page, turns the two
+"back to subject index" links into plain text (there is no index to return to), and
+writes the result to `standalone/`. Roughly 250–310 KB per subject. Everything works:
+routing, every question type, the timed mock exam, the decision map, dark mode,
+printing.
+
+**These are generated files and do not update themselves.** Re-run the script after
+changing a subject page or the engine, or the standalone copy silently goes stale.
+The files under `subjects/` remain the source of truth.
 
 Links point at `…/index.html` rather than at the folder, deliberately. A bare directory URL needs a server to resolve; an explicit filename works from `file://` too. Keep that convention when adding a subject card.
 
