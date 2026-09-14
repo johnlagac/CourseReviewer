@@ -1,0 +1,4 @@
+# Local virtualenv for PDF text extraction (see HANDOVER.md §10).
+# Build tooling only — nothing the reviewers need at runtime.
+venv/
+__pycache__/
