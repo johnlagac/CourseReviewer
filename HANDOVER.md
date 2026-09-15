@@ -20,7 +20,10 @@ A **reviewer** is a single-page study app for one university subject: topic note
 └── subjects/
     ├── _template/index.html      copy this to start a subject
     ├── str501/index.html         the worked reference — read it
-    └── act501/index.html         the second subject
+    ├── act501/index.html         the second subject
+    ├── inn506/index.html         built from decks, no mock exam
+    └── dsc512/index.html         a coding subject — uses t:'code' and .codeblock,
+        notebooks/                and ships the source notebooks beside it
 ```
 
 **Nothing in `assets/` is subject-specific.** Do not edit it to make one subject work; if a subject needs something the engine cannot do, that is an engine feature and every subject gets it.
@@ -173,6 +176,13 @@ Input accepts commas, currency symbols, unicode minus, a trailing `%` or `x`, an
 
 ### Text answers
 
+**Known limit:** the edit-distance tolerance is plain Levenshtein, so it forgives one
+*substitution, insertion or deletion* but not a **transposition** — `relaod` for
+`reload` is two edits and is rejected. Transposed letters are among the commonest
+typos, so either list the likely transposition in `a` or prefer a `mc` question where
+the exact spelling is the point.
+
+
 Matched **exactly after normalising** — case, punctuation and small words (`the`, `a`, `of`) are stripped — plus a bounded edit distance so one typo passes. There is deliberately **no substring matching**: it would score *"a sample frame is not what you need"* as correct. List real synonyms in `a` instead.
 
 ### Code answers
@@ -244,6 +254,10 @@ Each topic follows six beats, in order:
 6. **Concept check** — `<div data-quiz="…">`.
 
 Targets per subject, calibrated from STR 501: **8–15 topics, 80–140 questions, 30–60 formula-sheet rows, 1–3 mock exams**. Per topic: 6–10 questions, with at least one conceptual, one computational where applicable, and one trap mirroring a known exam trick.
+
+These are a guide, not a ceiling — the material decides. INN 506 ran to 16 topics and DSC 512 to 20, because a 2-unit course with thirteen session notebooks genuinely has that much in it. Consolidate to roughly one topic per notebook section-group rather than splitting finely, and agree the count with the user at step 3 before writing.
+
+**Let the assessment shape the reviewer.** Check what the exam actually asks before deciding the balance of notes to drills. DSC 512's papers hand out a docstring and mark the *method* — 6 of 10 marks for being vectorised and inside a line limit, only 4 for correctness — so its topics teach the one-liner as the answer rather than as an optimisation. A reviewer built on the assumption that exams test recall would have missed that entirely.
 
 A subject can ship usefully at 60% — notes and concept checks, no mock exam, no decision map. Every part is optional except topics and banks.
 
