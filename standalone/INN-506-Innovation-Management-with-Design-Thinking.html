@@ -169,6 +169,36 @@ ol.steps>li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 .k-cm{font-style:italic;color:var(--fg3)}
 /* Typed code answers need a monospace box wide enough to read. */
 .ain.code{font-family:var(--mono);font-size:13px;min-width:230px;max-width:340px}
+/* ============ RUNNABLE PYTHON CELLS ============ */
+.pyc{border:1px solid var(--line);border-left:3px solid var(--accent-line);
+  border-radius:var(--radius-sm);background:var(--surface);margin:14px 0;overflow:hidden}
+.pyc.ex{border-left-color:var(--info)}
+.pyq{padding:13px 15px 0;font-size:14.5px}
+.pyq .exn{display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:600;width:22px;height:22px;flex:none;
+  border-radius:50%;background:var(--info-bg);color:var(--info);margin-right:9px;
+  vertical-align:middle}
+.pyc-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 15px 0}
+.pyc-state{font-family:var(--mono);font-size:11px;color:var(--fg3)}
+.pyc-state.busy{color:var(--accent)}
+.pyc-state.ok{color:var(--ok);font-weight:600}
+.pyc-state.no{color:var(--bad);font-weight:600}
+.pyc-state.rv{color:var(--warn)}
+.pyc-in{display:block;width:100%;border:0;border-top:1px solid var(--line);box-sizing:border-box;
+  margin-top:11px;padding:12px 15px;background:var(--surface2);color:var(--fg);
+  font-family:var(--mono);font-size:13px;line-height:1.55;tab-size:4;-moz-tab-size:4;
+  resize:vertical;min-height:62px;overflow-x:auto;white-space:pre;outline:0}
+.pyc-in:focus{background:var(--bg);box-shadow:inset 0 0 0 2px var(--accent-line)}
+.pyc-out{border-top:1px solid var(--line);padding:11px 15px;background:var(--bg);
+  font-family:var(--mono);font-size:12.5px;line-height:1.5;
+  white-space:pre-wrap;word-break:break-word;color:var(--fg2);max-height:340px;overflow:auto}
+.pyc-out.ok{background:var(--ok-bg);color:var(--fg);border-top-color:var(--ok-line)}
+.pyc-out.err{background:var(--bad-bg);color:var(--fg);border-top-color:var(--bad-line)}
+.pyc .sol{margin:0;border-top:1px solid var(--line);border-radius:0}
+.pyc .sol.on{padding:13px 15px}
+.pyc .sol .codeblock{margin-bottom:0}
+@media(max-width:560px){ .pyc-in{font-size:12.5px} }
+
 /* Link from a topic to the notebook it was built from. */
 .nblink{display:inline-flex;align-items:center;gap:7px;text-decoration:none;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
@@ -2668,6 +2698,158 @@ function textOk(raw, item){
    Python is case-sensitive, and there is no edit-distance
    tolerance because in code two characters is the whole answer.
    ------------------------------------------------------------ */
+/* ============================================================
+   PYTHON RUNTIME
+
+   Runs real CPython in the page via Pyodide, so a reader can edit
+   a snippet and see what it actually does. Three decisions worth
+   knowing, each of them measured rather than assumed:
+
+   1. It runs in a Web Worker, not on the main thread. Beginners
+      write infinite loops, and on the main thread `while True:`
+      freezes the tab permanently with no way back. A worker can
+      be terminated, which is what RUN_TIMEOUT below does.
+
+   2. The runtime is fetched from a CDN, never from disk. A page
+      opened by double-click has a `file://` origin, and browsers
+      refuse to fetch one local file from another — so a vendored
+      copy cannot work, while a cross-origin CDN fetch can, and
+      does. The cost is that the first run of a session needs
+      network; everything is browser-cached afterwards.
+
+   3. One interpreter serves the whole page, so imports and names
+      persist between cells the way they do in a notebook. Killing
+      a runaway cell resets that, and the UI says so.
+
+   If the runtime cannot load — offline, or a blocked CDN — cells
+   fall back to showing their expected output and say why. Nothing
+   else on the page depends on any of this.
+   ============================================================ */
+var PY_INDEX_URL = 'https://cdn.jsdelivr.net/pyodide/v0.28.3/full/';
+var RUN_TIMEOUT  = 15000;   /* ms before a cell is assumed runaway */
+
+var PyRunner = (function(){
+  var worker = null, booting = null, seq = 0, pending = {}, loaded = {};
+  var INDEX = PY_INDEX_URL;
+
+  /* The worker is built from a Blob so it inherits this page's
+     origin and may importScripts the cross-origin runtime. */
+  function workerSource(){
+    return [
+      'importScripts(' + JSON.stringify(INDEX + 'pyodide.js') + ');',
+      'var py = null;',
+      'self.onmessage = async function(e){',
+      '  var m = e.data;',
+      '  try {',
+      '    if (m.cmd === "boot"){',
+      '      py = await loadPyodide({ indexURL: ' + JSON.stringify(INDEX) + ' });',
+      '      self.postMessage({ id:m.id, ok:true });',
+      '    } else if (m.cmd === "load"){',
+      '      await py.loadPackage(m.pkgs);',
+      '      self.postMessage({ id:m.id, ok:true });',
+      '    } else if (m.cmd === "run"){',
+      '      var buf = "";',
+      '      py.setStdout({ batched: function(s){ buf += s + "\\n"; } });',
+      '      py.setStderr({ batched: function(s){ buf += s + "\\n"; } });',
+      '      try {',
+      '        await py.runPythonAsync(m.code);',
+      '        self.postMessage({ id:m.id, ok:true, out:buf });',
+      '      } catch (err){',
+      '        self.postMessage({ id:m.id, ok:false, out:buf, err:String(err) });',
+      '      }',
+      '    }',
+      '  } catch (err){',
+      '    self.postMessage({ id:m.id, ok:false, err:String(err && err.message || err) });',
+      '  }',
+      '};'
+    ].join('\n');
+  }
+
+  function spawn(){
+    var url = URL.createObjectURL(new Blob([workerSource()], { type:'text/javascript' }));
+    var w = new Worker(url);
+    w.onmessage = function(e){
+      var p = pending[e.data.id];
+      if (!p) return;
+      delete pending[e.data.id];
+      clearTimeout(p.timer);
+      p.resolve(e.data);
+    };
+    w.onerror = function(){
+      /* Usually a blocked or unreachable CDN. Fail every waiter so
+         no cell is left spinning forever. */
+      Object.keys(pending).forEach(function(k){
+        clearTimeout(pending[k].timer);
+        pending[k].resolve({ ok:false, err:'runtime-unavailable' });
+        delete pending[k];
+      });
+      booting = null;
+    };
+    return w;
+  }
+
+  function send(msg, timeout){
+    if (!worker) return Promise.resolve({ ok:false, err:'runtime-unavailable' });
+    var id = ++seq;
+    msg.id = id;
+    return new Promise(function(resolve){
+      pending[id] = { resolve:resolve, timer:setTimeout(function(){
+        delete pending[id];
+        /* Assume runaway code. Killing the worker is the only way
+           back, and it discards every name the page had defined. */
+        kill();
+        resolve({ ok:false, err:'timeout' });
+      }, timeout || RUN_TIMEOUT) };
+      worker.postMessage(msg);
+    });
+  }
+
+  function kill(){
+    if (worker){ worker.terminate(); worker = null; }
+    booting = null; loaded = {}; pending = {};
+  }
+
+  function boot(){
+    if (booting) return booting;
+    try { worker = spawn(); }
+    catch (e){ return Promise.resolve({ ok:false, err:'runtime-unavailable' }); }
+    /* The first boot pulls ~13MB, so it gets a longer leash. */
+    booting = send({ cmd:'boot' }, 120000).then(function(r){
+      if (!r.ok) kill();
+      return r;
+    });
+    return booting;
+  }
+
+  function need(pkgs){
+    var want = (pkgs || []).filter(function(p){ return !loaded[p]; });
+    if (!want.length) return Promise.resolve({ ok:true });
+    return send({ cmd:'load', pkgs:want }, 120000).then(function(r){
+      if (r.ok) want.forEach(function(p){ loaded[p] = true; });
+      return r;
+    });
+  }
+
+  return {
+    /* Resolves {ok, out, err}. Never rejects — callers render the
+       failure rather than handling an exception. */
+    run: function(code, pkgs){
+      return boot().then(function(b){
+        if (!b.ok) return b;
+        return need(pkgs).then(function(l){
+          if (!l.ok) return l;
+          return send({ cmd:'run', code:code });
+        });
+      });
+    },
+    booted: function(){ return !!worker; },
+    reset: kill,
+    /* Point at a self-hosted copy instead of the CDN. Only useful
+       when the page is served over http — see the note above. */
+    configure: function(url){ if (url){ kill(); INDEX = url; } }
+  };
+})();
+
 /* ------------------------------------------------------------
    PYTHON HIGHLIGHTING — display only, never grading.
 
@@ -2712,6 +2894,157 @@ function highlightCode(root){
     b.innerHTML = capHTML + pyHighlight(b.textContent.replace(/^\n/, ''));
     b.classList.add('lit');
   }
+}
+
+/* ------------------------------------------------------------
+   RUNNABLE CELL — the editor, its Run button and its output.
+   `spec` is { code, pkgs, test, sol, solcode, onSettle }.
+   onSettle(passed) is called only for cells that carry a test.
+   ------------------------------------------------------------ */
+function buildPyCell(spec){
+  var el = document.createElement('div');
+  el.className = 'pyc' + (spec.test ? ' ex' : '');
+  el.innerHTML =
+    (spec.q ? '<div class="pyq">' + spec.q + '</div>' : '') +
+    '<div class="pyc-bar">' +
+      '<button type="button" class="btn sm run">Run</button>' +
+      (spec.test ? '<button type="button" class="btn ghost sm check">Run tests</button>' : '') +
+      '<button type="button" class="btn ghost sm reset">Reset</button>' +
+      (spec.sol || spec.solcode ? '<button type="button" class="btn ghost sm peek">Show solution</button>' : '') +
+      '<span class="pyc-state"></span>' +
+    '</div>' +
+    '<textarea class="pyc-in" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>' +
+    '<div class="pyc-out" hidden></div>' +
+    (spec.sol || spec.solcode ? '<div class="sol">' + (spec.sol || '') +
+      (spec.solcode ? '<div class="codeblock">' + esc(spec.solcode) + '</div>' : '') + '</div>' : '');
+
+  var ta    = el.querySelector('.pyc-in');
+  var out   = el.querySelector('.pyc-out');
+  var state = el.querySelector('.pyc-state');
+  var sol   = el.querySelector('.sol');
+  var start = spec.code || '';
+  var settled = false;
+
+  ta.value = start;
+  /* Line count is a reliable size even while the section is still
+     hidden; measuring is not, because a display:none element
+     reports a scrollHeight of 0 and would collapse the box. */
+  ta.rows = Math.max(3, start.split('\n').length + 1);
+  function autosize(){
+    ta.style.height = 'auto';
+    if (ta.scrollHeight > 0) ta.style.height = (ta.scrollHeight + 2) + 'px';
+  }
+  ta.addEventListener('input', autosize);
+
+  /* Tab must indent, not move focus — this is Python. Shift+Tab
+     removes one level. Escape restores tabbing out, for keyboard
+     users who would otherwise be trapped in the box. */
+  var trap = true;
+  ta.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ trap = false; return; }
+    if (e.key !== 'Tab' || !trap) return;
+    e.preventDefault();
+    var s = ta.selectionStart, t = ta.selectionEnd, v = ta.value;
+    if (e.shiftKey){
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      if (v.slice(ls, ls + 4) === '    '){
+        ta.value = v.slice(0, ls) + v.slice(ls + 4);
+        ta.selectionStart = ta.selectionEnd = Math.max(ls, s - 4);
+      }
+    } else {
+      ta.value = v.slice(0, s) + '    ' + v.slice(t);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+    autosize();
+  });
+  ta.addEventListener('focus', function(){ trap = true; });
+
+  function show(cls, text){
+    out.hidden = false;
+    out.className = 'pyc-out ' + cls;
+    out.textContent = text;
+  }
+  function busy(msg){ state.className = 'pyc-state busy'; state.textContent = msg; }
+  function idle(cls, msg){ state.className = 'pyc-state ' + (cls || ''); state.textContent = msg || ''; }
+
+  function explain(err){
+    if (err === 'runtime-unavailable')
+      return 'Python could not start. The runtime is downloaded the first time you press Run, so this usually means no internet connection — or that something is blocking jsdelivr.net. Everything else on this page works offline; only the Run button needs the network, and only once per browser.';
+    if (err === 'timeout')
+      return 'Stopped after ' + (RUN_TIMEOUT / 1000) + ' seconds. That is almost always a loop that never ends — check that something in the body changes the condition. The interpreter was restarted, so anything you defined in earlier cells is gone; run those cells again.';
+    return err;
+  }
+
+  function exec(code, pkgs, after){
+    if (!PyRunner.booted()) busy('Starting Python — first run downloads the runtime…');
+    else busy('Running…');
+    out.hidden = true;
+    return PyRunner.run(code, pkgs).then(function(r){
+      if (!r.ok && (r.err === 'runtime-unavailable' || r.err === 'timeout')){
+        idle('no', r.err === 'timeout' ? 'Stopped' : 'Unavailable');
+        show('err', explain(r.err));
+        return null;
+      }
+      idle('');
+      after(r);
+      return r;
+    });
+  }
+
+  el.querySelector('.run').onclick = function(){
+    exec(ta.value, spec.pkgs, function(r){
+      var body = (r.out || '').replace(/\n+$/, '');
+      if (r.ok){
+        show('', body || '(ran without printing anything)');
+        idle('ok', 'Ran');
+      } else {
+        show('err', (body ? body + '\n' : '') + lastLine(r.err));
+        idle('no', 'Error');
+      }
+    });
+  };
+
+  var chk = el.querySelector('.check');
+  if (chk) chk.onclick = function(){
+    /* The reader's code and the test run as one program, so the
+       test sees exactly the names the reader defined. */
+    exec(ta.value + '\n\n' + spec.test, spec.pkgs, function(r){
+      var body = (r.out || '').replace(/\n+$/, '');
+      if (r.ok){
+        show('ok', (body ? body + '\n\n' : '') + 'All tests passed.');
+        idle('ok', 'Passed');
+        if (!settled){ settled = true; if (spec.onSettle) spec.onSettle(true); }
+      } else {
+        show('err', (body ? body + '\n' : '') + lastLine(r.err));
+        idle('no', 'Failed');
+      }
+    });
+  };
+
+  el.querySelector('.reset').onclick = function(){
+    ta.value = start; autosize(); out.hidden = true; idle('');
+  };
+
+  var peek = el.querySelector('.peek');
+  if (peek) peek.onclick = function(){
+    var on = sol.classList.toggle('on');
+    this.textContent = on ? 'Hide solution' : 'Show solution';
+    /* Same rule as a concept check: seeing the answer first means
+       it is not earned. */
+    if (on && !settled){
+      settled = true;
+      if (spec.onSettle) spec.onSettle(false);
+      idle('rv', 'Revealed — not scored');
+    }
+    if (on) highlightCode(sol);
+  };
+
+  return el;
+}
+
+function lastLine(s){
+  var parts = String(s).split('\n').filter(function(x){ return x.trim(); });
+  return parts.length ? parts[parts.length - 1] : String(s);
 }
 
 /* A sentinel that cannot occur in Python source, so a lifted
@@ -2776,10 +3109,15 @@ function init(cfg){
   var EXAM         = cfg.exam || null;
   var TREE         = (cfg.map && cfg.map.tree) || null;
   var RES          = (cfg.map && cfg.map.results) || null;
+  var EXERCISES    = (cfg.python && cfg.python.exercises) || {};
+  if (cfg.python && cfg.python.indexURL) PyRunner.configure(cfg.python.indexURL);
 
   /* Stable ids, so saved progress keeps tracking the right question. */
   Object.keys(BANKS).forEach(function(k){
     BANKS[k].forEach(function(q, i){ q.id = k + '-' + (i + 1); q.topic = k; });
+  });
+  Object.keys(EXERCISES).forEach(function(k){
+    EXERCISES[k].forEach(function(x, i){ x.id = 'x-' + k + '-' + (i + 1); x.topic = k; });
   });
 
   /* ============================================================
@@ -2791,6 +3129,7 @@ function init(cfg){
     var ids = Object.keys(progress), tot = 0, right = 0, i;
     var total = 0;
     Object.keys(BANKS).forEach(function(k){ total += BANKS[k].length; });
+    Object.keys(EXERCISES).forEach(function(k){ total += EXERCISES[k].length; });
     for (i = 0; i < ids.length; i++){ tot++; if (progress[ids[i]] === 1) right++; }
     if (pbar) pbar.style.width = total ? (tot / total * 100) + '%' : '0%';
     if (pscore) pscore.textContent = right + ' / ' + tot + ' correct';
@@ -3001,9 +3340,52 @@ function init(cfg){
       if (BANKS[key]) renderQuiz(BANKS[key], hosts[i], 'study');
       else hosts[i].innerHTML = '<p class="fatal">No question bank named "' + esc(key) + '".</p>';
     }
+    mountPython(sec);
     /* Solutions can carry code blocks, and they only exist now. */
     highlightCode(sec);
     mounted[sectionId] = true;
+  }
+
+  /* Runnable cells. Two kinds: a .pycell written inline in the
+     content, which just runs; and a [data-exercise] host filled
+     from the config, which also carries tests and counts toward
+     progress exactly as a concept check does. */
+  function mountPython(sec){
+    var cells = sec.querySelectorAll('.pycell');
+    for (var i = 0; i < cells.length; i++){
+      var src = cells[i];
+      /* A caption is a label, not code — lift it out before reading
+         the source, or it becomes the first line of the program. */
+      var cap = src.querySelector('.codecap'), capHTML = '';
+      if (cap){ capHTML = cap.outerHTML; cap.parentNode.removeChild(cap); }
+      var cell = buildPyCell({
+        q: capHTML || null,
+        code: src.textContent.replace(/^\n/, '').replace(/\s+$/, ''),
+        pkgs: (src.getAttribute('data-pkgs') || '').split(',').filter(Boolean)
+      });
+      src.parentNode.replaceChild(cell, src);
+    }
+    var hosts = sec.querySelectorAll('[data-exercise]');
+    for (var j = 0; j < hosts.length; j++){
+      var key = hosts[j].getAttribute('data-exercise');
+      var set = EXERCISES[key];
+      if (!set){
+        hosts[j].innerHTML = '<p class="fatal">No exercise set named "' + esc(key) + '".</p>';
+        continue;
+      }
+      hosts[j].innerHTML = '';
+      set.forEach(function(x, n){
+        hosts[j].appendChild(buildPyCell({
+          q: '<span class="exn">' + (n + 1) + '</span>' + x.q,
+          code: x.start || '',
+          pkgs: x.pkgs,
+          test: x.test,
+          sol: x.sol,
+          solcode: x.solcode,
+          onSettle: (function(id){ return function(ok){ record(id, ok); }; })(x.id)
+        }));
+      });
+    }
   }
 
   /* ============================================================

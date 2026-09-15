@@ -185,6 +185,61 @@ the exact spelling is the point.
 
 Matched **exactly after normalising** — case, punctuation and small words (`the`, `a`, `of`) are stripped — plus a bounded edit distance so one typo passes. There is deliberately **no substring matching**: it would score *"a sample frame is not what you need"* as correct. List real synonyms in `a` instead.
 
+### Runnable code — cells that actually execute
+
+DSC 512 runs real CPython in the page through Pyodide, so a reader can edit a
+snippet and see what it does. Two author-facing forms:
+
+```html
+<!-- a worked example the reader can run and edit -->
+<div class="pycell" data-pkgs="numpy,pandas">
+import numpy as np
+print(np.arange(6).reshape(2, 3))
+</div>
+
+<!-- a set of exercises, checked by assertions -->
+<div data-exercise="t04"></div>
+```
+
+```js
+EXERCISES.t04 = [
+  { q:       'HTML prompt',
+    start:   'def sum_digits(n):\n    ### YOUR CODE HERE\n    raise NotImplementedError',
+    test:    'assert sum_digits(1345) == 13\nassert sum_digits(0) == 0',
+    pkgs:    ['numpy'],          // optional
+    sol:     '<p>Why this works.</p>',
+    solcode: 'def sum_digits(n):\n    return sum(int(c) for c in str(n))' }
+];
+
+REVIEWER.init({ …, python: { exercises: EXERCISES } });
+```
+
+Exercises count toward the progress bar exactly as concept checks do, and
+revealing the solution first scores zero, for the same reason.
+
+**Three things about this were measured, not assumed. Do not undo them.**
+
+1. **The runtime is fetched from a CDN and cannot be vendored.** A page opened
+   by double-click has a `file://` origin, and browsers refuse to fetch one
+   local file from another — a local copy of Pyodide fails with "Failed to
+   fetch dynamically imported module". A *cross-origin* fetch from a
+   `file://` page is allowed, so the CDN works and a vendored copy does not.
+   Vendoring is only an option if you also serve the folder over `http://`.
+2. **Code runs in a Web Worker.** Beginners write `while True:`, and on the
+   main thread that freezes the tab with no way back. The worker is
+   terminated after `RUN_TIMEOUT`, the page survives, and the cell explains
+   what happened. A Blob worker inherits the page origin, which is what lets
+   it `importScripts` the CDN.
+3. **One interpreter serves the page**, so names persist between cells like a
+   notebook. Killing a runaway cell resets that, and the message says so.
+
+Offline, cells report that the runtime could not start and say the rest of the
+page still works. Nothing else depends on the runtime — a subject that does not
+set `python` never spawns one.
+
+To point at a self-hosted copy instead (only meaningful when served over
+`http://`), pass `python: { indexURL: '…/pyodide/' }`.
+
 ### Code answers
 
 **Never use `t:'text'` for code.** `normText` lowercases, strips every operator
@@ -231,6 +286,8 @@ Author-facing classes. The engine owns everything else (`.q`, `.opt`, `.sol`, `.
 | `.codeblock.out` | what the code printed — muted, so it reads as a result not a program |
 | `.codecap` | small uppercase caption inside a code block, for a filename or a label |
 | `.nblink` | link from a topic to the source notebook it was built from |
+| `.pycell` | a code block the reader can edit and run. `data-pkgs="numpy,pandas"` loads those on first use |
+| `data-exercise="tNN"` | host for an exercise set, filled from `python.exercises` — the runnable counterpart of `data-quiz` |
 | `.ans` | inline answer badge with a small label |
 | `.verdict.rej` / `.verdict.keep` | conclusion pill |
 | `.tw > table.dt` | any table. **Always wrap in `.tw`** or it overflows on mobile. `td.s` = the answer, `td.m` = mono, `td.n` = right-aligned numeric |
@@ -308,6 +365,25 @@ Checklist before shipping a subject:
 7. No horizontal overflow at 360, 414 and 768 px — measure `document.documentElement.scrollWidth`.
 8. Dark mode persists across reload; print preview shows all sections once and returns you where you were.
 9. Console is clean. A failed Google Fonts request is expected offline and harmless.
+10. If the subject runs Python: a worked cell produces output; an exercise's
+    starter **fails** its tests and the reference solution **passes**; a
+    plausible-but-wrong answer is rejected; `while True:` is stopped and the
+    page survives; and with the runtime blocked, cells degrade with a message
+    instead of hanging. In this container the CDN is blocked, so redirect it
+    to a local copy in the test rather than concluding it is broken:
+
+    ```js
+    await p.route('**cdn.jsdelivr.net/pyodide/**', r => r.fulfill({
+      status: 302,
+      headers: { location: 'http://127.0.0.1:8766/' + r.request().url().split('/full/')[1] }
+    }));
+    ```
+
+**Write the tests before the page.** Keep every exercise's solution and test in
+a plain Python file and run two checks on each: the reference solution must
+pass, and the starter must **fail**. The second is the one that catches a test
+which does not actually test the reader's work — it caught one here, where the
+assertions exercised `divmod` directly and the untouched starter passed.
 
 ---
 
@@ -341,6 +417,14 @@ Checklist before shipping a subject:
 
 Everything works this way: navigation between subjects, every question type, the timed mock exam, dark mode, saved progress and printing. It has been tested end to end from a local folder with all network access blocked, and there is no degraded mode — the only thing that fails offline is the Google Fonts request, which falls back to system fonts.
 
+**One exception to "everything works offline":** DSC 512's **Run** buttons need
+the network the first time they are pressed in a browser, because the Python
+runtime is downloaded then (~13 MB, plus ~9 MB on first use of NumPy or
+pandas) and cached afterwards. Everything else in that subject — notes,
+concept checks, the mock exam, the syntax sheet — works with no network, and
+the other three subjects need none at all. A cell that cannot reach the
+runtime says so rather than hanging.
+
 **Keep the folder together.** `index.html` needs `assets/` and `subjects/` beside it. That is the cost of the shared engine: a single page moved somewhere on its own loses its styling.
 
 That failure is silent and looks like a rendering bug rather than a missing file: the
@@ -361,7 +445,7 @@ python3 build-standalone.py act501     # just one
 
 This inlines `reviewer.css` and `reviewer.js` into the subject page, turns the two
 "back to subject index" links into plain text (there is no index to return to), and
-writes the result to `standalone/`. Roughly 250–310 KB per subject. Everything works:
+writes the result to `standalone/`. Roughly 265–360 KB per subject. Everything works:
 routing, every question type, the timed mock exam, the decision map, dark mode,
 printing.
 
