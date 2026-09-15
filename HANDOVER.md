@@ -22,8 +22,9 @@ A **reviewer** is a single-page study app for one university subject: topic note
     ├── str501/index.html         the worked reference — read it
     ├── act501/index.html         the second subject
     ├── inn506/index.html         built from decks, no mock exam
-    └── dsc512/index.html         a coding subject — uses t:'code' and .codeblock,
-        notebooks/                and ships the source notebooks beside it
+    ├── dsc512/index.html         a coding subject — uses t:'code' and .codeblock,
+    │   notebooks/                and ships the source notebooks beside it
+    └── aid503/index.html         decks disagreed with the outline — see §11
 ```
 
 **Nothing in `assets/` is subject-specific.** Do not edit it to make one subject work; if a subject needs something the engine cannot do, that is an engine feature and every subject gets it.
@@ -328,6 +329,33 @@ Checklist before shipping a subject:
 **Verify every numeric answer independently.** Compute answers yourself rather than copying them, then check against any released solution. In STR 501 every figure matched the professor's workbook, which is what makes the mock exam trustworthy.
 
 **State the limits in the reviewer itself.** Where a source was unusable or a mark allocation unknown, say so on the page. A student needs to know which parts are authoritative.
+
+## 11a. Lessons from AID 503
+
+**Reconcile the outline against the decks before deriving a single topic, not after.** AID 503's
+outline and its slides disagreed in four places: session 2 was listed as statistical inference but
+actually taught decision analysis and EMV; decision trees were listed in session 4 and taught in
+session 2; session 3 covered both one- and two-population inference rather than the outline's split;
+and session 10 was titled "Unsupervised Learning" while containing none. A topic list derived from
+the outline would have been wrong about a third of the course.
+
+**A deck's title is not its contents.** Check what is actually on the slides. Session 4's outline
+title promised decision trees and predictive modelling; the deck is entirely enterprise analytics.
+
+**Name the gaps on the page, by session.** Five decks were missing, covering unsupervised learning,
+model evaluation metrics, decision trees as ML, SVM, neural networks, reinforcement learning, NLP
+and interpretability. The `#start` section lists each one explicitly so a student knows what this
+reviewer does not cover rather than assuming the silence means "not examinable".
+
+**Two names for the same tool is worth a callout.** Decision-analysis trees (EMV, chance nodes) and
+CART classification trees both appear in an AI course. Say which one a topic means, in a `.note.plain`
+at the top, or students will revise the wrong thing.
+
+**Known engine gap, found here:** `reviewer.js` sets the "Revealed — not scored" label only
+`if (vd)`, and choice questions have no `.vd` element — so on `mc`, `tf` and `ms` items the label
+never appears. The *scoring* half of bug 5 is fine (revealing still records 0 of 1); only the visible
+cue is missing, on every subject. Fixing it means giving choice questions a verdict slot in the
+engine.
 
 ---
 
