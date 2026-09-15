@@ -136,6 +136,35 @@ ol.steps>li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 .fx{font-family:var(--mono);font-size:14px;background:var(--surface2);border:1px solid var(--line);
   border-radius:var(--radius-sm);padding:12px 15px;margin:13px 0;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
 .fx.ans{border-left:3px solid var(--ok);background:var(--ok-bg)}
+
+/* ============ CODE ============
+   Unlike .fx, code must never wrap: a Python line broken across
+   two visual lines reads as a different program, and .fx sets
+   word-break:break-word. So this scrolls sideways instead, inside
+   its own box, which keeps the page itself from overflowing. */
+.codeblock{font-family:var(--mono);font-size:13px;line-height:1.55;
+  background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--accent-line);
+  border-radius:var(--radius-sm);padding:11px 14px;margin:12px 0;
+  overflow-x:auto;white-space:pre;tab-size:4;-moz-tab-size:4}
+/* What the code prints. Muted, so it reads as a result not a program. */
+.codeblock.out{border-left-color:var(--fg3);background:var(--bg);color:var(--fg2)}
+.codeblock .cap,.codecap{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--fg3);font-weight:600;margin-bottom:6px}
+/* Syntax colours map onto the existing palette, so dark mode is
+   already handled by the token overrides at the top of this file. */
+.k-kw{font-style:normal;color:var(--info);font-weight:600}
+.k-bi{font-style:normal;color:var(--accent)}
+.k-st{font-style:normal;color:var(--ok)}
+.k-nu{font-style:normal;color:var(--bad)}
+.k-cm{font-style:italic;color:var(--fg3)}
+/* Typed code answers need a monospace box wide enough to read. */
+.ain.code{font-family:var(--mono);font-size:13px;min-width:230px;max-width:340px}
+/* Link from a topic to the notebook it was built from. */
+.nblink{display:inline-flex;align-items:center;gap:7px;text-decoration:none;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:7px 12px;margin:10px 0;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.nblink:hover{border-color:var(--accent-line);background:var(--accent-bg)}
+.nblink b{font-weight:600}
 .ans{display:inline-block;background:var(--ok-bg);border:1px solid var(--ok-line);color:var(--ok);
   border-radius:var(--radius-sm);padding:7px 13px;margin:5px 8px 5px 0;font-family:var(--mono);font-weight:600;font-size:15px}
 .ans small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;font-weight:500}

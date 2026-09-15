@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DSC 512 — Fundamentals of Programming</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/reviewer.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <button class="menu-t" id="mt" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="brand" href="../../index.html">DSC 512 <span>· Fundamentals of Programming</span></a>
+  <div class="tb-right">
+    <div class="pwrap" title="Concept checks answered"><div class="pfill" id="pbar"></div></div>
+    <span id="pscore">0 / 0</span>
+    <span id="pageidx"></span>
+    <button class="theme" id="theme" aria-label="Toggle dark mode">Dark</button>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="rail" id="rail" aria-label="Sections">
+  <a class="rail-home" href="../../index.html"><b>&larr;</b>All subjects</a>
+  <div class="rgrp">Orientation</div>
+  <a href="#start"><em>00</em>Start here</a>
+  <div class="rgrp">Python core</div>
+  <a href="#t01"><em>01</em>Variables, strings, numbers</a>
+  <a href="#t02"><em>02</em>Conditionals</a>
+  <a href="#t03"><em>03</em>Loops</a>
+  <a href="#t04"><em>04</em>Functions</a>
+  <a href="#t05"><em>05</em>Modules and imports</a>
+  <a href="#t06"><em>06</em>Lists and tuples</a>
+  <a href="#t07"><em>07</em>Dictionaries and sets</a>
+  <a href="#t08"><em>08</em>Files and exceptions</a>
+  <a href="#t09"><em>09</em>Object-oriented programming</a>
+  <div class="rgrp">NumPy</div>
+  <a href="#t10"><em>10</em>Arrays and manipulation</a>
+  <a href="#t11"><em>11</em>Ufuncs and broadcasting</a>
+  <a href="#t12"><em>12</em>Indexing and sorting</a>
+  <div class="rgrp">pandas</div>
+  <a href="#t13"><em>13</em>Series and DataFrame</a>
+  <a href="#t14"><em>14</em>Essential functionality</a>
+  <a href="#t15"><em>15</em>Loading and writing data</a>
+  <a href="#t16"><em>16</em>Cleaning and exploring</a>
+  <a href="#t17"><em>17</em>Visualisation</a>
+  <a href="#t18"><em>18</em>GroupBy and aggregation</a>
+  <a href="#t19"><em>19</em>Time series</a>
+  <a href="#t20"><em>20</em>Merge, reshape, pivot</a>
+  <div class="rgrp">Practice</div>
+  <a href="#test"><em>✓</em>Comprehensive test</a>
+  <a href="#exam"><em>⏱</em>Mock exams</a>
+  <div class="rgrp">Reference</div>
+  <a href="#sheet"><em>ƒ</em>Syntax sheet</a>
+</nav>
+
+<main id="main">
+
+<!-- ================= START ================= -->
+<section id="start">
+  <div class="eyebrow">DSC 512 · Course reviewer</div>
+  <h1>Fundamentals of Programming and Vibe Coding with AI</h1>
+  <p class="lede">A syntax reviewer for the Python you were actually taught — from <code>print()</code> to a pandas pivot — built from the thirteen session notebooks rather than from the course outline, because the two disagree.</p>
+
+  <div class="note why"><span class="tag">What the exams actually ask</span>
+    <p>Neither exam is a recall test. Both give you a <strong>docstring and a function signature</strong>, and you write the body.</p>
+    <ul>
+      <li><strong>Midterm</strong> — 2 parts, one per session, 3 questions each. Every function takes a password string and returns a <code>bool</code>. Marked <code>0%</code> if it raises on valid input, <code>50%</code> if it fails the visible test, <code>80%</code> if it fails the hidden test, <code>100%</code> clean. PEP 8 is checked live by <code>pycodestyle_magic</code>.</li>
+      <li><strong>Final</strong> — 5 questions per section over 2 sections, 10 points each, on NumPy and pandas.</li>
+    </ul>
+  </div>
+
+  <div class="note watch"><span class="tag">The final's rubric is mostly not about correctness</span>
+    <p>Only 4 of the 10 points are for solving the problem. The other 6 are for <em>how</em> you solve it:</p>
+    <div class="tw"><table class="dt">
+      <thead><tr><th>Criterion</th><th class="n">Points</th></tr></thead>
+      <tbody>
+        <tr><td>No runtime errors on a valid attempt</td><td class="n">2</td></tr>
+        <tr><td class="s">Mostly vectorised, no unnecessary for-loops</td><td class="n">2</td></tr>
+        <tr><td class="s">Within the stated line limit</td><td class="n">2</td></tr>
+        <tr><td>Solves the problem as the docstring specifies</td><td class="n">4</td></tr>
+      </tbody>
+    </table></div>
+    <p>So <code>for</code> loops and list comprehensions are effectively banned in the final, semicolons are explicitly forbidden, and some questions cap you at <strong>one line of working code</strong>. A correct loop-based answer can score 6 out of 10. Practise writing the one-liner, not the loop.</p>
+  </div>
+
+  <div class="note scope"><span class="tag">Honest limits of this reviewer</span>
+    <ul>
+      <li><strong>Sessions 1–2, Intro to Linux Shell, are not covered.</strong> Those notebooks were not available when this was built. Everything else in the schedule is here.</li>
+      <li><strong>The course outline is unreliable for this subject.</strong> It omits two notebooks that exist and were taught — <code>08-oop</code> and <code>15-data-restructuring</code> — and its stated learning outcomes promise <strong>version control</strong> and <strong>basic machine learning</strong>, for which there is no notebook, no session and no material. The phrase "Vibe Coding with AI" appears in the course title and in none of the material. Topics here follow the notebooks, because the notebooks are what was taught.</li>
+      <li>Where a notebook's saved output disagreed with its own source, the output was recomputed rather than copied. One cell in <code>04-loops-conditionals</code> has a stored <code>TypeError</code> that its code cannot produce.</li>
+    </ul>
+  </div>
+
+  <h3>How each topic is built</h3>
+  <ol class="steps">
+    <li><strong>The idea in plain English</strong> — before any syntax.</li>
+    <li><strong>The syntax</strong> — the forms you have to be able to write from memory.</li>
+    <li><strong>A worked example</strong> — real code, and what it prints.</li>
+    <li><strong>Traps</strong> — the behaviour that catches people out.</li>
+    <li><strong>Recap</strong> — three things to remember.</li>
+    <li><strong>Concept check</strong> — questions with revealable solutions.</li>
+  </ol>
+
+  <div class="note"><span class="tag">The notebooks are here too</span>
+    <p>Every topic links to the notebook it was built from, under <code>notebooks/</code> beside this page. Open one to run the original code. Those links need the folder structure intact — in the single-file standalone copy they will not resolve.</p>
+  </div>
+</section>
+
+<!-- ================= 01 ================= -->
+<section id="t01">
+  <div class="lessonhead"><span class="lnum">01</span><div class="eyebrow">Sessions 3–4 · notebook 03</div></div>
+  <h2>Variables, strings and numbers</h2>
+  <span class="pill mid">Midterm</span><span class="pill fm">PEP 8 checked</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A variable is a name you stick on a value so you can talk about it later.</div>
+    <p class="pana">Nothing is being "stored in" the name the way a box holds an object. The name is a label pointing at a value, and assigning again just moves the label. That is why <code>a = b</code> never couples the two names together afterwards.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>What do I call this value?</span></div>
+      <div class="pcell"><b>It gives you</b><span>A name that refers to a value</span></div>
+      <div class="pcell"><b>Watch for</b><span>Types: <code>/</code> always returns a float</span></div>
+    </div>
+  </div>
+
+  <h3>Naming rules you can be marked on</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Rule</th><th>Valid</th><th>Invalid</th></tr></thead>
+    <tbody>
+      <tr><td>Letters, digits, underscores only</td><td class="m">message_1</td><td class="m">1_message</td></tr>
+      <tr><td>No spaces</td><td class="m">greeting_message</td><td class="m">greeting message</td></tr>
+      <tr><td>Not a keyword or builtin</td><td class="m">printed_text</td><td class="m">print</td></tr>
+      <tr><td class="s">PEP 8: lowercase with underscores</td><td class="m">first_name</td><td class="m">firstName</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="tag">PEP 8, other recommendations</span>
+    <p>Always surround binary operators with a single space on either side: assignment <code>=</code>, augmented assignment <code>+=</code>, comparisons <code>==</code> <code>&lt;</code> <code>&gt;</code> <code>!=</code> <code>&lt;=</code> <code>&gt;=</code> <code>in</code> <code>not in</code> <code>is</code> <code>is not</code>, and booleans <code>and</code> <code>or</code> <code>not</code>.</p>
+  </div>
+
+  <h3>Strings</h3>
+  <div class="codeblock"><span class="codecap">Defining</span>"This is a string"
+'This is a string'
+'I told my friend, "My dream is to become a data science leader"'
+"The language 'Python' is named after Monty Python"</div>
+  <p>Single and double quotes are identical in Python. PEP 8 declines to pick one — but when the text contains a quote, use the <em>other</em> kind rather than backslashes. Triple-quoted strings always use double quotes, to match the docstring convention.</p>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Operation</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>Concatenate</td><td class="m">"Leo" + " " + "Lorenzo"</td><td class="m">'Leo Lorenzo'</td></tr>
+      <tr><td>Repeat</td><td class="m">'eo' * 10</td><td class="m">'eoeoeoeoeoeoeoeoeoeo'</td></tr>
+      <tr><td>Membership</td><td class="m">'eo' in name</td><td class="m">True</td></tr>
+      <tr><td>Length</td><td class="m">len('eo' * 10)</td><td class="m">20</td></tr>
+      <tr><td>Case</td><td class="m">name.title() .upper() .lower()</td><td class="m">'Leo Lorenzo Ii'</td></tr>
+      <tr><td>Find position</td><td class="m">'data science'.index('e')</td><td class="m">8</td></tr>
+      <tr><td>Count</td><td class="m">'data science'.count('e')</td><td class="m">2</td></tr>
+      <tr><td>Pad</td><td class="m">name.center(30) .ljust(30) .rjust(30)</td><td class="m">padded to width 30</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Slicing</h3>
+  <p>Given <code>name = "Leo Lorenzo II"</code>:</p>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Slice</th><th>Result</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="m">name[0]</td><td class="m s">'L'</td><td>First character — index 0</td></tr>
+      <tr><td class="m">name[-1]</td><td class="m s">'I'</td><td>Last character</td></tr>
+      <tr><td class="m">name[0:3]</td><td class="m s">'Leo'</td><td>Stops <em>before</em> index 3</td></tr>
+      <tr><td class="m">name[:3]</td><td class="m s">'Leo'</td><td>Start defaults to 0</td></tr>
+      <tr><td class="m">name[0:-1]</td><td class="m s">'Leo Lorenzo I'</td><td>Everything but the last</td></tr>
+      <tr><td class="m">name[::-1]</td><td class="m s">'II ozneroL oeL'</td><td>Step of −1 reverses</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Putting variables inside strings</h3>
+  <div class="codeblock">first_name = "leo"
+last_name = "lorenzo"
+suffix = "ii"
+
+full_name = f"{first_name} {last_name} {suffix}"      # f-string — prefer this
+print("{} {} {}".format(first_name, last_name, suffix))   # format method
+print("%s %s %s" % (first_name, last_name, suffix))       # traditional</div>
+
+  <h3>Numbers</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Operator</th><th>Name</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td class="m">+ - *</td><td>Add, subtract, multiply</td><td class="m">8 * 2.5</td><td class="m">20.0</td></tr>
+      <tr><td class="m">/</td><td>Division</td><td class="m">9 / 2</td><td class="m s">4.5 — always a float</td></tr>
+      <tr><td class="m">//</td><td>Floor division</td><td class="m">9 // 2</td><td class="m">4</td></tr>
+      <tr><td class="m">%</td><td>Modulus</td><td class="m">9 % 2</td><td class="m">1</td></tr>
+      <tr><td class="m">**</td><td>Exponent</td><td class="m">2 ** 3</td><td class="m">8</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note watch"><span class="tag">Floor division and modulus with negatives</span>
+    <p>Python rounds floor division <em>down</em>, toward negative infinity — not toward zero as C and Java do. And the modulus takes the sign of the <strong>right</strong> operand.</p>
+    <div class="codeblock">9 // 2     #  4
+9 // -2    # -5   not -4
+9 % 2      #  1
+-9 % 2     #  1   not -1
+-9 % 4     #  3   not -1</div>
+    <p>The identity that holds is <code>a == (a // b) * b + (a % b)</code>. Check a negative case by hand before you trust your intuition.</p>
+  </div>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Function</th><th>Does</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td class="m">abs(x)</td><td>Absolute value</td><td class="m">abs(-1) → 1</td></tr>
+      <tr><td class="m">int(x) / float(x)</td><td>Convert type — <code>int</code> truncates</td><td class="m">int(1.23) → 1</td></tr>
+      <tr><td class="m">divmod(x, y)</td><td>The pair <code>(x // y, x % y)</code></td><td class="m">divmod(11, 5) → (2, 1)</td></tr>
+      <tr><td class="m">pow(x, y)</td><td>Same as <code>x ** y</code></td><td class="m">pow(2, 3) → 8</td></tr>
+      <tr><td class="m">complex(x, y)</td><td>Complex number <code>x + iy</code></td><td class="m">complex(1, 2)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Underscores group digits for readability — <code>1_000_000_000</code> is the same value as <code>1000000000</code>. To print with separators, use <code>f"{large_number:,}"</code>.</p>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>/</code> always produces a float, even <code>4 / 2</code>. Use <code>//</code> when you want an integer.</li>
+      <li>Negative floor division rounds <em>down</em>, and <code>%</code> takes the sign of the right operand.</li>
+      <li>Slices stop <em>before</em> the upper index, and <code>[::-1]</code> reverses.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/03-hello-python.ipynb"><b>Notebook 03</b> — Hello Python!</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t01"></div>
+</section>
+
+<!-- ================= 02 ================= -->
+<section id="t02">
+  <div class="lessonhead"><span class="lnum">02</span><div class="eyebrow">Sessions 3–4 · notebook 04</div></div>
+  <h2>Conditionals and boolean logic</h2>
+  <span class="pill mid">Midterm</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A conditional test is any expression that Python can answer with True or False.</div>
+    <p class="pana">Everything else — <code>if</code>, <code>while</code>, filtering a list — is built on that one idea. Get comfortable reading an expression and saying which of the two it is, and the rest of control flow follows.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>Is this condition met?</span></div>
+      <div class="pcell"><b>It gives you</b><span>A <code>bool</code>: True or False</span></div>
+      <div class="pcell"><b>Watch for</b><span>String comparison is case-sensitive</span></div>
+    </div>
+  </div>
+
+  <h3>Comparison operators</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Operator</th><th>True when</th></tr></thead>
+    <tbody>
+      <tr><td class="m">==</td><td>Both sides are equal</td></tr>
+      <tr><td class="m">!=</td><td>The sides are not equal</td></tr>
+      <tr><td class="m">&gt;</td><td>Left is greater than right</td></tr>
+      <tr><td class="m">&lt;</td><td>Left is less than right</td></tr>
+      <tr><td class="m">&gt;=</td><td>Left is greater than or equal to right</td></tr>
+      <tr><td class="m">&lt;=</td><td>Left is less than or equal to right</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note watch"><span class="tag">String equality is case-sensitive</span>
+    <div class="codeblock">car = 'Toyota'
+print(car == 'toyota')        # False
+
+print(car.lower() == 'toyota')  # True</div>
+    <p>Normalise the case immediately before comparing. This is the single most common source of a silently wrong password-rule function in the midterm.</p>
+  </div>
+
+  <h3>Combining conditions</h3>
+  <div class="codeblock">age = 26
+
+age &gt;= 18 and age &lt; 30     # True  — both sides must hold
+age &lt; 18 or age &gt; 30       # False — at least one side must hold
+not (age &gt;= 18)            # False — negates whatever follows</div>
+  <p><code>and</code> is True only when both operands are True. <code>or</code> is True when at least one is. <code>not</code> flips a boolean.</p>
+
+  <h3>if, if–else, if–elif–else</h3>
+  <div class="codeblock"><span class="codecap">The three shapes</span>if conditional_test:
+    do_something()
+
+if conditional_test:
+    do_something()
+else:
+    do_something_else()
+
+if test_one:
+    first_branch()
+elif test_two:
+    second_branch()
+else:
+    fallback()</div>
+
+  <h3>A worked example</h3>
+  <p>Typhoon classification by wind speed, which is a natural <code>elif</code> chain because the bands are ordered and exclusive:</p>
+  <div class="codeblock">wind_speed = 120    # km/h
+
+if wind_speed &lt; 62:
+    classification = "TROPICAL DEPRESSION (TD)"
+elif wind_speed &lt; 88:
+    classification = "TROPICAL STORM (TS)"
+elif wind_speed &lt; 117:
+    classification = "SEVERE TROPICAL STORM (STS)"
+elif wind_speed &lt; 184:
+    classification = "TYPHOON (TY)"
+else:
+    classification = "SUPER TYPHOON (STY)"
+
+print(f"The classification of the typhoon is {classification}")</div>
+  <div class="codeblock out"><span class="codecap">Output</span>The classification of the typhoon is TYPHOON (TY)</div>
+
+  <div class="note why"><span class="tag">Why the chain works without upper bounds</span>
+    <p>Python runs the tests in order and <strong>stops at the first one that passes</strong>. By the time <code>wind_speed &lt; 88</code> is evaluated, <code>wind_speed &lt; 62</code> has already failed, so the band is implicitly 62–87. Writing <code>elif 62 &lt;= wind_speed &lt; 88</code> is correct but redundant. Reorder the branches, though, and the whole thing breaks silently.</p>
+  </div>
+  <p>An <code>else</code> at the end is optional. Sometimes a final <code>elif</code> that names its condition explicitly reads better than a catch-all.</p>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li>Only <strong>one</strong> branch of an <code>if–elif–else</code> chain ever runs — the first that passes.</li>
+      <li>String comparison is case-sensitive; normalise with <code>.lower()</code> before comparing.</li>
+      <li><code>=</code> assigns, <code>==</code> compares. Using <code>=</code> in a condition is a <code>SyntaxError</code>, not a silent bug.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/04-loops-conditionals.ipynb"><b>Notebook 04</b> — Loops and Conditionals</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t02"></div>
+</section>
+
+<!-- ================= 03 ================= -->
+<section id="t03">
+  <div class="lessonhead"><span class="lnum">03</span><div class="eyebrow">Sessions 3–4 · notebook 04</div></div>
+  <h2>Loops and loop control</h2>
+  <span class="pill mid">Midterm</span><span class="pill tp">Final · avoid these</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">Write the instruction once, and let Python repeat it.</div>
+    <p class="pana">Use <code>for</code> when you know what you are iterating over. Use <code>while</code> when you do not know how many turns it will take and only have a stopping condition.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>for</b><span>Once per item in a collection</span></div>
+      <div class="pcell"><b>while</b><span>Until a condition goes False</span></div>
+      <div class="pcell"><b>Watch for</b><span>Forget to indent and it is an error</span></div>
+    </div>
+  </div>
+
+  <div class="note scope"><span class="tag">Required now, penalised later</span>
+    <p>Loops are core to the midterm. In the <strong>final</strong>, explicit <code>for</code> loops <em>and list comprehensions</em> cost you 2 of 10 marks on NumPy and pandas questions, which are graded on being vectorised. Learn loops properly here; then learn in topics 10–20 how to avoid writing them.</p>
+  </div>
+
+  <h3>The two forms</h3>
+  <div class="codeblock">for &lt;&lt;loop_variable&gt;&gt; in &lt;&lt;iterable&gt;&gt;:
+    &lt;&lt;block&gt;&gt;
+
+while &lt;&lt;conditional_expression&gt;&gt;:
+    &lt;&lt;block&gt;&gt;</div>
+
+  <div class="codeblock">message = 'I am a Data Science Leader'
+for ch in message:
+    if ch.isupper():
+        print(ch)</div>
+  <div class="codeblock out"><span class="codecap">Output</span>I
+D
+S
+L</div>
+
+  <h3>range()</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Call</th><th>Produces</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td class="m">range(5)</td><td class="m s">0 1 2 3 4</td><td>Stop is <strong>exclusive</strong></td></tr>
+      <tr><td class="m">range(1, 5)</td><td class="m s">1 2 3 4</td><td>Start inclusive, stop exclusive</td></tr>
+      <tr><td class="m">range(0, 10, 2)</td><td class="m s">0 2 4 6 8</td><td>Third argument is the step</td></tr>
+      <tr><td class="m">range(5, 0, -1)</td><td class="m s">5 4 3 2 1</td><td>A negative step counts down</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>range(4)</code> produces exactly the valid indices of a list of length 4. That is the reason it is exclusive at the top.</p>
+
+  <h3>while, with a real stopping condition</h3>
+  <div class="codeblock">time = 0
+initial_population = 1_000
+growth_rate = 0.21          # 21% growth per minute
+population = initial_population
+
+while population &lt; 2 * initial_population:
+    population += growth_rate * population
+    time += 1
+
+print(f"It took {time} minutes for the bacteria to double.")</div>
+  <div class="codeblock out"><span class="codecap">Output</span>It took 4 minutes for the bacteria to double.</div>
+
+  <h3>break and continue</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Keyword</th><th>Effect</th><th>Work done over <code>range(24)</code></th></tr></thead>
+    <tbody>
+      <tr><td class="m">—</td><td>Runs every iteration</td><td class="n s">24</td></tr>
+      <tr><td class="m">break</td><td>Leaves the loop immediately</td><td class="n s">8</td></tr>
+      <tr><td class="m">continue</td><td>Skips to the next iteration</td><td class="n s">23</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note why"><span class="tag">Why break gives 8 and continue gives 23</span>
+    <p>With <code>if time == 8: break</code>, the loop adds 1 for <code>time</code> 0 through 7 — eight iterations — then exits at 8 without adding. With <code>continue</code>, it skips only the single iteration where <code>time == 8</code> and completes the other 23. One value is skipped either way; the difference is whether the remaining sixteen still run.</p>
+  </div>
+
+  <h3>enumerate()</h3>
+  <div class="codeblock">for i, value in enumerate(['a', 'b', 'c']):
+    print(i, value)</div>
+  <div class="codeblock out"><span class="codecap">Output</span>0 a
+1 b
+2 c</div>
+  <p>Use <code>enumerate</code> when you need both the position and the item. Reaching for <code>range(len(xs))</code> and indexing back into <code>xs</code> works but reads worse.</p>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>range(n)</code> stops at <code>n - 1</code>. Off-by-one errors in the midterm almost always live here.</li>
+      <li><code>break</code> abandons the loop; <code>continue</code> abandons only the current iteration.</li>
+      <li>A <code>while</code> loop whose condition never goes False hangs. Make sure the body changes something the condition reads.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/04-loops-conditionals.ipynb"><b>Notebook 04</b> — Loops and Conditionals</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t03"></div>
+</section>
+
+<!-- ================= 04 ================= -->
+<section id="t04">
+  <div class="lessonhead"><span class="lnum">04</span><div class="eyebrow">Sessions 5–6 · notebook 05</div></div>
+  <h2>Functions</h2>
+  <span class="pill mid">Midterm</span><span class="pill tp">Final · every answer is a function</span><span class="pill fm">Docstrings marked</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A function is a name for a piece of work, so you write the work once and call it many times.</div>
+    <p class="pana">The principle behind it is <strong>DRY — Don't Repeat Yourself</strong>. Whenever you notice yourself writing the same few lines a second time, that is the signal to wrap them in a function.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>Can I name this operation?</span></div>
+      <div class="pcell"><b>It gives you</b><span>A reusable, testable unit</span></div>
+      <div class="pcell"><b>Watch for</b><span>Local names die at the <code>return</code></span></div>
+    </div>
+  </div>
+
+  <div class="note watch"><span class="tag">Both exams are entirely this</span>
+    <p>Every midterm and final question hands you a <code>def</code> line and a docstring and asks for the body. You never choose the name, the parameters or the return type — and changing them loses marks. Read the docstring as a specification, including the variable names it uses.</p>
+  </div>
+
+  <h3>Defining and calling</h3>
+  <div class="codeblock">def &lt;&lt;function_name&gt;&gt;(&lt;&lt;arguments&gt;&gt;):
+    &lt;&lt;function_body&gt;&gt;</div>
+
+  <div class="codeblock">def convert_to_fahrenheit(celsius):
+    """Convert a given temperature in celsius to fahrenheit"""
+    fahrenheit = 9/5*celsius + 32
+
+    return fahrenheit
+
+
+convert_to_fahrenheit(29.0)</div>
+  <div class="codeblock out"><span class="codecap">Output</span>84.2</div>
+  <p>The first line is the <em>header</em>; the indented block is the <em>body</em>. A <code>return</code> ends the function immediately and hands back the value of its expression. A function with no <code>return</code> hands back <code>None</code>.</p>
+
+  <h3>Passing arguments</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Style</th><th>Call</th><th>Behaviour</th></tr></thead>
+    <tbody>
+      <tr><td>Positional</td><td class="m">describe_pet('dog', 'Maki')</td><td>Matched by order — get the order wrong and it still runs, wrongly</td></tr>
+      <tr><td class="s">Keyword</td><td class="m">describe_pet(pet_name='Midnight', animal_type='cat')</td><td>Matched by name, so order stops mattering</td></tr>
+      <tr><td>Default</td><td class="m">def f(a, b, middle='')</td><td>Makes an argument optional</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note watch"><span class="tag">Positional arguments fail silently</span>
+    <p><code>describe_pet('Maki', 'dog')</code> raises no error. It simply prints "I have a Maki" — a wrong answer that runs cleanly. Keyword arguments are immune to this.</p>
+  </div>
+
+  <h3>Local variables and scope</h3>
+  <div class="codeblock">def quadratic_formula(a, b, c):
+    """Compute the roots of a quadratic polynomial"""
+    root_1 = (-b + (b**2 - 4*a*c)**0.5) / (2*a)
+    root_2 = (-b - (b**2 - 4*a*c)**0.5) / 2 / a
+
+    return root_1, root_2
+
+
+quadratic_formula(1, 1, -6)</div>
+  <div class="codeblock out"><span class="codecap">Output</span>(2.0, -3.0)</div>
+  <p><code>root_1</code> and <code>root_2</code> exist only inside the function. Referring to them afterwards raises <code>NameError</code>. The region of a program where a name is usable is its <strong>scope</strong>. Returning two values gives you a <em>tuple</em> — see topic 06.</p>
+
+  <h3>Recursion</h3>
+  <div class="codeblock">def factorial(n):
+    """Return the factorial of integer value n"""
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+
+def fibonacci(n):
+    """Return the fibonacci number F_n"""
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)</div>
+  <p>A recursive function calls itself. It needs a <strong>base case</strong> that returns without recursing — here <code>n == 0</code> — or it never terminates. <code>factorial(4)</code> is 24 and <code>fibonacci(5)</code> is 5.</p>
+
+  <h3>The recipe for designing a function</h3>
+  <ol class="steps">
+    <li>What is an appropriate and informative <strong>name</strong>?</li>
+    <li>What are the <strong>parameters</strong>, and what types of information do they refer to?</li>
+    <li>What <strong>calculations</strong> are you doing with that information?</li>
+    <li>What information does the function <strong>return</strong>?</li>
+    <li>Does it <strong>work</strong> like you expect it to?</li>
+  </ol>
+
+  <h3>Docstrings — the numpy format</h3>
+  <p>This is the format the course uses, and the format both exams hand you. Three double quotes open and close it.</p>
+  <div class="codeblock">def convert_to_fahrenheit(celsius: float) -&gt; float:
+    """Convert a given temperature in celsius to fahrenheit
+
+    Parameters
+    ----------
+    celsius : float
+        Input temperature in celsius
+
+    Returns
+    -------
+    fahrenheit : float
+        Temperature of the input in fahrenheit
+
+    Examples
+    --------
+    &gt;&gt;&gt; convert_to_fahrenheit(37.0)
+    98.6
+    """
+    fahrenheit = 9/5*celsius + 32
+
+    return fahrenheit</div>
+  <p><code>celsius: float</code> and <code>-&gt; float</code> are <strong>type hints</strong>. Python does not enforce them at runtime; they document intent, and the final exam's questions are all written with them.</p>
+
+  <h3>Built-in functions worth knowing</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Function</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td class="m">abs()</td><td class="m">abs(-9)</td><td class="m">9</td></tr>
+      <tr><td class="m">round()</td><td class="m">round(1.337, 2)</td><td class="m">1.34</td></tr>
+      <tr><td class="m">pow()</td><td class="m">pow(25, 0.5)</td><td class="m">5.0</td></tr>
+      <tr><td class="m">help()</td><td class="m">help(round)</td><td>Prints the docstring</td></tr>
+      <tr><td class="m">len() min() max() sum()</td><td class="m">sum([1, 2, 3])</td><td class="m">6</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li>A function without an explicit <code>return</code> returns <code>None</code>, not the last value computed.</li>
+      <li>Positional arguments in the wrong order fail <em>silently</em>; keyword arguments cannot.</li>
+      <li>Every recursive function needs a base case, or it recurses until Python gives up.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/05-functions.ipynb"><b>Notebook 05</b> — Functions</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t04"></div>
+</section>
+
+<!-- ================= 05 ================= -->
+<section id="t05">
+  <div class="lessonhead"><span class="lnum">05</span><div class="eyebrow">Sessions 5–8 · notebooks 05 &amp; 07</div></div>
+  <h2>Modules and imports</h2>
+  <span class="pill mid">Midterm</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A module is a <code>.py</code> file whose names you can borrow from another program.</div>
+    <p class="pana">Mathematicians don't prove every theorem from scratch; they build on what predecessors established. Modules are the same move for code — you import the work rather than rewrite it.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>You're asking</b><span>Has someone written this already?</span></div>
+      <div class="pcell"><b>It gives you</b><span>A namespace of ready names</span></div>
+      <div class="pcell"><b>Watch for</b><span>Imports are cached, not re-read</span></div>
+    </div>
+  </div>
+
+  <h3>The import forms</h3>
+  <div class="codeblock">import math                      # whole module; use as math.sqrt(9)
+from math import sqrt, pi        # selected names; use as sqrt(9)
+import numpy as np               # module under an alias
+from importlib import reload     # a name from a submodule</div>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Form</th><th>You then write</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td class="m">import math</td><td class="m">math.sqrt(9)</td><td>Longer, but obvious where it came from</td></tr>
+      <tr><td class="m">from math import sqrt</td><td class="m">sqrt(9)</td><td>Shorter, but can collide with your own names</td></tr>
+      <tr><td class="m">import numpy as np</td><td class="m">np.array([1, 2])</td><td class="s">The convention for NumPy and pandas — always use it</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Where Python looks</h3>
+  <div class="codeblock">import sys
+sys.path.append('../modules')    # then your own module becomes importable
+import my_module
+my_module.my_function()</div>
+  <p><code>sys.path</code> is the list of directories searched, in order. A module in a directory that is not on that list cannot be imported no matter how it is spelled.</p>
+
+  <div class="note watch"><span class="tag">Editing a module does not update a running session</span>
+    <p>Python caches a module the first time it is imported. Change the file and re-run <code>import example</code> and you still get the old version — no error, no warning, just stale behaviour.</p>
+    <div class="codeblock">from importlib import reload
+reload(example)          # now the new definitions are live</div>
+    <p>This is a classic hour-loser in notebooks. If a function refuses to change its behaviour, suspect the cache before you suspect your logic.</p>
+  </div>
+
+  <h3><code>__name__</code> and <code>"__main__"</code></h3>
+  <p>Any <code>.py</code> file is both an importable module and a runnable program. Python sets a variable <code>__name__</code> in each one so the file can tell which is happening:</p>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>How the file was used</th><th><code>__name__</code> is</th></tr></thead>
+    <tbody>
+      <tr><td>Imported by another program</td><td class="m s">'example'</td></tr>
+      <tr><td>Run directly, <code>python example.py</code></td><td class="m s">'__main__'</td></tr>
+    </tbody>
+  </table></div>
+  <div class="codeblock">if __name__ == "__main__":
+    # only runs when the file is executed directly,
+    # never when it is imported
+    main()</div>
+  <p>Without this guard, any print or test code at the bottom of a module fires every time somebody imports it.</p>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>import x</code> then <code>x.f()</code>; <code>from x import f</code> then <code>f()</code>. Mixing the two up is a <code>NameError</code>.</li>
+      <li>A module is cached on first import — use <code>reload()</code> after editing it.</li>
+      <li><code>if __name__ == "__main__":</code> keeps a file's script half from running on import.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/05-functions.ipynb"><b>Notebook 05</b> — Functions, §3 Modular organisation</a>
+  <a class="nblink" href="notebooks/07-files-modules-exceptions.ipynb"><b>Notebook 07</b> — Files, Modules and Exceptions, §2</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t05"></div>
+</section>
+
+<!-- ================= 06 ================= -->
+<section id="t06">
+  <div class="lessonhead"><span class="lnum">06</span><div class="eyebrow">Sessions 5–8 · notebook 06</div></div>
+  <h2>Lists and tuples</h2>
+  <span class="pill mid">Midterm</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A list is an ordered collection you can change; a tuple is an ordered collection you cannot.</div>
+    <p class="pana">That single difference — mutable versus immutable — decides which one to reach for, and it is also why a tuple can be a dictionary key and a list cannot.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>list</b><span>Square brackets, mutable</span></div>
+      <div class="pcell"><b>tuple</b><span>Parentheses, immutable</span></div>
+      <div class="pcell"><b>Watch for</b><span><code>sort()</code> returns <code>None</code></span></div>
+    </div>
+  </div>
+
+  <h3>Lists</h3>
+  <div class="codeblock">bicycles = ['trek', 'cannondale', 'redline', 'specialized']
+
+bicycles[0]        # 'trek'        — first item is index 0
+bicycles[-1]       # 'specialized' — last item
+bicycles[0:2]      # ['trek', 'cannondale']  — stops before index 2</div>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Operation</th><th>Effect</th><th>Returns</th></tr></thead>
+    <tbody>
+      <tr><td class="m">xs[0] = 'ducati'</td><td>Replace one item</td><td>—</td></tr>
+      <tr><td class="m">xs.append('honda')</td><td>Add one item to the end</td><td class="s">None</td></tr>
+      <tr><td class="m">xs.extend(['a', 'b'])</td><td>Add <em>each</em> item of another list</td><td class="s">None</td></tr>
+      <tr><td class="m">xs.insert(3, 'bmw')</td><td>Insert at a position</td><td class="s">None</td></tr>
+      <tr><td class="m">del xs[1]</td><td>Remove by position</td><td>—</td></tr>
+      <tr><td class="m">xs.pop(-1)</td><td>Remove by position</td><td class="s">the removed item</td></tr>
+      <tr><td class="m">xs.sort()</td><td>Sort <em>in place</em>, permanently</td><td class="s">None</td></tr>
+      <tr><td class="m">sorted(xs)</td><td>Leave <code>xs</code> alone</td><td class="s">a new sorted list</td></tr>
+      <tr><td class="m">len(xs)</td><td>Count items</td><td class="s">an int</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note watch"><span class="tag">append vs extend, sort vs sorted</span>
+    <p><code>xs.append(['a','b'])</code> adds <em>one</em> item that happens to be a list, giving a nested list. <code>xs.extend(['a','b'])</code> adds two items. They are not interchangeable.</p>
+    <p>And the in-place methods return <code>None</code>. Writing <code>xs = xs.sort()</code> silently replaces your list with <code>None</code> — one of the most common bugs in the whole course. Use <code>xs.sort()</code> alone, or <code>ys = sorted(xs)</code>.</p>
+  </div>
+
+  <p>Lists support <code>+</code> and <code>*</code> the way strings do: <code>motorcycles + bicycles</code> concatenates, <code>motorcycles * 3</code> repeats. <code>min()</code>, <code>max()</code> and <code>sum()</code> work over lists of numbers. Sorting descending is <code>xs.sort(reverse=True)</code>.</p>
+
+  <h3>List comprehensions</h3>
+  <p>A compact way to write "transform every item, optionally filtered". These two are equivalent:</p>
+  <div class="codeblock">squares = []
+for value in digits:
+    squares.append(value ** 2)
+
+squares = [value ** 2 for value in digits]</div>
+  <p>And with a condition appended after the <code>for</code>:</p>
+  <div class="codeblock">even_squares = [value ** 2 for value in digits if not value % 2]
+# [4, 16, 36, 64, 100]  for digits 1..10</div>
+  <div class="note scope"><span class="tag">Allowed now, penalised in the final</span>
+    <p>List comprehensions are idiomatic Python and fine in the midterm. The final's rubric explicitly counts them as loops — "for-loops (either explicit loops or list comprehension) for these particular problems should almost never be used". For NumPy and pandas questions, the vectorised form is the one that scores.</p>
+  </div>
+
+  <h3>Lists and strings</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Call</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td class="m">list('abc')</td><td class="m">['a', 'b', 'c']</td></tr>
+      <tr><td class="m">'a b c'.split(' ')</td><td class="m">['a', 'b', 'c']</td></tr>
+      <tr><td class="m">'-'.join(['a', 'b'])</td><td class="m">'a-b'</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>join</code> reads backwards the first few times: the <em>separator</em> is the string you call it on, and the list is the argument.</p>
+
+  <h3>Tuples</h3>
+  <div class="codeblock">coordinate = (200, 50)
+coordinate[0]        # 200
+coordinate[0] = 100  # TypeError — tuples are immutable</div>
+  <p>Returning several values from a function gives a tuple. That is why <code>min_max(digits)</code> below has type <code>tuple</code>:</p>
+  <div class="codeblock">def min_max(sequence):
+    return min(sequence), max(sequence)
+
+
+min_max([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])   # (1, 10)</div>
+
+  <h3>zip, unpacking and *args</h3>
+  <div class="codeblock">names = ['Leo', 'Pat', 'Gil']
+ages = [32, 27, 30]
+
+for name, age in zip(names, ages):
+    print(f'{name}: {age}')</div>
+  <div class="note watch"><span class="tag">zip is lazy, and gets exhausted</span>
+    <div class="codeblock">zipped = zip(names, ages)
+list(zipped)     # [('Leo', 32), ('Pat', 27), ('Gil', 30)]
+list(zipped)     # []   <-- the second call gives nothing</div>
+    <p>A <code>zip</code> object is a one-shot iterator. Once walked through, it is empty. Wrap it in <code>list()</code> immediately if you need it twice.</p>
+  </div>
+  <p>Unzipping is <code>zip(*zipped_sequence)</code> — the <code>*</code> scatters the list back into separate arguments. A parameter written <code>*pargs</code> does the reverse, <em>gathering</em> any number of positional arguments into a tuple:</p>
+  <div class="codeblock">def print_all(*pargs):
+    """Print an arbitrary number of positional arguments as a tuple"""
+    print(pargs)
+
+
+print_all(1, 2.0, '3')     # (1, 2.0, '3')</div>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>xs.sort()</code> returns <code>None</code> and mutates; <code>sorted(xs)</code> returns a new list and does not.</li>
+      <li><code>append</code> adds one item, <code>extend</code> adds each item of an iterable.</li>
+      <li><code>zip</code> is a lazy iterator that empties after one pass.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/06-collections.ipynb"><b>Notebook 06</b> — Storing and Processing Collections of Data</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t06"></div>
+</section>
+
+<!-- ================= 07 ================= -->
+<section id="t07">
+  <div class="lessonhead"><span class="lnum">07</span><div class="eyebrow">Sessions 7–8 · notebook 06</div></div>
+  <h2>Dictionaries and sets</h2>
+  <span class="pill mid">Midterm</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A dictionary stores values you look up by name instead of by position.</div>
+    <p class="pana">A list answers "what is the third thing?". A dictionary answers "what is the <em>weight</em>?". When the things you are storing are related facts about one subject rather than a sequence, a dictionary is the honest structure.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>dict</b><span>Key–value pairs, <code>{}</code> with <code>:</code></span></div>
+      <div class="pcell"><b>set</b><span>Unordered, unique, <code>{}</code> without <code>:</code></span></div>
+      <div class="pcell"><b>Watch for</b><span>Keys must be immutable</span></div>
+    </div>
+  </div>
+
+  <h3>Dictionaries</h3>
+  <div class="codeblock">my_pokemon = {
+    'Name': 'Evee', 'Type': 'Normal', 'Height': 0.30, 'Weight': 6.5,
+    'Abilities': ['Run Away', 'Adaptability'], 'Base Exp': 65
+}</div>
+  <p>Values can be anything, including lists. <strong>Keys must be immutable</strong> — a string, number or tuple, never a list.</p>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Operation</th><th>Behaviour when the key is missing</th></tr></thead>
+    <tbody>
+      <tr><td class="m">d['Name']</td><td class="s">Raises <code>KeyError</code></td></tr>
+      <tr><td class="m">d.get('Name')</td><td>Returns <code>None</code></td></tr>
+      <tr><td class="m">d.get('Food', 'Pizza')</td><td>Returns <code>'Pizza'</code>, leaves <code>d</code> unchanged</td></tr>
+      <tr><td class="m">d.setdefault('Food', 'Pizza')</td><td class="s">Returns <code>'Pizza'</code> <em>and inserts the key</em></td></tr>
+      <tr><td class="m">d['Species'] = 'Lightning'</td><td>Assignment adds the key if absent</td></tr>
+      <tr><td class="m">del d['Food']</td><td>Removes it; <code>KeyError</code> if absent</td></tr>
+      <tr><td class="m">d.update({...})</td><td>Merges another dict in, overwriting on collision</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note watch"><span class="tag">get and setdefault are not the same</span>
+    <p>Both return a default for a missing key. Only <code>setdefault</code> <em>writes</em> that default into the dictionary. Use <code>get</code> when you are only reading; reach for <code>setdefault</code> deliberately, because it silently grows your data.</p>
+  </div>
+
+  <h3>Iterating a dictionary</h3>
+  <div class="codeblock">for key, value in my_pokemon.items():
+    print(f"{key}: {value}")</div>
+  <p><code>.items()</code> gives key–value pairs, <code>.keys()</code> gives keys, <code>.values()</code> gives values. Iterating the dictionary directly gives you the <em>keys</em>.</p>
+
+  <h3><code>**kwargs</code></h3>
+  <div class="codeblock">def print_pokemon(**kwargs):
+    for key, value in kwargs.items():
+        print(f"{key}: {value}")
+
+
+print_pokemon(Name='Evee', Height=0.30)   # gathers into a dict
+print_pokemon(**my_pokemon)               # scatters a dict into arguments</div>
+  <p><code>**</code> before a <em>parameter</em> gathers keyword arguments into a dictionary. <code>**</code> before a <em>dictionary</em> at a call site scatters it into keyword arguments. Same symbol, opposite directions — exactly like <code>*</code> and tuples.</p>
+
+  <h3>Sets</h3>
+  <div class="codeblock">vowels = {'a', 'o', 'o', 'i', 'e', 'u', 'a'}
+vowels      # {'a', 'e', 'i', 'o', 'u'}  — duplicates silently dropped</div>
+  <p>A set is unordered and holds only unique, immutable items. It behaves like dictionary keys with no values.</p>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Method</th><th>Operator</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="m">a.union(b)</td><td class="m">a | b</td><td>In either</td></tr>
+      <tr><td class="m">a.intersection(b)</td><td class="m">a &amp; b</td><td>In both</td></tr>
+      <tr><td class="m">a.difference(b)</td><td class="m">a - b</td><td>In <code>a</code> but not <code>b</code></td></tr>
+      <tr><td class="m">a.symmetric_difference(b)</td><td class="m">(a | b) - (a &amp; b)</td><td>In exactly one</td></tr>
+      <tr><td class="m">a.issubset(b)</td><td class="m">a &lt;= b</td><td>Every item of <code>a</code> is in <code>b</code></td></tr>
+      <tr><td class="m">a.add(x) / a.remove(x)</td><td>—</td><td>Insert / delete one item</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Specialised containers</h3>
+  <div class="codeblock">from collections import Counter, defaultdict
+
+name = "Leodegario Lorenzo II"
+char_count = Counter(name.lower())
+char_count.most_common(5)
+# [('o', 4), ('e', 3), ('i', 3), ('l', 2), ('r', 2)]
+
+d_dict = defaultdict(lambda: None)
+d_dict['favorite_food']      # None instead of KeyError</div>
+  <p><code>Counter</code> tallies occurrences and gives you <code>.most_common(n)</code> free — it is the right answer to any "most frequent word" exercise. <code>defaultdict</code> supplies a value for absent keys instead of raising.</p>
+
+  <div class="codeblock">import itertools
+
+list(itertools.chain('ABC', 'DEF'))          # ['A','B','C','D','E','F']
+list(itertools.product('ABC', 'DEF'))        # every (a, b) pair — 9 of them
+list(itertools.permutations('ABC', 2))       # order matters — 6
+list(itertools.combinations('ABC', 2))       # order does not — 3</div>
+  <div class="note why"><span class="tag">permutations vs combinations</span>
+    <p>From <code>'ABC'</code> taken 2 at a time, <code>permutations</code> gives 6 because <code>('A','B')</code> and <code>('B','A')</code> are both counted; <code>combinations</code> gives 3 because they are the same selection. If the question says "how many ways to <em>choose</em>", you want combinations.</p>
+  </div>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>d[k]</code> raises on a missing key; <code>d.get(k)</code> returns <code>None</code>; <code>d.setdefault(k, v)</code> also inserts.</li>
+      <li>Sets drop duplicates and have no order — never index a set.</li>
+      <li><code>*</code> and <code>**</code> gather at the definition and scatter at the call.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/06-collections.ipynb"><b>Notebook 06</b> — Storing and Processing Collections of Data</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t07"></div>
+</section>
+
+<!-- ================= 08 ================= -->
+<section id="t08">
+  <div class="lessonhead"><span class="lnum">08</span><div class="eyebrow">Sessions 7–8 · notebook 07</div></div>
+  <h2>Files, persistence and exceptions</h2>
+  <span class="pill mid">Midterm</span>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">Files let a program outlive one run; exceptions let it survive a bad one.</div>
+    <p class="pana">Both are about the world being less tidy than your code assumes. A file may not be there, a user may type a word where you wanted a number — and the program should cope rather than collapse.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>with</b><span>Closes the file even on error</span></div>
+      <div class="pcell"><b>try / except</b><span>Handles a failure and continues</span></div>
+      <div class="pcell"><b>Watch for</b><span><code>finally</code> can override a <code>return</code></span></div>
+    </div>
+  </div>
+
+  <h3>Opening files</h3>
+  <div class="codeblock">with open('data/file_example.txt', 'r') as file:
+    contents = file.read()
+print(contents)</div>
+  <p>Always use <code>with</code>. It calls the file's <code>__enter__</code> on the way in and <code>__exit__</code> on the way out, so the file closes <em>even if the block raises</em>. The manual <code>open()</code> … <code>file.close()</code> pair leaks the handle whenever anything between them fails.</p>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Mode</th><th>Meaning</th><th>If the file exists</th></tr></thead>
+    <tbody>
+      <tr><td class="m">'r'</td><td>Read</td><td>Reads it; <code>FileNotFoundError</code> if absent</td></tr>
+      <tr><td class="m">'w'</td><td>Write</td><td class="s">Truncates it to empty</td></tr>
+      <tr><td class="m">'a'</td><td>Append</td><td>Adds at the end</td></tr>
+      <tr><td class="m">'x'</td><td>Exclusive creation</td><td class="s">Raises <code>FileExistsError</code></td></tr>
+      <tr><td class="m">'+'</td><td>Update — combines with the above</td><td>Allows reading and writing</td></tr>
+      <tr><td class="m">'b'</td><td>Bytes — combines, e.g. <code>'wb'</code></td><td>Binary rather than text</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note watch"><span class="tag">'w' destroys data without asking</span>
+    <p>Opening an existing file with <code>'w'</code> empties it the moment it opens, before you write anything. If you meant to add to it, you wanted <code>'a'</code>. If you meant to be sure it is new, you wanted <code>'x'</code>.</p>
+  </div>
+
+  <h3>Four ways to read</h3>
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Call</th><th>Gives</th><th>Use when</th></tr></thead>
+    <tbody>
+      <tr><td class="m">file.read()</td><td>One string, everything</td><td>Small file, you want the whole text</td></tr>
+      <tr><td class="m">file.read(10)</td><td>The next 10 characters</td><td>You need a fixed chunk</td></tr>
+      <tr><td class="m">file.readlines()</td><td>A list of lines, <em>keeping</em> <code>\n</code></td><td>You want them all at once</td></tr>
+      <tr><td class="m">file.readline()</td><td>One line, advancing the cursor</td><td class="s">Skipping a header or comments</td></tr>
+      <tr><td class="m">for line in file:</td><td>One line at a time</td><td class="s">Large files — nothing is held in memory</td></tr>
+    </tbody>
+  </table></div>
+  <p>Reading always starts at the current cursor, so these combine. The line separators survive <code>readlines()</code>, which is why <code>[line.strip() for line in file]</code> is the standard idiom.</p>
+
+  <h3>Writing</h3>
+  <div class="codeblock">with open('programming.txt', 'w') as file:
+    file.write('I love programming.')
+
+lines = ['I love programming.\n', 'I love games.\n']
+with open('programming.txt', 'w') as file:
+    file.writelines(lines)</div>
+  <p><code>writelines</code> does <strong>not</strong> add line separators. Despite the name it is just "write each of these strings", so you append <code>"\n"</code> yourself.</p>
+
+  <h3>Persisting objects with pickle</h3>
+  <div class="codeblock">import pickle
+
+with open('pelts_data.pickle', 'wb') as file:    # note 'wb' — bytes
+    pickle.dump(pelts_data, file)
+
+with open('pelts_data.pickle', 'rb') as file:
+    unpickled = pickle.load(file)</div>
+  <p>Serialisation turns a live object into bytes; <em>pickling</em> writes, <em>unpickling</em> reads back. Use it for dictionaries, lists, and trained models — anything you would rather not re-derive.</p>
+
+  <h3>Exceptions</h3>
+  <div class="codeblock">for filepath in filepaths:
+    try:
+        with open(filepath, 'r') as file:
+            contents = file.read()
+        print(f"Successful reading of {filepath}.")
+    except FileNotFoundError:
+        print(f"File {filepath} does not exist.")</div>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Clause</th><th>Runs when</th></tr></thead>
+    <tbody>
+      <tr><td class="m">try</td><td>Always — it is the guarded block</td></tr>
+      <tr><td class="m">except SomeError</td><td>That error was raised inside <code>try</code></td></tr>
+      <tr><td class="m">else</td><td class="s">The <code>try</code> block finished <em>without</em> an error</td></tr>
+      <tr><td class="m">finally</td><td class="s">Always, error or not — the last thing to run</td></tr>
+    </tbody>
+  </table></div>
+  <p>Order matters: every <code>except</code> comes before <code>else</code>, and <code>finally</code> is last. Raise your own with <code>raise ValueError("Invalid value")</code>, and catch the object with <code>except Exception as err:</code> — <code>err.args</code> holds whatever was passed in.</p>
+
+  <div class="note watch"><span class="tag">finally beats return</span>
+    <div class="codeblock">def bool_return():
+    try:
+        return True
+    finally:
+        return False
+
+
+bool_return()      # False</div>
+    <p>The <code>finally</code> clause runs just before the <code>return</code> actually happens — and if <code>finally</code> itself returns, that value wins. Never put a <code>return</code> in a <code>finally</code> block outside of a puzzle.</p>
+  </div>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>'w'</code> truncates an existing file immediately. <code>'a'</code> appends, <code>'x'</code> refuses to overwrite.</li>
+      <li><code>readlines()</code> keeps the <code>\n</code>; <code>writelines()</code> does not add one.</li>
+      <li><code>else</code> runs only when <code>try</code> succeeded; <code>finally</code> runs either way and can override a <code>return</code>.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/07-files-modules-exceptions.ipynb"><b>Notebook 07</b> — Files, Modules and Exceptions</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t08"></div>
+</section>
+
+<!-- ================= 09 ================= -->
+<section id="t09">
+  <div class="lessonhead"><span class="lnum">09</span><div class="eyebrow">Not in the course outline · notebook 08</div></div>
+  <h2>Object-oriented programming</h2>
+  <span class="pill mid">Midterm</span><span class="pill fm">CLO 3</span>
+
+  <div class="note scope"><span class="tag">Taught, but missing from the outline</span>
+    <p>The 20-session schedule in the course outline never mentions OOP, yet notebook <code>08-oop</code> exists and covers it in full. The outline's learning outcome 3 does require it. Treat it as examinable.</p>
+  </div>
+
+  <div class="primer">
+    <div class="ptag">The idea, in plain English</div>
+    <div class="phook">A class bundles data and the operations on that data into one new type.</div>
+    <p class="pana">Everything so far has been <em>procedural</em> — functions that act on data passed to them. OOP inverts that: the data carries its own behaviour. You have used it all along without noticing, because <code>a.sort()</code> is a list acting on itself.</p>
+    <div class="pgrid">
+      <div class="pcell"><b>class</b><span>The template, written once</span></div>
+      <div class="pcell"><b>instance</b><span>One object built from it</span></div>
+      <div class="pcell"><b>self</b><span>The instance, inside its own methods</span></div>
+    </div>
+  </div>
+
+  <h3>A class, an initialiser and a method</h3>
+  <div class="codeblock">class Point:
+    """Point class represents and manipulates x, y coordinates"""
+
+    def __init__(self, x=0, y=0):
+        """Initialize a new point at x,y"""
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+    def distance_from_origin(self):
+        """Compute the distance of point to origin"""
+        return ((self.x ** 2) + (self.y ** 2)) ** 0.5
+
+
+p = Point(3, 4)
+p.distance_from_origin()     # 5.0
+print(p)                     # (3, 4)</div>
+
+  <div class="tw"><table class="dt">
+    <thead><tr><th>Term</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td class="m">class Point:</td><td>Defines a new type — a "programmer-defined type"</td></tr>
+      <tr><td class="m">__init__</td><td class="s">The initialiser, called automatically at <code>Point(3, 4)</code></td></tr>
+      <tr><td class="m">self</td><td>The instance being worked on; always the first parameter</td></tr>
+      <tr><td class="m">self.x</td><td>An <strong>attribute</strong> — data stored on the instance</td></tr>
+      <tr><td class="m">__str__</td><td class="s">What <code>print()</code> and <code>str()</code> should show</td></tr>
+      <tr><td>instantiation</td><td>Creating an object from the class</td></tr>
+    </tbody>
+  </table></div>
+  <p>Without <code>__str__</code>, printing an object gives something like <code>&lt;__main__.Point object at 0x10474a6c0&gt;</code> — technically correct and useless.</p>
+
+  <h3>Objects are mutable, and methods can return new ones</h3>
+  <div class="codeblock">def midpoint(p1, p2):
+    """Return the midpoint of points p1 and p2"""
+    mx = (p1.x + p2.x) / 2
+    my = (p1.y + p2.y) / 2
+
+    return Point(mx, my)</div>
+  <p>A function or method can return a fresh instance. Written as a method instead — <code>p.halfway(q)</code> — the first point is <code>self</code> and the other is the argument. And <code>p.x = 10</code> simply works: attributes are writable unless you go out of your way to stop it.</p>
+
+  <h3>Polymorphism and operator overloading</h3>
+  <p><code>+</code> already means different things for numbers and strings — <code>4 + 4</code> is 8, <code>"4" + "4"</code> is <code>'44'</code>. That is <strong>operator overloading</strong>, and your own classes can join in:</p>
+  <div class="codeblock">class Point:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def __add__(self, other):
+        return Point(self.x + other.x, self.y + other.y)
+
+
+p = Point(3, 4)
+q = Point(5, 12)
+print(p + q)     # (8, 16)</div>
+  <div class="note why"><span class="tag">The duck typing rule</span>
+    <p>A function that works on many types is <strong>polymorphic</strong>. Python's test for whether it will work is not "is this the right class?" but: <em>if all the operations inside the function can be applied to the type, the function can be applied to the type</em>. <code>multadd(x, y, z)</code> returning <code>x*y + z</code> works for anything that can be multiplied and added — integers, or your <code>Point</code>, once it defines <code>__mul__</code> and <code>__add__</code>.</p>
+  </div>
+
+  <h3>Inheritance</h3>
+  <div class="codeblock">class Member:
+    """A member of a university"""
+
+    def __init__(self, name, address, email):
+        self.name = name
+        self.address = address
+        self.email = email
+
+
+class Faculty(Member):
+    """A faculty member at a university"""
+
+    def __init__(self, name, address, email, faculty_num):
+        super().__init__(name, address, email)
+        self.faculty_number = faculty_num
+        self.courses_teaching = []</div>
+  <p>Faculty and students both have a name, address and email. Rather than write those three lines twice, put them in a <code>Member</code> base class and have each subclass call <code>super().__init__(...)</code> to run it. The subclass then adds only what is genuinely its own. Copying shared code into both classes instead is how one forgotten line becomes a bug nobody can find.</p>
+
+  <div class="note recap"><span class="tag">Remember three things</span>
+    <ul>
+      <li><code>self</code> is the first parameter of every method and is passed automatically — you never supply it at the call.</li>
+      <li><code>__init__</code> sets up a new instance; <code>__str__</code> decides what printing it shows.</li>
+      <li><code>super().__init__(...)</code> runs the parent's initialiser — omit it and the parent's attributes never get set.</li>
+    </ul>
+  </div>
+
+  <a class="nblink" href="notebooks/08-oop.ipynb"><b>Notebook 08</b> — Object Oriented Programming</a>
+  <h3>Concept check</h3>
+  <div data-quiz="t09"></div>
+</section>
+
+</main>
+</div>
+
+<nav class="pager" id="pager" aria-label="Page navigation"></nav>
+<div class="foot">
+  DSC 512 · Fundamentals of Programming and Vibe Coding with AI · MAIDA 2027 · J. Bautista<br>
+  Built from the thirteen session notebooks, the sample midterm and the final exam practice set.
+</div>
+
+<script src="../../assets/reviewer.js"></script>
+<script>
+(function(){
+'use strict';
+
+var TOPIC_TITLES = {
+  t01: 'Variables, strings, numbers',
+  t02: 'Conditionals',
+  t03: 'Loops',
+  t04: 'Functions',
+  t05: 'Modules and imports',
+  t06: 'Lists and tuples',
+  t07: 'Dictionaries and sets',
+  t08: 'Files and exceptions',
+  t09: 'Object-oriented programming'
+};
+
+var BANKS = {};
+
+BANKS.t01 = [
+ {t:'num', c:'true-division', q:'What does <code>9 / 2</code> evaluate to?',
+  a:4.5, tol:0.001,
+  sol:'<b>4.5.</b> A single slash is true division and <em>always</em> returns a float, even when the division is exact — <code>4 / 2</code> is <code>2.0</code>, not <code>2</code>. Use <code>//</code> if you want an integer.'},
+
+ {t:'num', c:'floor-negative', q:'What does <code>9 // -2</code> evaluate to?',
+  a:-5, tol:0.001,
+  sol:'<b>−5.</b> Floor division rounds <em>down</em>, toward negative infinity, not toward zero. The exact quotient is −4.5, and the next integer below that is −5. Answering −4 assumes truncation, which is what C does, not Python.'},
+
+ {t:'num', c:'mod-sign', q:'What does <code>-9 % 4</code> evaluate to?',
+  a:3, tol:0.001,
+  sol:'<b>3.</b> The modulus takes the sign of the <em>right</em> operand, so with a positive divisor the result is positive. Check it against the identity: <code>-9 // 4</code> is −3, and <code>-3 * 4 + 3 == -9</code>.'},
+
+ {t:'mc', c:'slice-bounds', q:'Given <code>name = "Leo Lorenzo II"</code>, what is <code>name[0:3]</code>?',
+  opts:["'Leo '", "'Leo'", "'Le'", "'L'"], a:1,
+  sol:"<b>'Leo'.</b> A slice includes the start index and stops <em>before</em> the stop index, so <code>[0:3]</code> gives positions 0, 1 and 2. <code>'Leo '</code> with the space would be <code>[0:4]</code>; <code>'Le'</code> would be <code>[0:2]</code>."},
+
+ {t:'code', c:'reverse-slice', q:'Write the slice that reverses a string <code>s</code>.',
+  a:['s[::-1]'],
+  sol:'<code>s[::-1]</code> — empty start and stop means the whole string, and a step of −1 walks it backwards. <code>s.reverse()</code> does not exist for strings, and <code>reversed(s)</code> returns an iterator, not a string.'},
+
+ {t:'mc', c:'quote-choice', q:'You need the literal text <code>My dream is "data science"</code>. Which is the PEP 8 preference?',
+  opts:['Escape the inner quotes with backslashes',
+        'Wrap in single quotes and leave the double quotes bare',
+        'Use triple single quotes',
+        'Use the % formatting operator'], a:1,
+  sol:'PEP 8: "When a string contains single or double quote characters, however, use the other one to avoid backslashes. It improves readability." Both quote kinds are otherwise identical in Python — the standard deliberately declines to prefer one.'},
+
+ {t:'tf', c:'underscore-literal', q:'<code>1_000_000</code> and <code>1000000</code> are the same value.',
+  opts:['True','False'], a:0,
+  sol:'<b>True.</b> Underscores in a numeric literal are ignored by Python and exist purely so a human can read the magnitude. They are not a string formatting feature — to print with commas you need <code>f"{n:,}"</code>.'},
+
+ {t:'text', c:'fstring-name', q:'What is the name for the <code>f"..."</code> string form that interpolates variables directly? (Two words)',
+  a:['f-string','f string','formatted string literal'],
+  sol:'An <b>f-string</b>, or formally a formatted string literal. It is generally preferred over <code>.format()</code> and the older <code>%</code> operator because the value appears where it will be printed.'}
+];
+
+BANKS.t02 = [
+ {t:'mc', c:'case-sensitivity', q:'<code>car = \'Toyota\'</code>. What does <code>car == \'toyota\'</code> return?',
+  opts:['True','False','TypeError','It depends on the platform'], a:1,
+  sol:'<b>False.</b> String equality in Python is case-sensitive, so <code>\'Toyota\'</code> and <code>\'toyota\'</code> are different values. Normalise first: <code>car.lower() == \'toyota\'</code> is True.'},
+
+ {t:'code', c:'normalise-compare', q:'Rewrite <code>car == \'toyota\'</code> so it matches regardless of how <code>car</code> is capitalised.',
+  a:["car.lower() == 'toyota'"],
+  sol:"<code>car.lower() == 'toyota'</code>. Lowercase the variable, not the literal — the literal is already lowercase. <code>car.title()</code> would give <code>'Toyota'</code> and fail against a lowercase literal."},
+
+ {t:'mc', c:'elif-first-match', q:'With <code>wind_speed = 120</code> and the bands <code>&lt; 62</code>, <code>&lt; 88</code>, <code>&lt; 117</code>, <code>&lt; 184</code>, which branch runs?',
+  opts:['Every branch whose test passes','Only <code>&lt; 184</code>','Only <code>&lt; 117</code>','None, because 120 exceeds 117'], a:1,
+  sol:'<b>Only <code>&lt; 184</code>.</b> Python evaluates the tests in order and stops at the first that passes. 120 fails <code>&lt; 62</code>, <code>&lt; 88</code> and <code>&lt; 117</code>, then passes <code>&lt; 184</code>. The remaining tests are never evaluated — that is what makes the implicit lower bounds work.'},
+
+ {t:'tf', c:'else-required', q:'An <code>if–elif</code> chain must end with an <code>else</code> block.',
+  opts:['True','False'], a:1,
+  sol:'<b>False.</b> The <code>else</code> is optional. If no branch passes and there is no <code>else</code>, nothing happens and execution simply continues after the chain — which is a common source of a variable never being assigned.'},
+
+ {t:'ms', c:'boolean-ops', q:'With <code>age = 26</code>, which of these evaluate to <code>True</code>? (Select all.)',
+  opts:['<code>age &gt;= 18 and age &lt; 30</code>',
+        '<code>age &lt; 18 or age &gt; 30</code>',
+        '<code>not (age &gt; 30)</code>',
+        '<code>age != 18</code>'], a:[0,2,3],
+  sol:'The second is False: 26 is neither under 18 nor over 30, and <code>or</code> needs at least one side to hold. The other three are True — <code>and</code> needs both sides, <code>not</code> flips False to True, and 26 is genuinely not 18.'},
+
+ {t:'code', c:'not-equal-op', q:'Write the operator that tests whether two values are <em>not</em> equal.',
+  a:['!='],
+  sol:'<code>!=</code>. Python has no <code>&lt;&gt;</code> operator — that was removed in Python 3. <code>not ==</code> is not valid syntax either, though <code>not (a == b)</code> is.'},
+
+ {t:'mc', c:'bool-type', q:'What does <code>type(age &lt; 18)</code> return?',
+  opts:['<code>int</code>','<code>bool</code>','<code>str</code>','<code>NoneType</code>'], a:1,
+  sol:'<b><code>bool</code>.</b> A comparison produces a genuine boolean value, not an integer. Booleans do behave like 0 and 1 in arithmetic — <code>True + True</code> is 2 — but their type is <code>bool</code>.'}
+];
+
+BANKS.t03 = [
+ {t:'num', c:'range-count', q:'How many numbers does <code>range(5)</code> produce?',
+  a:5, tol:0.5,
+  sol:'<b>5</b> — the values 0, 1, 2, 3, 4. The stop value is exclusive, so 5 itself never appears. These are exactly the valid indices of a five-element list, which is the reason for the convention.'},
+
+ {t:'num', c:'range-start-stop', q:'How many numbers does <code>range(1, 5)</code> produce?',
+  a:4, tol:0.5,
+  sol:'<b>4</b> — the values 1, 2, 3, 4. With two arguments the first is an inclusive start and the second an exclusive stop, so the count is <code>stop - start</code>.'},
+
+ {t:'num', c:'break-count', q:'A counter starts at 0. In <code>for t in range(24):</code> with <code>if t == 8: break</code> and <code>else: work += 1</code>, what is the final value of <code>work</code>?',
+  a:8, tol:0.5,
+  sol:'<b>8.</b> The counter increments for <code>t</code> = 0 through 7, which is eight iterations, then <code>t == 8</code> triggers <code>break</code> and the loop ends without incrementing. Everything from 8 to 23 never runs.'},
+
+ {t:'num', c:'continue-count', q:'Same loop, but with <code>continue</code> instead of <code>break</code>. What is the final value of <code>work</code>?',
+  a:23, tol:0.5,
+  sol:'<b>23.</b> <code>continue</code> skips only the iteration where <code>t == 8</code>, so 23 of the 24 iterations still increment the counter. This is the whole difference: <code>break</code> abandons the loop, <code>continue</code> abandons one pass.'},
+
+ {t:'mc', c:'while-vs-for', q:'You must repeat a calculation until a population doubles, and you do not know how many steps that takes. Which loop?',
+  opts:['<code>for</code> with <code>range()</code>','<code>while</code> with a condition','Either works identically','A recursive function'], a:1,
+  sol:'<b><code>while</code>.</b> A <code>for</code> loop needs to know its iteration count up front. When you only have a stopping <em>condition</em> and no count, <code>while</code> is the natural form. Recursion could express it but risks exceeding the recursion limit.'},
+
+ {t:'code', c:'enumerate-call', q:'Write the call that iterates <code>xs</code> giving both index and item, to fill <code>for i, v in ___:</code>',
+  a:['enumerate(xs)'],
+  sol:'<code>enumerate(xs)</code> yields <code>(index, item)</code> pairs. <code>range(len(xs))</code> gives only indices, and <code>zip(xs)</code> with one argument gives one-element tuples.'},
+
+ {t:'tf', c:'indent-required', q:'The line after a <code>for</code> statement must be indented.',
+  opts:['True','False'], a:0,
+  sol:'<b>True.</b> Python uses indentation to delimit the loop body — there are no braces. Omitting it raises <code>IndentationError</code>, which at least fails loudly rather than silently doing the wrong thing.'},
+
+ {t:'mc', c:'vectorise-warning', q:'In the <em>final</em> exam, what does writing a correct answer with an explicit <code>for</code> loop cost you?',
+  opts:['Nothing, if the output is right',
+        '2 of 10 marks, for not being vectorised',
+        'The whole question',
+        '1 mark for style'], a:1,
+  sol:'<b>2 of 10.</b> The rubric awards 2 points for "mostly vectorized, and has no unneccessary for-loops" separately from the 4 points for solving the problem. List comprehensions count as loops for this purpose. A correct looping answer that also breaks the line limit scores 6.'}
+];
+
+BANKS.t04 = [
+ {t:'mc', c:'implicit-none', q:'A function ends without any <code>return</code> statement. What does calling it give back?',
+  opts:['The last value computed','<code>None</code>','<code>0</code>','It raises an error'], a:1,
+  sol:'<b><code>None</code>.</b> Python does not hand back the last expression the way some languages do — a function with no <code>return</code> always yields <code>None</code>. This bites when you write a function that prints instead of returning, then try to use its "result".'},
+
+ {t:'num', c:'quadratic-roots', q:'Using <code>quadratic_formula(a, b, c)</code> on <code>x² + x − 6</code>, what is the larger of the two roots?',
+  a:2, tol:0.01,
+  sol:'<b>2.0.</b> The roots are <code>(-1 ± √(1 + 24)) / 2</code> = <code>(-1 ± 5) / 2</code>, giving 2.0 and −3.0. The function returns them as the tuple <code>(2.0, -3.0)</code>.'},
+
+ {t:'num', c:'factorial-recursion', q:'Given the recursive definition with base case <code>n == 0 → 1</code>, what is <code>factorial(4)</code>?',
+  a:24, tol:0.5,
+  sol:'<b>24.</b> 4 × 3 × 2 × 1 × (the base case 1) = 24. The base case is what stops the recursion; without <code>if n == 0: return 1</code> it would call itself forever.'},
+
+ {t:'num', c:'fibonacci-recursion', q:'With <code>F₀ = 0</code> and <code>F₁ = 1</code>, what is <code>fibonacci(5)</code>?',
+  a:5, tol:0.5,
+  sol:'<b>5.</b> The sequence runs 0, 1, 1, 2, 3, 5 — so F₅ is 5. Note there are <em>two</em> base cases here, for 0 and 1, because the recursive step reaches back two places.'},
+
+ {t:'mc', c:'positional-order', q:'<code>describe_pet(animal_type, pet_name)</code> is called as <code>describe_pet(\'Maki\', \'dog\')</code>. What happens?',
+  opts:['<code>TypeError</code>, the arguments are the wrong way round',
+        'Python matches them by name automatically',
+        'It runs and prints "I have a Maki"',
+        'A warning, then it corrects itself'], a:2,
+  sol:'<b>It runs and prints "I have a Maki."</b> Positional arguments are matched purely by order, and both values are strings, so nothing is detectably wrong. This is a wrong answer that passes cleanly — which is exactly why keyword arguments exist.'},
+
+ {t:'code', c:'docstring-delimiter', q:'Write the delimiter that opens and closes a docstring.',
+  a:['"""'],
+  sol:'Three double quotes, <code>"""</code>. PEP 257 and PEP 8 both specify double rather than single for triple-quoted strings, for consistency with the docstring convention. Both exams hand you docstrings in this form.'},
+
+ {t:'ms', c:'scope-local', q:'<code>root_1</code> is assigned inside <code>quadratic_formula</code>. Which are true? (Select all.)',
+  opts:['It can be read after the function returns',
+        'It exists only while the function runs',
+        'Referring to it outside raises <code>NameError</code>',
+        'It is a local variable'], a:[1,2,3],
+  sol:'Only the first is false. A name assigned inside a function is local to it: it is created on each call and gone when the call ends. Its <em>scope</em> is the function body, so reading it outside raises <code>NameError</code>.'},
+
+ {t:'tf', c:'type-hints-enforced', q:'Writing <code>def f(x: float) -&gt; float</code> makes Python reject a call that passes a string.',
+  opts:['True','False'], a:1,
+  sol:'<b>False.</b> Type hints are documentation, not enforcement — Python will happily run <code>f("abc")</code> and fail later, or not at all. They exist for readers and for tools. The final exam writes every signature with them, so read them as the specification they are.'}
+];
+
+BANKS.t05 = [
+ {t:'mc', c:'import-forms', q:'After <code>from math import sqrt</code>, which call works?',
+  opts:['<code>math.sqrt(9)</code>','<code>sqrt(9)</code>','Both','Neither'], a:1,
+  sol:'<b><code>sqrt(9)</code>.</b> The <code>from … import</code> form brings the <em>name</em> into your namespace but not the module, so <code>math</code> itself is still undefined and <code>math.sqrt(9)</code> raises <code>NameError</code>. Use <code>import math</code> if you want the dotted form.'},
+
+ {t:'code', c:'numpy-alias', q:'Write the conventional import line for NumPy.',
+  a:['import numpy as np'],
+  sol:'<code>import numpy as np</code>. The alias is a near-universal convention — the final exam\'s starter cell uses it, and its answers are written as <code>np.something</code>. pandas is <code>import pandas as pd</code>.'},
+
+ {t:'mc', c:'module-cache', q:'You edit a function in <code>example.py</code>, then re-run <code>import example</code> in the same session. What do you get?',
+  opts:['The updated function','The old function, silently','An <code>ImportError</code>','A warning that the module changed'], a:1,
+  sol:'<b>The old function, silently.</b> Python caches modules on first import and a repeated <code>import</code> is a no-op. You need <code>from importlib import reload</code> then <code>reload(example)</code>. Nothing warns you, so a function that stubbornly refuses to change behaviour is usually this, not your logic.'},
+
+ {t:'text', c:'reload-function', q:'Which function from <code>importlib</code> forces an edited module to be re-read? (One word)',
+  a:['reload'],
+  sol:'<code>reload</code>. Used as <code>from importlib import reload</code> then <code>reload(example)</code>. Re-running the plain <code>import</code> statement will not do it.'},
+
+ {t:'mc', c:'dunder-name', q:'What is <code>__name__</code> inside <code>example.py</code> when you run <code>python example.py</code>?',
+  opts:["<code>'example'</code>","<code>'__main__'</code>","<code>'__name__'</code>","It is undefined"], a:1,
+  sol:"<b><code>'__main__'</code>.</b> Run directly, a file's <code>__name__</code> is <code>'__main__'</code>; imported by something else, it is the module's own name, <code>'example'</code>. That difference is the whole point of the <code>if __name__ == \"__main__\":</code> guard."},
+
+ {t:'code', c:'main-guard', q:'Write the condition that guards code meant to run only on direct execution: <code>if ___:</code>',
+  a:['__name__ == "__main__"'],
+  sol:'<code>__name__ == "__main__"</code>. Without the guard, any script-level code at the bottom of a module runs every time somebody imports it — which is why importing a notebook helper can unexpectedly print or plot.'},
+
+ {t:'tf', c:'syspath', q:'A module in a directory not listed in <code>sys.path</code> can still be imported if you spell the path in the import statement.',
+  opts:['True','False'], a:1,
+  sol:'<b>False.</b> <code>import</code> takes a module name, not a filesystem path. Python searches the directories in <code>sys.path</code> in order. To import from elsewhere, append the directory first: <code>sys.path.append(\'../modules\')</code>.'}
+];
+
+BANKS.t06 = [
+ {t:'mc', c:'sort-returns-none', q:'What is the value of <code>xs</code> after <code>xs = xs.sort()</code>?',
+  opts:['The sorted list','<code>None</code>','The original unsorted list','A <code>TypeError</code>'], a:1,
+  sol:'<b><code>None</code>.</b> <code>sort()</code> sorts in place and returns <code>None</code>, so assigning its result destroys your list. Either call <code>xs.sort()</code> on its own line, or use <code>ys = sorted(xs)</code>, which returns a new list and leaves <code>xs</code> alone.'},
+
+ {t:'mc', c:'append-vs-extend', q:"<code>xs = ['a']</code>. What is <code>xs</code> after <code>xs.append(['b','c'])</code>?",
+  opts:["<code>['a','b','c']</code>","<code>['a', ['b','c']]</code>","<code>['a']</code>","<code>TypeError</code>"], a:1,
+  sol:"<b><code>['a', ['b','c']]</code>.</b> <code>append</code> adds exactly one item, and here that item is itself a list — so you get a nested list of length 2. <code>extend</code> is the one that adds each element, giving <code>['a','b','c']</code>."},
+
+ {t:'code', c:'sorted-nondestructive', q:'Write the call that returns a sorted copy of <code>xs</code> without changing <code>xs</code>.',
+  a:['sorted(xs)'],
+  sol:'<code>sorted(xs)</code>. The built-in function returns a new list; the <code>xs.sort()</code> <em>method</em> mutates in place and returns <code>None</code>. Same idea applies to <code>reversed()</code> versus <code>.reverse()</code>.'},
+
+ {t:'num', c:'zip-exhausted', q:'<code>z = zip(names, ages)</code> over three-item lists. After <code>list(z)</code>, how many items does a second <code>list(z)</code> return?',
+  a:0, tol:0.5,
+  sol:'<b>0.</b> <code>zip</code> returns a lazy iterator, which is consumed by the first pass and empty afterwards. Nothing raises — you just silently get <code>[]</code>. If you need it twice, materialise it once with <code>list(zip(...))</code>.'},
+
+ {t:'mc', c:'tuple-immutable', q:'<code>coordinate = (200, 50)</code>. What does <code>coordinate[0] = 100</code> do?',
+  opts:['Sets the first element to 100','Raises <code>TypeError</code>','Creates a new tuple','Raises <code>IndexError</code>'], a:1,
+  sol:'<b><code>TypeError</code>.</b> Tuples are immutable — that is the entire difference from a list. Immutability is also why a tuple can be a dictionary key or a set member and a list cannot.'},
+
+ {t:'code', c:'listcomp-filter', q:'Write a list comprehension giving the squares of the even values in <code>digits</code>.',
+  a:['[v ** 2 for v in digits if not v % 2]','[v ** 2 for v in digits if v % 2 == 0]','[v**2 for v in digits if v%2==0]','[v**2 for v in digits if not v%2]'],
+  sol:'<code>[v ** 2 for v in digits if not v % 2]</code>, or equivalently with <code>if v % 2 == 0</code>. The condition goes <em>after</em> the <code>for</code> clause. Remember this form is penalised in the final exam on NumPy and pandas questions, where a vectorised expression is wanted instead.'},
+
+ {t:'num', c:'slice-stop', q:"<code>bicycles</code> has 4 items. How many does <code>bicycles[0:2]</code> return?",
+  a:2, tol:0.5,
+  sol:'<b>2</b> — indices 0 and 1. The stop index is exclusive, so <code>[0:2]</code> stops <em>before</em> position 2. The length of a simple slice is always <code>stop - start</code>.'},
+
+ {t:'mc', c:'join-direction', q:"Which produces <code>'a-b-c'</code> from <code>['a','b','c']</code>?",
+  opts:["<code>['a','b','c'].join('-')</code>",
+        "<code>'-'.join(['a','b','c'])</code>",
+        "<code>join('-', ['a','b','c'])</code>",
+        "<code>'-'.join('abc', sep='-')</code>"], a:1,
+  sol:"<b><code>'-'.join([...])</code>.</b> The separator is the string you call the method on and the list is the argument — which reads backwards until you have written it a few times. Lists have no <code>.join</code> method, so the first option is an <code>AttributeError</code>."},
+
+ {t:'tf', c:'star-args', q:'A parameter written <code>*pargs</code> collects any number of positional arguments into a tuple.',
+  opts:['True','False'], a:0,
+  sol:'<b>True.</b> At a definition, <code>*</code> <em>gathers</em> into a tuple. At a call site, <code>*</code> does the reverse and <em>scatters</em> a sequence into separate arguments — which is how <code>zip(*zipped)</code> unzips.'}
+];
+
+BANKS.t07 = [
+ {t:'mc', c:'missing-key', q:'<code>d</code> has no key <code>\'Food\'</code>. What does <code>d[\'Food\']</code> do?',
+  opts:['Returns <code>None</code>','Raises <code>KeyError</code>','Returns an empty string','Adds the key with value <code>None</code>'], a:1,
+  sol:'<b>Raises <code>KeyError</code>.</b> Square-bracket access on a dictionary demands the key exists. <code>d.get(\'Food\')</code> returns <code>None</code> instead, and <code>d.get(\'Food\', \'Pizza\')</code> returns a default of your choosing.'},
+
+ {t:'mc', c:'get-vs-setdefault', q:'Which of these <em>adds</em> the missing key to the dictionary as a side effect?',
+  opts:["<code>d.get('Food', 'Pizza')</code>",
+        "<code>d.setdefault('Food', 'Pizza')</code>",
+        "Both of them",
+        "Neither of them"], a:1,
+  sol:"<b><code>setdefault</code>.</b> Both return <code>'Pizza'</code>, but only <code>setdefault</code> writes the pair into <code>d</code>. That difference is easy to miss and means <code>setdefault</code> quietly grows the dictionary you are only inspecting."},
+
+ {t:'code', c:'dict-items', q:'Write the method call that yields key–value pairs, to fill <code>for k, v in d.___:</code>',
+  a:['items()'],
+  sol:'<code>items()</code>. <code>keys()</code> and <code>values()</code> give one side each, and iterating the dictionary directly — <code>for k in d</code> — gives the keys.'},
+
+ {t:'ms', c:'valid-dict-keys', q:'Which of these can be used as a dictionary key? (Select all.)',
+  opts:['A string','A tuple of numbers','A list','An integer'], a:[0,1,3],
+  sol:'Everything except the list. Keys must be <strong>immutable</strong>, because the dictionary hashes them — and a list can change after insertion, which would corrupt the lookup. A tuple is immutable and therefore fine.'},
+
+ {t:'num', c:'set-dedupe', q:'How many elements does <code>{\'a\', \'o\', \'o\', \'i\', \'e\', \'u\', \'a\'}</code> contain?',
+  a:5, tol:0.5,
+  sol:'<b>5.</b> Sets hold unique items, so the repeated <code>\'o\'</code> and <code>\'a\'</code> collapse, leaving the five distinct vowels. No error and no warning — duplicates are dropped silently.'},
+
+ {t:'code', c:'set-intersection-op', q:'Write the operator form of <code>a.intersection(b)</code>.',
+  a:['a & b'],
+  sol:'<code>a &amp; b</code>. The operator forms are <code>|</code> union, <code>&amp;</code> intersection, <code>-</code> difference. Note <code>+</code> is <em>not</em> a set operator — unlike lists, sets do not concatenate.'},
+
+ {t:'mc', c:'counter-most-common', q:'Which is the shortest correct way to get the five most frequent characters in a string?',
+  opts:['Sort a dictionary of counts by value and slice',
+        '<code>Counter(s).most_common(5)</code>',
+        '<code>set(s)[:5]</code>',
+        '<code>sorted(s)[:5]</code>'], a:1,
+  sol:'<b><code>Counter(s).most_common(5)</code>.</b> <code>Counter</code> from <code>collections</code> tallies and ranks in one step. Option 3 fails outright — sets are unordered and cannot be sliced — and option 4 sorts alphabetically, not by frequency.'},
+
+ {t:'num', c:'combinations-count', q:'How many items does <code>list(itertools.combinations(\'ABC\', 2))</code> produce?',
+  a:3, tol:0.5,
+  sol:'<b>3</b> — AB, AC, BC. Combinations ignore order, so BA is not counted separately. <code>permutations(\'ABC\', 2)</code> gives 6 because it does count them. "How many ways to choose" means combinations.'},
+
+ {t:'mc', c:'kwargs-direction', q:'In <code>def print_pokemon(**kwargs)</code>, what does <code>**</code> do?',
+  opts:['Scatters a dictionary into separate arguments',
+        'Gathers keyword arguments into a dictionary',
+        'Raises the arguments to a power',
+        'Marks the arguments as optional'], a:1,
+  sol:'<b>Gathers.</b> At a <em>definition</em>, <code>**</code> collects keyword arguments into a dict. At a <em>call site</em>, <code>print_pokemon(**my_pokemon)</code> does the opposite and scatters the dict into keyword arguments. The symbol is the same; the direction depends on where it appears.'}
+];
+
+BANKS.t08 = [
+ {t:'mc', c:'mode-w-truncates', q:"A file has content. What does <code>open(path, 'w')</code> do to it?",
+  opts:['Appends to the end','Empties it immediately','Raises <code>FileExistsError</code>','Opens it read-only'], a:1,
+  sol:"<b>Empties it immediately</b> — on open, before you write anything. To add to a file use <code>'a'</code>; to be certain you are not clobbering one use <code>'x'</code>, which raises <code>FileExistsError</code> if it already exists."},
+
+ {t:'code', c:'mode-exclusive', q:"Write the single-character mode that creates a file but refuses to overwrite an existing one.",
+  a:["'x'",'x'],
+  sol:"<code>'x'</code>, exclusive creation. It implies writing, so it otherwise behaves like <code>'w'</code> — but it raises <code>FileExistsError</code> rather than silently destroying data."},
+
+ {t:'mc', c:'with-statement', q:'Why is <code>with open(...) as f:</code> preferred over <code>f = open(...)</code> then <code>f.close()</code>?',
+  opts:['It is faster','It closes the file even if the block raises an error',
+        'It allows more modes','It reads the file more efficiently'], a:1,
+  sol:'<b>It closes the file even if the block raises.</b> <code>with</code> calls the object\'s <code>__enter__</code> on entry and <code>__exit__</code> on exit, and the exit runs during an exception too. With the manual pair, an error between them skips the <code>close()</code> and leaks the handle.'},
+
+ {t:'tf', c:'readlines-keeps-newline', q:'<code>file.readlines()</code> strips the newline character from the end of each line.',
+  opts:['True','False'], a:1,
+  sol:'<b>False.</b> The separators are kept, which is why the standard idiom is <code>[line.strip() for line in file]</code>. Conversely <code>writelines()</code> does <em>not</em> add separators — you have to append <code>"\\n"</code> yourself. Both surprise people in opposite directions.'},
+
+ {t:'mc', c:'finally-overrides', q:'<code>def f(): try: return True; finally: return False</code>. What does <code>f()</code> return?',
+  opts:['<code>True</code>','<code>False</code>','<code>None</code>','It raises an error'], a:1,
+  sol:'<b><code>False</code>.</b> The <code>finally</code> clause runs immediately before the <code>return</code> takes effect, and a <code>return</code> inside <code>finally</code> replaces the pending one. The same applies to <code>break</code> and <code>continue</code>. Never put a <code>return</code> in a <code>finally</code> outside of a puzzle.'},
+
+ {t:'mc', c:'else-clause', q:'When does the <code>else</code> block of a <code>try</code> statement run?',
+  opts:['When an exception was raised','When no exception was raised',
+        'Always','Only if there is no <code>except</code> clause'], a:1,
+  sol:'<b>When no exception was raised.</b> It is the mirror of <code>except</code>: <code>try</code> guards, <code>except</code> handles failure, <code>else</code> handles success, <code>finally</code> runs regardless. The <code>else</code> must come after every <code>except</code>.'},
+
+ {t:'code', c:'pickle-mode', q:"Write the mode string for opening a file to write a pickle.",
+  a:["'wb'",'wb'],
+  sol:"<code>'wb'</code> — write, binary. Pickling produces bytes, not text, so the <code>b</code> is required; plain <code>'w'</code> raises <code>TypeError</code>. Reading one back uses <code>'rb'</code>."},
+
+ {t:'text', c:'serialisation-name', q:'What is the general name for converting a live Python object into a storable byte stream? (One word)',
+  a:['serialization','serialisation','pickling'],
+  sol:'<b>Serialisation</b> — and in Python specifically, <em>pickling</em>. The reverse is deserialisation or unpickling. <code>pickle.dump()</code> writes and <code>pickle.load()</code> reads.'},
+
+ {t:'ms', c:'read-methods', q:'Which of these read exactly one line and advance the cursor? (Select all.)',
+  opts:['<code>file.read()</code>','<code>file.readline()</code>',
+        '<code>file.readlines()</code>','Iterating with <code>for line in file</code>'], a:[1,3],
+  sol:'<code>readline()</code> returns a single line, and iterating the file yields one line per pass — both leave the cursor at the start of the next line. <code>read()</code> consumes everything remaining and <code>readlines()</code> returns the whole rest as a list.'}
+];
+
+BANKS.t09 = [
+ {t:'code', c:'init-method', q:'Write the name of the method called automatically when an instance is created.',
+  a:['__init__'],
+  sol:'<code>__init__</code>, the initialiser. It runs on <code>Point(3, 4)</code> and is where instance attributes get their starting values. It is not a "constructor" in the strict sense — the object already exists by the time it runs.'},
+
+ {t:'mc', c:'self-param', q:'What is <code>self</code> in a method definition?',
+  opts:['A keyword reserved by Python',
+        'The instance the method was called on',
+        'The class itself',
+        'A copy of the instance'], a:1,
+  sol:'<b>The instance.</b> It is passed automatically — you write <code>p.distance_from_origin()</code>, never <code>p.distance_from_origin(p)</code>. It is a naming convention rather than a keyword, but calling it anything else is unidiomatic to the point of being wrong.'},
+
+ {t:'num', c:'distance-origin', q:'For <code>Point(5, 12)</code>, what does <code>distance_from_origin()</code> return?',
+  a:13, tol:0.01,
+  sol:'<b>13.0.</b> √(5² + 12²) = √169 = 13. A 5-12-13 right triangle. The method computes <code>((self.x ** 2) + (self.y ** 2)) ** 0.5</code>.'},
+
+ {t:'mc', c:'str-method', q:'Your class has no <code>__str__</code>. What does <code>print(p)</code> show?',
+  opts:['The attribute values','Something like <code>&lt;__main__.Point object at 0x104...&gt;</code>',
+        'An empty string','A <code>TypeError</code>'], a:1,
+  sol:'<b>The default object representation</b> — the class name and a memory address. Technically correct and useless. Defining <code>__str__</code> to return a formatted string is what makes <code>print()</code> and <code>str()</code> informative.'},
+
+ {t:'code', c:'add-overload', q:'Write the method name that makes the <code>+</code> operator work on your class.',
+  a:['__add__'],
+  sol:'<code>__add__</code>. Defining it is <strong>operator overloading</strong> — the same mechanism that makes <code>+</code> mean addition for numbers and concatenation for strings. <code>__mul__</code> does the same job for <code>*</code>.'},
+
+ {t:'code', c:'super-call', q:'Write the call that runs the parent class\u2019s initialiser from inside a subclass, passing <code>name, address, email</code>.',
+  a:['super().__init__(name, address, email)'],
+  sol:'<code>super().__init__(name, address, email)</code>. Skip it and the parent\u2019s attributes are never set, so <code>faculty.name</code> raises <code>AttributeError</code> — a failure that appears far away from the class that caused it.'},
+
+ {t:'mc', c:'duck-typing', q:'Python\u2019s rule for whether a polymorphic function works on a new type is:',
+  opts:['The type must inherit from a common base class',
+        'The type must be registered with the function',
+        'If every operation inside the function applies to the type, the function applies',
+        'The type must declare which functions may use it'], a:2,
+  sol:'<b>The third — the duck typing rule.</b> Python checks nothing in advance; it simply tries the operations. <code>multadd(x, y, z)</code> returning <code>x*y + z</code> works for any type supporting <code>*</code> and <code>+</code>, whether or not it shares an ancestor with anything.'},
+
+ {t:'tf', c:'objects-mutable', q:'After <code>p = Point(3, 4)</code>, the statement <code>p.x = 10</code> is allowed.',
+  opts:['True','False'], a:0,
+  sol:'<b>True.</b> Instance attributes are writable by default, and you can even add new ones that <code>__init__</code> never mentioned. Python gives you no built-in way to forbid this — restricting it takes deliberate effort with properties or <code>__slots__</code>.'},
+
+ {t:'mc', c:'inheritance-purpose', q:'Why put shared attributes in a <code>Member</code> base class rather than repeating them in <code>Faculty</code> and <code>Student</code>?',
+  opts:['It runs faster',
+        'It avoids duplicated code that can drift apart',
+        'Python requires a base class',
+        'It reduces memory use'], a:1,
+  sol:'<b>To avoid duplication that drifts.</b> The notebook puts it plainly: if a programmer forgets just one line in one of the copies, the program fails for reasons that are difficult to track down. Inheritance keeps the shared definition in exactly one place.'}
+];
+
+var EXAM = null;
+var MAP = null;
+
+REVIEWER.init({
+  id: 'dsc512',
+  topicTitles: TOPIC_TITLES,
+  banks: BANKS,
+  exam: EXAM,
+  map: MAP
+});
+
+})();
+</script>
+</body>
+</html>

@@ -151,6 +151,7 @@ Every question needs `t`, `q`, `sol`, and a `c` (concept group). Ids are assigne
 {t:'ms',   c:'concept', q:'…', opts:[…], a:[0,2],          sol:'…'}    // all-or-nothing
 {t:'num',  c:'concept', q:'…', a:27.75, rtol:0.01,         sol:'…'}
 {t:'text', c:'concept', q:'…', a:['sample frame','sampling frame'], sol:'…'}
+{t:'code', c:'concept', q:'…', a:['x > 5'], sol:'…'}                   // exact, case-sensitive
 ```
 
 ### `c` — concept groups
@@ -174,6 +175,30 @@ Input accepts commas, currency symbols, unicode minus, a trailing `%` or `x`, an
 
 Matched **exactly after normalising** — case, punctuation and small words (`the`, `a`, `of`) are stripped — plus a bounded edit distance so one typo passes. There is deliberately **no substring matching**: it would score *"a sample frame is not what you need"* as correct. List real synonyms in `a` instead.
 
+### Code answers
+
+**Never use `t:'text'` for code.** `normText` lowercases, strips every operator
+and bracket, and forgives two characters of typo — which between them accept
+`x < 5` as an answer to `x > 5`, `range(6)` for `range(5)`, and `x != y` for
+`x == y`. This was measured, not guessed.
+
+`t:'code'` matches exactly after normalising only what is genuinely
+insignificant in Python:
+
+| Forgiven | Not forgiven |
+|---|---|
+| surrounding whitespace | case — `True` ≠ `true` |
+| spacing around operators — `x>5` = `x > 5` | any operator or identifier difference |
+| quote style — `'a'` = `"a"` | spacing *inside* a string literal |
+| | anything at all in an edit-distance sense |
+
+String literals are lifted out before the spacing rules run, so `', '.join(w)`
+and `','.join(w)` stay different — the space there is data, not formatting.
+Keyword boundaries survive too: `not x` never collapses to `notx`.
+
+List every genuinely acceptable form in `a`, exactly as you would for `text`:
+`a: ['xs.sort()', 'sorted(xs)']`.
+
 ### Solutions
 
 Write `sol` to explain **why the distractors are wrong**, not only why the answer is right. That is the difference between a quiz and a reviewer. Use `<div class="steps">` for worked arithmetic — it renders as a monospace block preserving line breaks.
@@ -192,6 +217,10 @@ Author-facing classes. The engine owns everything else (`.q`, `.opt`, `.sol`, `.
 | `ol.steps` | numbered procedure with circular badges |
 | `.path` | tool breadcrumb — `<span>Data</span><i>→</i><span class="last">Regression</span>` |
 | `.fx` / `.fx.ans` | monospace formula block, preserves line breaks |
+| `.codeblock` | source code. Python-highlighted automatically; scrolls sideways rather than wrapping, because a wrapped line reads as a different program. Use this, never `.fx`, for code |
+| `.codeblock.out` | what the code printed — muted, so it reads as a result not a program |
+| `.codecap` | small uppercase caption inside a code block, for a filename or a label |
+| `.nblink` | link from a topic to the source notebook it was built from |
 | `.ans` | inline answer badge with a small label |
 | `.verdict.rej` / `.verdict.keep` | conclusion pill |
 | `.tw > table.dt` | any table. **Always wrap in `.tw`** or it overflows on mobile. `td.s` = the answer, `td.m` = mono, `td.n` = right-aligned numeric |
@@ -231,6 +260,12 @@ These cost real time. They are fixed in `assets/reviewer.js`; the risk is re-cre
 5. **Revealing an answer before attempting it scores zero** and is labelled "Revealed — not scored", rather than silently inflating the total.
 6. **Print captures the active section before expanding all of them**, so printing does not navigate the reader back to page one.
 7. **`scrollRestoration = 'manual'` plus a deferred scroll on load**, or a deep-linked heading sits under the sticky top bar.
+8. **Code is graded by `codeOk`, never `textOk`.** The text matcher scores `x < 5`
+   as correct for `x > 5`. See "Code answers" in §5.
+9. **The syntax highlighter escapes before it colours.** It runs over author-supplied
+   content, so raw `<script>` in a code block must come out inert. It is also
+   idempotent — a `.lit` marker stops a second pass double-escaping a block when a
+   quiz mounts later and re-runs it.
 
 ---
 

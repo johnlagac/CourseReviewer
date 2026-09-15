@@ -135,6 +135,108 @@ function textOk(raw, item){
   });
 }
 
+/* ------------------------------------------------------------
+   CODE ANSWERS
+
+   normText above cannot grade code and must never be used for it.
+   It lowercases (so True and true collapse), strips every operator
+   and bracket (so len(a) becomes "len" and x != y becomes "x y"),
+   removes the words for/is/in, and then forgives two characters of
+   typo — which between them score `x < 5` as a correct answer to
+   `x > 5`, and range(6) as a correct answer to range(5).
+
+   So code is matched exactly, after normalising only what is
+   genuinely insignificant in Python: surrounding whitespace,
+   spacing around operators and delimiters, and quote style (PEP 8
+   deliberately leaves that to taste). Case is preserved because
+   Python is case-sensitive, and there is no edit-distance
+   tolerance because in code two characters is the whole answer.
+   ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   PYTHON HIGHLIGHTING — display only, never grading.
+
+   A reviewer for a programming course asks the reader to read a
+   lot of code, so the code is coloured. This is a single-pass
+   tokeniser rather than a parser: comments and strings are
+   matched before identifiers, so a keyword inside a string is not
+   recoloured. Anything it fails to recognise is emitted verbatim,
+   which is why it can safely run over arbitrary content.
+   ------------------------------------------------------------ */
+var PY_KW = /^(False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var PY_BI = /^(abs|all|any|bool|dict|dir|divmod|enumerate|filter|float|format|frozenset|getattr|help|hex|id|input|int|isinstance|issubclass|iter|len|list|map|max|min|next|object|open|ord|pow|print|range|repr|reversed|round|set|setattr|sorted|str|sum|super|tuple|type|vars|zip)$/;
+
+function pyHighlight(src){
+  /* Order matters: comment, then string, then number, then word. */
+  var re = /(#[^\n]*)|("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d[\w.]*)|([A-Za-z_]\w*)|([\s\S])/g;
+  var out = '', m;
+  while ((m = re.exec(src)) !== null){
+    if (m[1])      out += '<i class="k-cm">' + esc(m[1]) + '</i>';
+    else if (m[2]) out += '<i class="k-st">' + esc(m[2]) + '</i>';
+    else if (m[3]) out += '<i class="k-nu">' + esc(m[3]) + '</i>';
+    else if (m[4]){
+      if (PY_KW.test(m[4]))      out += '<i class="k-kw">' + m[4] + '</i>';
+      else if (PY_BI.test(m[4])) out += '<i class="k-bi">' + m[4] + '</i>';
+      else                       out += esc(m[4]);
+    }
+    else out += esc(m[5]);
+  }
+  return out;
+}
+
+/* Idempotent, so it can run again when a quiz mounts later and
+   brings its own code blocks in a solution. */
+function highlightCode(root){
+  var blocks = (root || document).querySelectorAll('.codeblock:not(.out):not(.lit)');
+  for (var i = 0; i < blocks.length; i++){
+    var b = blocks[i];
+    /* A caption is prose, not code. Lift it out before reading
+       textContent, or it gets tokenised into the first line. */
+    var cap = b.querySelector('.codecap'), capHTML = '';
+    if (cap){ capHTML = cap.outerHTML; cap.parentNode.removeChild(cap); }
+    b.innerHTML = capHTML + pyHighlight(b.textContent.replace(/^\n/, ''));
+    b.classList.add('lit');
+  }
+}
+
+/* A sentinel that cannot occur in Python source, so a lifted
+   literal is never confused with real code. */
+var SENT = '@';
+
+function normCode(s){
+  var t = String(s).replace(/\r\n?/g, '\n')
+    .replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+  /* Lift string literals out first, so the spacing rules below
+     cannot reach inside them: the space in ', '.join(x) is data,
+     not formatting, and collapsing it changes the output. */
+  var lits = [];
+  t = t.replace(/"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'/g, function(m){
+    lits.push(m.slice(1, -1));
+    return SENT + (lits.length - 1) + SENT;
+  });
+  t = t.replace(/[ \t]+/g, ' ')
+       .replace(/\s*([^\w\s@])\s*/g, '$1')  /* x > 5 === x>5 */
+       .replace(/\n+/g, '\n')
+       .trim();
+  /* Restore with one quote style, so 'a' and "a" compare equal. */
+  return t.replace(/@(\d+)@/g, function(_, i){ return '"' + lits[+i] + '"'; });
+}
+
+function codeOk(raw, item){
+  var t = normCode(raw);
+  if (!t) return false;
+  var accepted = (item.a instanceof Array ? item.a : [item.a]).map(normCode);
+  return accepted.indexOf(t) > -1;
+}
+
+/* One dispatch for every typed-input question, shared by the
+   immediate check and by deferred grading, so the two can never
+   disagree about what counts as correct. */
+function inputOk(raw, item){
+  if (item.t === 'num')  return numOk(readNum(raw, item), item);
+  if (item.t === 'code') return codeOk(raw, item);
+  return textOk(raw, item);
+}
+
 function shuffle(arr, rnd){
   var a = arr.slice(), i, j, tmp;
   for (i = a.length - 1; i > 0; i--){
@@ -217,8 +319,13 @@ function init(cfg){
       body += '</div>';
       if (item.t === 'ms') body += '<div class="ansrow"><button type="button" class="btn sm chk">Check selection</button><span class="vd"></span></div>';
     } else {
-      var ph = item.t === 'num' ? 'Type a number' : 'Type your answer';
-      body = '<div class="ansrow"><input class="ain" placeholder="' + ph + '" autocomplete="off">' +
+      var isCode = item.t === 'code';
+      var ph = item.t === 'num' ? 'Type a number' : isCode ? 'Type the Python' : 'Type your answer';
+      /* Phone keyboards capitalise and autocorrect by default, which
+         silently rewrites Python into something that cannot be right. */
+      var attrs = isCode ? ' autocapitalize="off" autocorrect="off" spellcheck="false"' : '';
+      body = '<div class="ansrow"><input class="ain' + (isCode ? ' code' : '') +
+             '" placeholder="' + ph + '" autocomplete="off"' + attrs + '>' +
              (mode === 'study' ? '<button type="button" class="btn sm chk">Check</button>' : '') +
              '<span class="vd"></span></div>';
     }
@@ -315,7 +422,7 @@ function init(cfg){
         if (!String(v.raw).trim()) return;
         v.locked = true;
         inp.disabled = true;
-        var ok = item.t === 'num' ? numOk(readNum(v.raw, item), item) : textOk(v.raw, item);
+        var ok = inputOk(v.raw, item);
         inp.classList.add(ok ? 'right' : 'wrong');
         settle(ok);
       };
@@ -341,7 +448,7 @@ function init(cfg){
         if (inp2){
           v.raw = inp2.value; inp2.disabled = true;
           if (String(v.raw).trim()){
-            ok = item.t === 'num' ? numOk(readNum(v.raw, item), item) : textOk(v.raw, item);
+            ok = inputOk(v.raw, item);
             inp2.classList.add(ok ? 'right' : 'wrong');
           } else if (vd){ vd.className = 'vd no'; vd.textContent = 'No answer'; }
         }
@@ -378,6 +485,8 @@ function init(cfg){
       if (BANKS[key]) renderQuiz(BANKS[key], hosts[i], 'study');
       else hosts[i].innerHTML = '<p class="fatal">No question bank named "' + esc(key) + '".</p>';
     }
+    /* Solutions can carry code blocks, and they only exist now. */
+    highlightCode(sec);
     mounted[sectionId] = true;
   }
 
@@ -814,6 +923,7 @@ function init(cfg){
   });
 
   dmRender('root');
+  highlightCode(document);
   paintProgress();
   paintTestCfg();
   if (EXAM && store.get('examstart', null)){
