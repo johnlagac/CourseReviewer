@@ -169,6 +169,36 @@ ol.steps>li::before{content:counter(st);position:absolute;left:0;top:-1px;width:
 .k-cm{font-style:italic;color:var(--fg3)}
 /* Typed code answers need a monospace box wide enough to read. */
 .ain.code{font-family:var(--mono);font-size:13px;min-width:230px;max-width:340px}
+/* ============ RUNNABLE PYTHON CELLS ============ */
+.pyc{border:1px solid var(--line);border-left:3px solid var(--accent-line);
+  border-radius:var(--radius-sm);background:var(--surface);margin:14px 0;overflow:hidden}
+.pyc.ex{border-left-color:var(--info)}
+.pyq{padding:13px 15px 0;font-size:14.5px}
+.pyq .exn{display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;font-weight:600;width:22px;height:22px;flex:none;
+  border-radius:50%;background:var(--info-bg);color:var(--info);margin-right:9px;
+  vertical-align:middle}
+.pyc-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 15px 0}
+.pyc-state{font-family:var(--mono);font-size:11px;color:var(--fg3)}
+.pyc-state.busy{color:var(--accent)}
+.pyc-state.ok{color:var(--ok);font-weight:600}
+.pyc-state.no{color:var(--bad);font-weight:600}
+.pyc-state.rv{color:var(--warn)}
+.pyc-in{display:block;width:100%;border:0;border-top:1px solid var(--line);box-sizing:border-box;
+  margin-top:11px;padding:12px 15px;background:var(--surface2);color:var(--fg);
+  font-family:var(--mono);font-size:13px;line-height:1.55;tab-size:4;-moz-tab-size:4;
+  resize:vertical;min-height:62px;overflow-x:auto;white-space:pre;outline:0}
+.pyc-in:focus{background:var(--bg);box-shadow:inset 0 0 0 2px var(--accent-line)}
+.pyc-out{border-top:1px solid var(--line);padding:11px 15px;background:var(--bg);
+  font-family:var(--mono);font-size:12.5px;line-height:1.5;
+  white-space:pre-wrap;word-break:break-word;color:var(--fg2);max-height:340px;overflow:auto}
+.pyc-out.ok{background:var(--ok-bg);color:var(--fg);border-top-color:var(--ok-line)}
+.pyc-out.err{background:var(--bad-bg);color:var(--fg);border-top-color:var(--bad-line)}
+.pyc .sol{margin:0;border-top:1px solid var(--line);border-radius:0}
+.pyc .sol.on{padding:13px 15px}
+.pyc .sol .codeblock{margin-bottom:0}
+@media(max-width:560px){ .pyc-in{font-size:12.5px} }
+
 /* Link from a topic to the notebook it was built from. */
 .nblink{display:inline-flex;align-items:center;gap:7px;text-decoration:none;
   background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
@@ -443,6 +473,15 @@ table.dt td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabu
     <li><strong>Concept check</strong> — questions with revealable solutions.</li>
   </ol>
 
+  <div class="note why"><span class="tag">The code on this page actually runs</span>
+    <p>Every <strong>Try it</strong> block is editable, and <strong>Run</strong> executes it — real CPython 3.13 with real NumPy and pandas, inside your browser. Nothing is uploaded anywhere. The <strong>Hands-on</strong> exercises go further: <strong>Run tests</strong> checks your answer against assertions, the same way the real exams are marked, and a pass counts toward your progress.</p>
+    <ul>
+      <li><strong>The first Run of a session needs internet.</strong> The Python runtime is about 13 MB (plus 9 MB the first time you touch NumPy or pandas) and is fetched once, then cached by your browser. Everything else — notes, concept checks, the mock exam, the syntax sheet — works with no network at all.</li>
+      <li><strong>An endless loop is survivable.</strong> Code is run in a background worker, so if you write <code>while True:</code> the page stops it after 15 seconds instead of freezing. You lose any variables defined in earlier cells, and it tells you so.</li>
+      <li><strong>Cells share one interpreter</strong>, like a notebook — something you define in one cell is visible in the next, in the order you ran them.</li>
+    </ul>
+  </div>
+
   <div class="note"><span class="tag">The notebooks are here too</span>
     <p>Every topic links to the notebook it was built from, under <code>notebooks/</code> beside this page. Open one to run the original code. Those links need the folder structure intact — in the single-file standalone copy they will not resolve.</p>
   </div>
@@ -515,7 +554,7 @@ table.dt td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabu
   </table></div>
 
   <h3>Putting variables inside strings</h3>
-  <div class="codeblock">first_name = "leo"
+  <div class="pycell">first_name = "leo"
 last_name = "lorenzo"
 suffix = "ii"
 
@@ -566,6 +605,10 @@ print("%s %s %s" % (first_name, last_name, suffix))       # traditional</div>
   </div>
 
   <a class="nblink" href="notebooks/03-hello-python.ipynb"><b>Notebook 03</b> — Hello Python!</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t01"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t01"></div>
 </section>
@@ -601,7 +644,7 @@ print("%s %s %s" % (first_name, last_name, suffix))       # traditional</div>
   </table></div>
 
   <div class="note watch"><span class="tag">String equality is case-sensitive</span>
-    <div class="codeblock">car = 'Toyota'
+    <div class="pycell">car = 'Toyota'
 print(car == 'toyota')        # False
 
 print(car.lower() == 'toyota')  # True</div>
@@ -634,7 +677,7 @@ else:
 
   <h3>A worked example</h3>
   <p>Typhoon classification by wind speed, which is a natural <code>elif</code> chain because the bands are ordered and exclusive:</p>
-  <div class="codeblock">wind_speed = 120    # km/h
+  <div class="pycell">wind_speed = 120    # km/h
 
 if wind_speed &lt; 62:
     classification = "TROPICAL DEPRESSION (TD)"
@@ -664,6 +707,10 @@ print(f"The classification of the typhoon is {classification}")</div>
   </div>
 
   <a class="nblink" href="notebooks/04-loops-conditionals.ipynb"><b>Notebook 04</b> — Loops and Conditionals</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t02"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t02"></div>
 </section>
@@ -696,7 +743,7 @@ print(f"The classification of the typhoon is {classification}")</div>
 while &lt;&lt;conditional_expression&gt;&gt;:
     &lt;&lt;block&gt;&gt;</div>
 
-  <div class="codeblock">message = 'I am a Data Science Leader'
+  <div class="pycell">message = 'I am a Data Science Leader'
 for ch in message:
     if ch.isupper():
         print(ch)</div>
@@ -718,7 +765,7 @@ L</div>
   <p><code>range(4)</code> produces exactly the valid indices of a list of length 4. That is the reason it is exclusive at the top.</p>
 
   <h3>while, with a real stopping condition</h3>
-  <div class="codeblock">time = 0
+  <div class="pycell">time = 0
 initial_population = 1_000
 growth_rate = 0.21          # 21% growth per minute
 population = initial_population
@@ -744,7 +791,7 @@ print(f"It took {time} minutes for the bacteria to double.")</div>
   </div>
 
   <h3>enumerate()</h3>
-  <div class="codeblock">for i, value in enumerate(['a', 'b', 'c']):
+  <div class="pycell">for i, value in enumerate(['a', 'b', 'c']):
     print(i, value)</div>
   <div class="codeblock out"><span class="codecap">Output</span>0 a
 1 b
@@ -760,6 +807,10 @@ print(f"It took {time} minutes for the bacteria to double.")</div>
   </div>
 
   <a class="nblink" href="notebooks/04-loops-conditionals.ipynb"><b>Notebook 04</b> — Loops and Conditionals</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t03"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t03"></div>
 </section>
@@ -900,6 +951,21 @@ def fibonacci(n):
   </div>
 
   <a class="nblink" href="notebooks/05-functions.ipynb"><b>Notebook 05</b> — Functions</a>
+  <h3>Try it</h3>
+  <div class="pycell">def describe_pet(animal_type, pet_name):
+    """Display information about a pet."""
+    print(f"I have a {animal_type}.")
+    print(f"My {animal_type}'s name is {pet_name.title()}.")
+
+
+describe_pet('dog', 'Maki')          # positional - order matters
+describe_pet(pet_name='Midnight', animal_type='cat')   # keyword - it does not
+describe_pet('Maki', 'dog')          # the silent failure: no error, wrong output</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t04"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t04"></div>
 </section>
@@ -975,6 +1041,19 @@ reload(example)          # now the new definitions are live</div>
 
   <a class="nblink" href="notebooks/05-functions.ipynb"><b>Notebook 05</b> — Functions, §3 Modular organisation</a>
   <a class="nblink" href="notebooks/07-files-modules-exceptions.ipynb"><b>Notebook 07</b> — Files, Modules and Exceptions, §2</a>
+  <h3>Try it</h3>
+  <div class="pycell">import math
+from math import sqrt, pi
+
+print("math.sqrt(9) =", math.sqrt(9))
+print("bare sqrt(9)  =", sqrt(9))
+print("area of r=3   =", pi * 3 ** 2)
+print("__name__ here is", __name__)</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t05"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t05"></div>
 </section>
@@ -1062,7 +1141,7 @@ coordinate[0] = 100  # TypeError — tuples are immutable</div>
 min_max([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])   # (1, 10)</div>
 
   <h3>zip, unpacking and *args</h3>
-  <div class="codeblock">names = ['Leo', 'Pat', 'Gil']
+  <div class="pycell">names = ['Leo', 'Pat', 'Gil']
 ages = [32, 27, 30]
 
 for name, age in zip(names, ages):
@@ -1074,7 +1153,7 @@ list(zipped)     # []   <-- the second call gives nothing</div>
     <p>A <code>zip</code> object is a one-shot iterator. Once walked through, it is empty. Wrap it in <code>list()</code> immediately if you need it twice.</p>
   </div>
   <p>Unzipping is <code>zip(*zipped_sequence)</code> — the <code>*</code> scatters the list back into separate arguments. A parameter written <code>*pargs</code> does the reverse, <em>gathering</em> any number of positional arguments into a tuple:</p>
-  <div class="codeblock">def print_all(*pargs):
+  <div class="pycell">def print_all(*pargs):
     """Print an arbitrary number of positional arguments as a tuple"""
     print(pargs)
 
@@ -1090,6 +1169,10 @@ print_all(1, 2.0, '3')     # (1, 2.0, '3')</div>
   </div>
 
   <a class="nblink" href="notebooks/06-collections.ipynb"><b>Notebook 06</b> — Storing and Processing Collections of Data</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t06"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t06"></div>
 </section>
@@ -1198,6 +1281,21 @@ list(itertools.combinations('ABC', 2))       # order does not — 3</div>
   </div>
 
   <a class="nblink" href="notebooks/06-collections.ipynb"><b>Notebook 06</b> — Storing and Processing Collections of Data</a>
+  <h3>Try it</h3>
+  <div class="pycell">my_pokemon = {'Name': 'Evee', 'Type': 'Normal', 'Height': 0.30}
+
+print(my_pokemon.get('Food', 'Pizza'))   # a default, dict unchanged
+print('Food' in my_pokemon)              # False - get did not insert
+my_pokemon.setdefault('Food', 'Pizza')   # same default, but it DOES insert
+print('Food' in my_pokemon)              # True
+
+for key, value in my_pokemon.items():
+    print(f"{key}: {value}")</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t07"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t07"></div>
 </section>
@@ -1313,6 +1411,28 @@ bool_return()      # False</div>
   </div>
 
   <a class="nblink" href="notebooks/07-files-modules-exceptions.ipynb"><b>Notebook 07</b> — Files, Modules and Exceptions</a>
+  <h3>Try it</h3>
+  <div class="pycell">def bool_return():
+    try:
+        return True
+    finally:
+        return False
+
+
+print("finally wins:", bool_return())
+
+try:
+    raise ValueError("Invalid value for the variable")
+except ValueError as err:
+    print("caught:", err)
+    print("args:", err.args)
+finally:
+    print("finally always runs")</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t08"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t08"></div>
 </section>
@@ -1339,7 +1459,7 @@ bool_return()      # False</div>
   </div>
 
   <h3>A class, an initialiser and a method</h3>
-  <div class="codeblock">class Point:
+  <div class="pycell">class Point:
     """Point class represents and manipulates x, y coordinates"""
 
     def __init__(self, x=0, y=0):
@@ -1383,7 +1503,7 @@ print(p)                     # (3, 4)</div>
 
   <h3>Polymorphism and operator overloading</h3>
   <p><code>+</code> already means different things for numbers and strings — <code>4 + 4</code> is 8, <code>"4" + "4"</code> is <code>'44'</code>. That is <strong>operator overloading</strong>, and your own classes can join in:</p>
-  <div class="codeblock">class Point:
+  <div class="pycell">class Point:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
@@ -1427,6 +1547,10 @@ class Faculty(Member):
   </div>
 
   <a class="nblink" href="notebooks/08-oop.ipynb"><b>Notebook 08</b> — Object Oriented Programming</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t09"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t09"></div>
 </section>
@@ -1544,6 +1668,25 @@ np.hsplit(grid, [2])</div>
   </div>
 
   <a class="nblink" href="notebooks/09-numpy.ipynb"><b>Notebook 09</b> — NumPy Basics and Fundamentals, §2–3</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="numpy">import numpy as np
+
+m = np.arange(12).reshape(3, 4)
+print("shape", m.shape, "| size", m.size, "| ndim", m.ndim)
+print(m)
+
+sub = m[:2, :2]        # a VIEW, not a copy
+sub[0, 0] = 99
+print("after writing to the slice, m[0,0] =", m[0, 0])
+
+safe = m[:2, :2].copy()
+safe[0, 0] = -1
+print("after writing to a .copy(),  m[0,0] =", m[0, 0])</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t10"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t10"></div>
 </section>
@@ -1642,6 +1785,21 @@ m - m.mean(axis=1)[:, np.newaxis]  # centre each row — now (3, 1), works</div>
   </div>
 
   <a class="nblink" href="notebooks/09-numpy.ipynb"><b>Notebook 09</b> — NumPy, §4–6</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="numpy">import numpy as np
+
+m = np.arange(12).reshape(3, 4).astype(float)
+print("sum()        -&gt;", m.sum())
+print("sum(axis=0)  -&gt;", m.sum(axis=0), " one per column")
+print("sum(axis=1)  -&gt;", m.sum(axis=1), " one per row")
+
+print("\ncentre each column:", (m - m.mean(axis=0)).shape)
+try:
+    m - m.mean(axis=1)
+except ValueError as e:
+    print("m - m.mean(axis=1) raises:", e)
+print("with [:, np.newaxis]:", (m - m.mean(axis=1)[:, np.newaxis]).shape)</div>
+
   <h3>Concept check</h3>
   <div data-quiz="t11"></div>
 </section>
@@ -1733,6 +1891,25 @@ x                      # [2. 0. 1. 0. 0.]   the repeat counted</div>
   </div>
 
   <a class="nblink" href="notebooks/09-numpy.ipynb"><b>Notebook 09</b> — NumPy, §7–8</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="numpy">import numpy as np
+
+x = np.array([3, 8, 1, 9, 5])
+print("mask      ", x &gt; 5)
+print("filtered  ", x[x &gt; 5])
+print("count     ", (x &gt; 5).sum())
+print("proportion", (x &gt; 5).mean())
+print("combined  ", x[(x &gt; 3) &amp; (x &lt; 9)])
+
+try:
+    x[x &gt; 3 and x &lt; 9]
+except ValueError as e:
+    print("using 'and' raises:", e)</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t12"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t12"></div>
 </section>
@@ -1812,6 +1989,20 @@ s.iloc[0:2]       # positions 0 and 1 -- two values</div>
   </div>
 
   <a class="nblink" href="notebooks/10-intro-to-pandas.ipynb"><b>Notebook 10</b> — Getting Started with pandas, §1–2</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="pandas">import pandas as pd
+
+s = pd.Series([4, 7, -5, 3], index=['a', 'b', 'c', 'd'])
+print("loc['a':'c'] -&gt;", list(s.loc['a':'c']), " endpoint INCLUDED")
+print("iloc[0:2]    -&gt;", list(s.iloc[0:2]), " endpoint excluded")
+
+df = pd.DataFrame({'state': ['Ohio', 'Ohio', 'Nevada'],
+                   'year': [2000, 2001, 2001],
+                   'pop': [1.5, 1.7, 2.4]})
+print(df)
+print("\ntype of df['pop']  :", type(df['pop']).__name__)
+print("type of df[['pop']]:", type(df[['pop']]).__name__)</div>
+
   <h3>Concept check</h3>
   <div data-quiz="t13"></div>
 </section>
@@ -1888,6 +2079,17 @@ s.rank(method='min')                       # ties all take the lowest rank</div>
   </div>
 
   <a class="nblink" href="notebooks/10-intro-to-pandas.ipynb"><b>Notebook 10</b> — Getting Started with pandas, §3</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="pandas">import pandas as pd
+
+s1 = pd.Series([7.3, -2.5], index=['a', 'c'])
+s2 = pd.Series([-2.1, 3.6], index=['a', 'b'])
+
+print("s1 + s2 aligns on the index:")
+print(s1 + s2)
+print("\nwith a fill value instead of NaN:")
+print(s1.add(s2, fill_value=0))</div>
+
   <h3>Concept check</h3>
   <div data-quiz="t14"></div>
 </section>
@@ -2040,6 +2242,10 @@ s.str.len()</div>
   </div>
 
   <a class="nblink" href="notebooks/11-data-preparation.ipynb"><b>Notebook 11</b> — Data Loading, Preparation and Exploration, §2–3</a>
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t16"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t16"></div>
 </section>
@@ -2167,6 +2373,20 @@ df.groupby('team')['pts'].mean().reset_index()      # same result, after the fac
   </div>
 
   <a class="nblink" href="notebooks/13-group-operations.ipynb"><b>Notebook 13</b> — Data Aggregation and Group Operations</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="pandas">import pandas as pd
+
+df = pd.DataFrame({'team': ['A', 'A', 'B', 'B'], 'pts': [10.0, 20.0, 30.0, 50.0]})
+
+print("agg       -&gt;", len(df.groupby('team')['pts'].mean()), "rows (one per group)")
+print("transform -&gt;", len(df.groupby('team')['pts'].transform('mean')), "rows (one per original row)")
+print("\ncentred within team:")
+print(list(df['pts'] - df.groupby('team')['pts'].transform('mean')))</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t18"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t18"></div>
 </section>
@@ -2331,6 +2551,20 @@ pd.melt(df, id_vars=['key'], value_vars=['a', 'b'])        # wide -&gt; long</di
   </div>
 
   <a class="nblink" href="notebooks/15-data-restructuring.ipynb"><b>Notebook 15</b> — Data Restructuring</a>
+  <h3>Try it</h3>
+  <div class="pycell" data-pkgs="pandas">import pandas as pd
+
+L = pd.DataFrame({'k': ['a', 'b', 'c'], 'v': [1, 2, 3]})
+R = pd.DataFrame({'k': ['a', 'b', 'd'], 'w': [4, 5, 6]})
+
+print("inner (the default) keeps", len(pd.merge(L, R, on='k')), "rows")
+print("outer keeps", len(pd.merge(L, R, on='k', how='outer')), "rows")
+print(pd.merge(L, R, on='k', how='outer').sort_values('k').to_string(index=False))</div>
+
+  <h3>Hands-on</h3>
+  <p>Edit the code and press <strong>Run</strong>. <strong>Run tests</strong> checks your answer the way the exam does.</p>
+  <div data-exercise="t20"></div>
+
   <h3>Concept check</h3>
   <div data-quiz="t20"></div>
 </section>
@@ -2755,6 +2989,158 @@ function textOk(raw, item){
    Python is case-sensitive, and there is no edit-distance
    tolerance because in code two characters is the whole answer.
    ------------------------------------------------------------ */
+/* ============================================================
+   PYTHON RUNTIME
+
+   Runs real CPython in the page via Pyodide, so a reader can edit
+   a snippet and see what it actually does. Three decisions worth
+   knowing, each of them measured rather than assumed:
+
+   1. It runs in a Web Worker, not on the main thread. Beginners
+      write infinite loops, and on the main thread `while True:`
+      freezes the tab permanently with no way back. A worker can
+      be terminated, which is what RUN_TIMEOUT below does.
+
+   2. The runtime is fetched from a CDN, never from disk. A page
+      opened by double-click has a `file://` origin, and browsers
+      refuse to fetch one local file from another — so a vendored
+      copy cannot work, while a cross-origin CDN fetch can, and
+      does. The cost is that the first run of a session needs
+      network; everything is browser-cached afterwards.
+
+   3. One interpreter serves the whole page, so imports and names
+      persist between cells the way they do in a notebook. Killing
+      a runaway cell resets that, and the UI says so.
+
+   If the runtime cannot load — offline, or a blocked CDN — cells
+   fall back to showing their expected output and say why. Nothing
+   else on the page depends on any of this.
+   ============================================================ */
+var PY_INDEX_URL = 'https://cdn.jsdelivr.net/pyodide/v0.28.3/full/';
+var RUN_TIMEOUT  = 15000;   /* ms before a cell is assumed runaway */
+
+var PyRunner = (function(){
+  var worker = null, booting = null, seq = 0, pending = {}, loaded = {};
+  var INDEX = PY_INDEX_URL;
+
+  /* The worker is built from a Blob so it inherits this page's
+     origin and may importScripts the cross-origin runtime. */
+  function workerSource(){
+    return [
+      'importScripts(' + JSON.stringify(INDEX + 'pyodide.js') + ');',
+      'var py = null;',
+      'self.onmessage = async function(e){',
+      '  var m = e.data;',
+      '  try {',
+      '    if (m.cmd === "boot"){',
+      '      py = await loadPyodide({ indexURL: ' + JSON.stringify(INDEX) + ' });',
+      '      self.postMessage({ id:m.id, ok:true });',
+      '    } else if (m.cmd === "load"){',
+      '      await py.loadPackage(m.pkgs);',
+      '      self.postMessage({ id:m.id, ok:true });',
+      '    } else if (m.cmd === "run"){',
+      '      var buf = "";',
+      '      py.setStdout({ batched: function(s){ buf += s + "\\n"; } });',
+      '      py.setStderr({ batched: function(s){ buf += s + "\\n"; } });',
+      '      try {',
+      '        await py.runPythonAsync(m.code);',
+      '        self.postMessage({ id:m.id, ok:true, out:buf });',
+      '      } catch (err){',
+      '        self.postMessage({ id:m.id, ok:false, out:buf, err:String(err) });',
+      '      }',
+      '    }',
+      '  } catch (err){',
+      '    self.postMessage({ id:m.id, ok:false, err:String(err && err.message || err) });',
+      '  }',
+      '};'
+    ].join('\n');
+  }
+
+  function spawn(){
+    var url = URL.createObjectURL(new Blob([workerSource()], { type:'text/javascript' }));
+    var w = new Worker(url);
+    w.onmessage = function(e){
+      var p = pending[e.data.id];
+      if (!p) return;
+      delete pending[e.data.id];
+      clearTimeout(p.timer);
+      p.resolve(e.data);
+    };
+    w.onerror = function(){
+      /* Usually a blocked or unreachable CDN. Fail every waiter so
+         no cell is left spinning forever. */
+      Object.keys(pending).forEach(function(k){
+        clearTimeout(pending[k].timer);
+        pending[k].resolve({ ok:false, err:'runtime-unavailable' });
+        delete pending[k];
+      });
+      booting = null;
+    };
+    return w;
+  }
+
+  function send(msg, timeout){
+    if (!worker) return Promise.resolve({ ok:false, err:'runtime-unavailable' });
+    var id = ++seq;
+    msg.id = id;
+    return new Promise(function(resolve){
+      pending[id] = { resolve:resolve, timer:setTimeout(function(){
+        delete pending[id];
+        /* Assume runaway code. Killing the worker is the only way
+           back, and it discards every name the page had defined. */
+        kill();
+        resolve({ ok:false, err:'timeout' });
+      }, timeout || RUN_TIMEOUT) };
+      worker.postMessage(msg);
+    });
+  }
+
+  function kill(){
+    if (worker){ worker.terminate(); worker = null; }
+    booting = null; loaded = {}; pending = {};
+  }
+
+  function boot(){
+    if (booting) return booting;
+    try { worker = spawn(); }
+    catch (e){ return Promise.resolve({ ok:false, err:'runtime-unavailable' }); }
+    /* The first boot pulls ~13MB, so it gets a longer leash. */
+    booting = send({ cmd:'boot' }, 120000).then(function(r){
+      if (!r.ok) kill();
+      return r;
+    });
+    return booting;
+  }
+
+  function need(pkgs){
+    var want = (pkgs || []).filter(function(p){ return !loaded[p]; });
+    if (!want.length) return Promise.resolve({ ok:true });
+    return send({ cmd:'load', pkgs:want }, 120000).then(function(r){
+      if (r.ok) want.forEach(function(p){ loaded[p] = true; });
+      return r;
+    });
+  }
+
+  return {
+    /* Resolves {ok, out, err}. Never rejects — callers render the
+       failure rather than handling an exception. */
+    run: function(code, pkgs){
+      return boot().then(function(b){
+        if (!b.ok) return b;
+        return need(pkgs).then(function(l){
+          if (!l.ok) return l;
+          return send({ cmd:'run', code:code });
+        });
+      });
+    },
+    booted: function(){ return !!worker; },
+    reset: kill,
+    /* Point at a self-hosted copy instead of the CDN. Only useful
+       when the page is served over http — see the note above. */
+    configure: function(url){ if (url){ kill(); INDEX = url; } }
+  };
+})();
+
 /* ------------------------------------------------------------
    PYTHON HIGHLIGHTING — display only, never grading.
 
@@ -2799,6 +3185,157 @@ function highlightCode(root){
     b.innerHTML = capHTML + pyHighlight(b.textContent.replace(/^\n/, ''));
     b.classList.add('lit');
   }
+}
+
+/* ------------------------------------------------------------
+   RUNNABLE CELL — the editor, its Run button and its output.
+   `spec` is { code, pkgs, test, sol, solcode, onSettle }.
+   onSettle(passed) is called only for cells that carry a test.
+   ------------------------------------------------------------ */
+function buildPyCell(spec){
+  var el = document.createElement('div');
+  el.className = 'pyc' + (spec.test ? ' ex' : '');
+  el.innerHTML =
+    (spec.q ? '<div class="pyq">' + spec.q + '</div>' : '') +
+    '<div class="pyc-bar">' +
+      '<button type="button" class="btn sm run">Run</button>' +
+      (spec.test ? '<button type="button" class="btn ghost sm check">Run tests</button>' : '') +
+      '<button type="button" class="btn ghost sm reset">Reset</button>' +
+      (spec.sol || spec.solcode ? '<button type="button" class="btn ghost sm peek">Show solution</button>' : '') +
+      '<span class="pyc-state"></span>' +
+    '</div>' +
+    '<textarea class="pyc-in" spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>' +
+    '<div class="pyc-out" hidden></div>' +
+    (spec.sol || spec.solcode ? '<div class="sol">' + (spec.sol || '') +
+      (spec.solcode ? '<div class="codeblock">' + esc(spec.solcode) + '</div>' : '') + '</div>' : '');
+
+  var ta    = el.querySelector('.pyc-in');
+  var out   = el.querySelector('.pyc-out');
+  var state = el.querySelector('.pyc-state');
+  var sol   = el.querySelector('.sol');
+  var start = spec.code || '';
+  var settled = false;
+
+  ta.value = start;
+  /* Line count is a reliable size even while the section is still
+     hidden; measuring is not, because a display:none element
+     reports a scrollHeight of 0 and would collapse the box. */
+  ta.rows = Math.max(3, start.split('\n').length + 1);
+  function autosize(){
+    ta.style.height = 'auto';
+    if (ta.scrollHeight > 0) ta.style.height = (ta.scrollHeight + 2) + 'px';
+  }
+  ta.addEventListener('input', autosize);
+
+  /* Tab must indent, not move focus — this is Python. Shift+Tab
+     removes one level. Escape restores tabbing out, for keyboard
+     users who would otherwise be trapped in the box. */
+  var trap = true;
+  ta.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ trap = false; return; }
+    if (e.key !== 'Tab' || !trap) return;
+    e.preventDefault();
+    var s = ta.selectionStart, t = ta.selectionEnd, v = ta.value;
+    if (e.shiftKey){
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      if (v.slice(ls, ls + 4) === '    '){
+        ta.value = v.slice(0, ls) + v.slice(ls + 4);
+        ta.selectionStart = ta.selectionEnd = Math.max(ls, s - 4);
+      }
+    } else {
+      ta.value = v.slice(0, s) + '    ' + v.slice(t);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+    autosize();
+  });
+  ta.addEventListener('focus', function(){ trap = true; });
+
+  function show(cls, text){
+    out.hidden = false;
+    out.className = 'pyc-out ' + cls;
+    out.textContent = text;
+  }
+  function busy(msg){ state.className = 'pyc-state busy'; state.textContent = msg; }
+  function idle(cls, msg){ state.className = 'pyc-state ' + (cls || ''); state.textContent = msg || ''; }
+
+  function explain(err){
+    if (err === 'runtime-unavailable')
+      return 'Python could not start. The runtime is downloaded the first time you press Run, so this usually means no internet connection — or that something is blocking jsdelivr.net. Everything else on this page works offline; only the Run button needs the network, and only once per browser.';
+    if (err === 'timeout')
+      return 'Stopped after ' + (RUN_TIMEOUT / 1000) + ' seconds. That is almost always a loop that never ends — check that something in the body changes the condition. The interpreter was restarted, so anything you defined in earlier cells is gone; run those cells again.';
+    return err;
+  }
+
+  function exec(code, pkgs, after){
+    if (!PyRunner.booted()) busy('Starting Python — first run downloads the runtime…');
+    else busy('Running…');
+    out.hidden = true;
+    return PyRunner.run(code, pkgs).then(function(r){
+      if (!r.ok && (r.err === 'runtime-unavailable' || r.err === 'timeout')){
+        idle('no', r.err === 'timeout' ? 'Stopped' : 'Unavailable');
+        show('err', explain(r.err));
+        return null;
+      }
+      idle('');
+      after(r);
+      return r;
+    });
+  }
+
+  el.querySelector('.run').onclick = function(){
+    exec(ta.value, spec.pkgs, function(r){
+      var body = (r.out || '').replace(/\n+$/, '');
+      if (r.ok){
+        show('', body || '(ran without printing anything)');
+        idle('ok', 'Ran');
+      } else {
+        show('err', (body ? body + '\n' : '') + lastLine(r.err));
+        idle('no', 'Error');
+      }
+    });
+  };
+
+  var chk = el.querySelector('.check');
+  if (chk) chk.onclick = function(){
+    /* The reader's code and the test run as one program, so the
+       test sees exactly the names the reader defined. */
+    exec(ta.value + '\n\n' + spec.test, spec.pkgs, function(r){
+      var body = (r.out || '').replace(/\n+$/, '');
+      if (r.ok){
+        show('ok', (body ? body + '\n\n' : '') + 'All tests passed.');
+        idle('ok', 'Passed');
+        if (!settled){ settled = true; if (spec.onSettle) spec.onSettle(true); }
+      } else {
+        show('err', (body ? body + '\n' : '') + lastLine(r.err));
+        idle('no', 'Failed');
+      }
+    });
+  };
+
+  el.querySelector('.reset').onclick = function(){
+    ta.value = start; autosize(); out.hidden = true; idle('');
+  };
+
+  var peek = el.querySelector('.peek');
+  if (peek) peek.onclick = function(){
+    var on = sol.classList.toggle('on');
+    this.textContent = on ? 'Hide solution' : 'Show solution';
+    /* Same rule as a concept check: seeing the answer first means
+       it is not earned. */
+    if (on && !settled){
+      settled = true;
+      if (spec.onSettle) spec.onSettle(false);
+      idle('rv', 'Revealed — not scored');
+    }
+    if (on) highlightCode(sol);
+  };
+
+  return el;
+}
+
+function lastLine(s){
+  var parts = String(s).split('\n').filter(function(x){ return x.trim(); });
+  return parts.length ? parts[parts.length - 1] : String(s);
 }
 
 /* A sentinel that cannot occur in Python source, so a lifted
@@ -2863,10 +3400,15 @@ function init(cfg){
   var EXAM         = cfg.exam || null;
   var TREE         = (cfg.map && cfg.map.tree) || null;
   var RES          = (cfg.map && cfg.map.results) || null;
+  var EXERCISES    = (cfg.python && cfg.python.exercises) || {};
+  if (cfg.python && cfg.python.indexURL) PyRunner.configure(cfg.python.indexURL);
 
   /* Stable ids, so saved progress keeps tracking the right question. */
   Object.keys(BANKS).forEach(function(k){
     BANKS[k].forEach(function(q, i){ q.id = k + '-' + (i + 1); q.topic = k; });
+  });
+  Object.keys(EXERCISES).forEach(function(k){
+    EXERCISES[k].forEach(function(x, i){ x.id = 'x-' + k + '-' + (i + 1); x.topic = k; });
   });
 
   /* ============================================================
@@ -2878,6 +3420,7 @@ function init(cfg){
     var ids = Object.keys(progress), tot = 0, right = 0, i;
     var total = 0;
     Object.keys(BANKS).forEach(function(k){ total += BANKS[k].length; });
+    Object.keys(EXERCISES).forEach(function(k){ total += EXERCISES[k].length; });
     for (i = 0; i < ids.length; i++){ tot++; if (progress[ids[i]] === 1) right++; }
     if (pbar) pbar.style.width = total ? (tot / total * 100) + '%' : '0%';
     if (pscore) pscore.textContent = right + ' / ' + tot + ' correct';
@@ -3088,9 +3631,52 @@ function init(cfg){
       if (BANKS[key]) renderQuiz(BANKS[key], hosts[i], 'study');
       else hosts[i].innerHTML = '<p class="fatal">No question bank named "' + esc(key) + '".</p>';
     }
+    mountPython(sec);
     /* Solutions can carry code blocks, and they only exist now. */
     highlightCode(sec);
     mounted[sectionId] = true;
+  }
+
+  /* Runnable cells. Two kinds: a .pycell written inline in the
+     content, which just runs; and a [data-exercise] host filled
+     from the config, which also carries tests and counts toward
+     progress exactly as a concept check does. */
+  function mountPython(sec){
+    var cells = sec.querySelectorAll('.pycell');
+    for (var i = 0; i < cells.length; i++){
+      var src = cells[i];
+      /* A caption is a label, not code — lift it out before reading
+         the source, or it becomes the first line of the program. */
+      var cap = src.querySelector('.codecap'), capHTML = '';
+      if (cap){ capHTML = cap.outerHTML; cap.parentNode.removeChild(cap); }
+      var cell = buildPyCell({
+        q: capHTML || null,
+        code: src.textContent.replace(/^\n/, '').replace(/\s+$/, ''),
+        pkgs: (src.getAttribute('data-pkgs') || '').split(',').filter(Boolean)
+      });
+      src.parentNode.replaceChild(cell, src);
+    }
+    var hosts = sec.querySelectorAll('[data-exercise]');
+    for (var j = 0; j < hosts.length; j++){
+      var key = hosts[j].getAttribute('data-exercise');
+      var set = EXERCISES[key];
+      if (!set){
+        hosts[j].innerHTML = '<p class="fatal">No exercise set named "' + esc(key) + '".</p>';
+        continue;
+      }
+      hosts[j].innerHTML = '';
+      set.forEach(function(x, n){
+        hosts[j].appendChild(buildPyCell({
+          q: '<span class="exn">' + (n + 1) + '</span>' + x.q,
+          code: x.start || '',
+          pkgs: x.pkgs,
+          test: x.test,
+          sol: x.sol,
+          solcode: x.solcode,
+          onSettle: (function(id){ return function(ok){ record(id, ok); }; })(x.id)
+        }));
+      });
+    }
   }
 
   /* ============================================================
@@ -4347,6 +4933,242 @@ BANKS.t20 = [
   sol:"<code>how='outer'</code>. Unmatched rows are kept with <code>NaN</code> in the columns from the frame that lacked them. It is the safest choice when you need to see what failed to match."}
 ];
 
+/* Hands-on exercises. Generated from the notebooks' own tasks; every
+   reference solution was executed against its tests, and every starter
+   was confirmed to fail them, before this was written. */
+var EXERCISES = {};
+
+EXERCISES.t01 = [
+ {
+  q: "Represent a famous person in <code>famous_person<\/code> and a quote of theirs in <code>message<\/code>, so that <code>message<\/code> reads exactly like <code>Albert Einstein once said, \"A person who never made a mistake never tried anything new.\"<\/code> (including the quotation marks). Build <code>message<\/code> with an f-string.",
+  start: "famous_person = \"Albert Einstein\"\nquote = \"A person who never made a mistake never tried anything new.\"\n\n### YOUR CODE HERE\nmessage = None",
+  test: "assert isinstance(message, str), \"message should be a string\"\nassert message == 'Albert Einstein once said, \"A person who never made a mistake never tried anything new.\"'\nprint(\"message =\", message)",
+  sol: "<p>The outer quotes have to be the <em>other<\/em> kind from the ones inside the text — that is exactly the PEP 8 rule about string quotes. Single outside, double inside, and no backslashes needed.<\/p>",
+  solcode: "famous_person = \"Albert Einstein\"\nquote = \"A person who never made a mistake never tried anything new.\"\n\nmessage = f'{famous_person} once said, \"{quote}\"'"
+ },
+ {
+  q: "Given <code>celsius_temp<\/code>, compute <code>fahrenheit_temp<\/code> using <code>F = (9/5)C + 32<\/code>.",
+  start: "celsius_temp = 37.0\n\n### YOUR CODE HERE\nfahrenheit_temp = None",
+  test: "assert abs(fahrenheit_temp - 98.6) < 1e-9, f\"expected 98.6, got {fahrenheit_temp}\"\ncelsius_temp = 100.0\nf2 = 9/5 * celsius_temp + 32\nassert abs(f2 - 212.0) < 1e-9\nprint(\"37C =\", fahrenheit_temp, \"F\")",
+  sol: "<p>Write <code>9/5<\/code> rather than <code>1.8<\/code> to keep the formula recognisable. In Python 3 <code>9/5<\/code> is 1.8 — in Python 2 it would have been 1, which is the classic version of this bug.<\/p>",
+  solcode: "celsius_temp = 37.0\n\nfahrenheit_temp = 9/5 * celsius_temp + 32"
+ },
+ {
+  q: "Write <code>elapsed(time_secs)<\/code> returning the time as a string of minutes and seconds. <code>elapsed(130)<\/code> must return exactly <code>\"2 minutes 10 seconds\"<\/code>.",
+  start: "def elapsed(time_secs):\n    ### YOUR CODE HERE\n    raise NotImplementedError\n\nprint(elapsed(130))",
+  test: "assert elapsed(130) == \"2 minutes 10 seconds\", repr(elapsed(130))\nassert elapsed(59) == \"0 minutes 59 seconds\", repr(elapsed(59))\nassert elapsed(3600) == \"60 minutes 0 seconds\", repr(elapsed(3600))\nassert elapsed(0) == \"0 minutes 0 seconds\"\nassert isinstance(elapsed(130), str)\nprint(\"elapsed(130) =\", elapsed(130))",
+  sol: "<p><code>divmod<\/code> returns the pair <code>(x // y, x % y)<\/code>, which is precisely this question — the whole-minutes and the remainder in one call. Two separate <code>//<\/code> and <code>%<\/code> operations are equally correct, just longer.<\/p>",
+  solcode: "def elapsed(time_secs):\n    \"\"\"Return time_secs as a \"M minutes S seconds\" string.\"\"\"\n    minutes, seconds = divmod(time_secs, 60)\n    return f\"{minutes} minutes {seconds} seconds\"\n\n\nprint(elapsed(130))"
+ }
+];
+
+EXERCISES.t02 = [
+ {
+  q: "Write <code>stage(age)<\/code> returning a person’s stage of life: <code>baby<\/code> under 2, <code>toddler<\/code> under 4, <code>kid<\/code> under 13, <code>teenager<\/code> under 20, <code>adult<\/code> under 65, otherwise <code>elder<\/code>.",
+  start: "def stage(age):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert stage(1) == \"baby\"\nassert stage(2) == \"toddler\"\nassert stage(3) == \"toddler\"\nassert stage(4) == \"kid\"\nassert stage(12) == \"kid\"\nassert stage(13) == \"teenager\"\nassert stage(19) == \"teenager\"\nassert stage(20) == \"adult\"\nassert stage(64) == \"adult\"\nassert stage(65) == \"elder\"\nassert stage(90) == \"elder\"\nprint(\"all boundaries correct\")",
+  sol: "<p>Order matters and upper bounds are implicit: by the time <code>age &lt; 4<\/code> is tested, <code>age &lt; 2<\/code> has already failed. Reorder the branches and every boundary silently moves.<\/p>",
+  solcode: "def stage(age):\n    if age < 2:\n        return \"baby\"\n    elif age < 4:\n        return \"toddler\"\n    elif age < 13:\n        return \"kid\"\n    elif age < 20:\n        return \"teenager\"\n    elif age < 65:\n        return \"adult\"\n    else:\n        return \"elder\""
+ },
+ {
+  q: "Write <code>fizz(n)<\/code> returning <code>'Fizz'<\/code> if <code>n<\/code> is divisible by 3, <code>'Buzz'<\/code> if by 5, <code>'Fuzz'<\/code> if by 15, and <code>str(n)<\/code> otherwise.",
+  start: "def fizz(n):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert fizz(3) == \"Fizz\"\nassert fizz(9) == \"Fizz\"\nassert fizz(5) == \"Buzz\"\nassert fizz(25) == \"Buzz\"\nassert fizz(15) == \"Fuzz\", \"15 is divisible by 15 - check that case first\"\nassert fizz(30) == \"Fuzz\"\nassert fizz(7) == \"7\"\nassert fizz(1) == \"1\"\nprint(\"15 ->\", fizz(15), \"| 25 ->\", fizz(25))",
+  sol: "<p>The trap is ordering. 15 is divisible by 3 <em>and<\/em> 5 <em>and<\/em> 15, so the most specific test has to come first — check 15 before 3 and 5, or 15 returns <code>'Fizz'<\/code> and the hidden test catches you.<\/p>",
+  solcode: "def fizz(n):\n    if n % 15 == 0:\n        return \"Fuzz\"\n    elif n % 3 == 0:\n        return \"Fizz\"\n    elif n % 5 == 0:\n        return \"Buzz\"\n    else:\n        return str(n)"
+ }
+];
+
+EXERCISES.t03 = [
+ {
+  q: "Using a <code>for<\/code> loop, build the right triangle of <code>T<\/code>s, one character wide at the top and seven at the bottom, with the hypotenuse on the <strong>left<\/strong>. Return it as a single string with newlines between rows.",
+  start: "def triangle():\n    ### YOUR CODE HERE\n    raise NotImplementedError\n\nprint(triangle())",
+  test: "_t = triangle()\n_lines = _t.split(\"\\n\")\nassert len(_lines) == 7, f\"expected 7 rows, got {len(_lines)}\"\nassert _lines[0] == \"      T\", repr(_lines[0])\nassert _lines[-1] == \"TTTTTTT\", repr(_lines[-1])\nassert all(len(l) == 7 for l in _lines), \"every row should be 7 characters wide\"\nassert all(l.count(\"T\") == i + 1 for i, l in enumerate(_lines))\nprint(\"triangle correct\")",
+  sol: "<p>Each row has <code>7 - i<\/code> spaces then <code>i<\/code> T’s, so the right-hand edge lines up. <code>range(1, 8)<\/code> gives 1 through 7 — using <code>range(7)<\/code> and adjusting inside is the usual off-by-one here.<\/p>",
+  solcode: "def triangle():\n    rows = []\n    for i in range(1, 8):\n        rows.append(\" \" * (7 - i) + \"T\" * i)\n    return \"\\n\".join(rows)\n\nprint(triangle())"
+ },
+ {
+  q: "Using a <code>while<\/code> loop, write <code>weeks_to_gain(weight, rate, target)<\/code> returning how many whole weeks it takes for <code>weight<\/code>, growing by <code>rate<\/code> each week, to reach <code>target<\/code> times its original value.",
+  start: "def weeks_to_gain(weight, rate, target):\n    weeks = 0\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert weeks_to_gain(200, 0.05, 1.25) == 5, weeks_to_gain(200, 0.05, 1.25)\nassert isinstance(weeks_to_gain(200, 0.05, 1.25), int)\nassert weeks_to_gain(200, 0.02, 1.10) == 5\nassert weeks_to_gain(100, 0.10, 2.0) == 8\nprint(\"5% to +25% takes\", weeks_to_gain(200, 0.05, 1.25), \"weeks\")",
+  sol: "<p>Compute the goal <em>before<\/em> the loop. If you write <code>while weight &lt; weight * target<\/code> the goal moves every iteration, and with any positive rate the condition never becomes false — the classic infinite loop in this exercise.<\/p>",
+  solcode: "def weeks_to_gain(weight, rate, target):\n    weeks = 0\n    goal = weight * target\n    while weight < goal:\n        weight += rate * weight\n        weeks += 1\n    return weeks"
+ }
+];
+
+EXERCISES.t04 = [
+ {
+  q: "Write <code>city_country(city, country)<\/code> returning a string like <code>\"Makati City, Philippines\"<\/code>.",
+  start: "def city_country(city, country):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert city_country(\"Makati City\", \"Philippines\") == \"Makati City, Philippines\"\nassert isinstance(city_country(\"Makati City\", \"Philippines\"), str)\nassert city_country(\"Tokyo\", \"Japan\") == \"Tokyo, Japan\"\nprint(city_country(\"Makati City\", \"Philippines\"))",
+  sol: "<p>An f-string is the clearest form. Note the comma <em>and<\/em> the space — the test checks the exact string, as the real hidden tests do.<\/p>",
+  solcode: "def city_country(city, country):\n    \"\"\"Return the city and country as one formatted string.\"\"\"\n    return f\"{city}, {country}\""
+ },
+ {
+  q: "Write <code>sum_digits(n)<\/code> returning the sum of the digits of a non-negative integer.",
+  start: "def sum_digits(n):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert sum_digits(1345) == 13\nassert isinstance(sum_digits(1345), int)\nassert sum_digits(0) == 0\nassert sum_digits(9) == 9\nassert sum_digits(999) == 27\nprint(\"sum_digits(1345) =\", sum_digits(1345))",
+  sol: "<p>Converting to a string makes each digit reachable. The arithmetic alternative — repeatedly taking <code>n % 10<\/code> and <code>n //= 10<\/code> — is equally valid and worth being able to write.<\/p>",
+  solcode: "def sum_digits(n):\n    \"\"\"Return the sum of the digits of n.\"\"\"\n    return sum(int(c) for c in str(n))"
+ },
+ {
+  q: "Write <code>ack(m, n)<\/code>, the Ackermann function: <code>n + 1<\/code> when <code>m == 0<\/code>; <code>ack(m-1, 1)<\/code> when <code>m &gt; 0<\/code> and <code>n == 0<\/code>; otherwise <code>ack(m-1, ack(m, n-1))<\/code>.",
+  start: "def ack(m, n):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert ack(0, 0) == 1\nassert ack(1, 1) == 3\nassert ack(2, 2) == 7\nassert ack(3, 3) == 61\nassert ack(3, 4) == 125\nassert isinstance(ack(3, 4), int)\nprint(\"ack(3, 4) =\", ack(3, 4))",
+  sol: "<p>Two base cases and a doubly recursive step. It grows ferociously — <code>ack(3, 4)<\/code> is 125 and already takes over ten thousand calls, and <code>ack(4, 2)<\/code> has 19,729 digits. Do not try it.<\/p>",
+  solcode: "def ack(m, n):\n    \"\"\"Return the Ackermann function A(m, n).\"\"\"\n    if m == 0:\n        return n + 1\n    elif n == 0:\n        return ack(m - 1, 1)\n    else:\n        return ack(m - 1, ack(m, n - 1))"
+ }
+];
+
+EXERCISES.t05 = [
+ {
+  q: "Import what you need from the <code>math<\/code> module and write <code>circle_area(r)<\/code> returning the area of a circle of radius <code>r<\/code>.",
+  start: "### YOUR CODE HERE\n\ndef circle_area(r):\n    raise NotImplementedError",
+  test: "import math\nassert abs(circle_area(1) - math.pi) < 1e-12, \"use math.pi, not a rounded literal\"\nassert abs(circle_area(2) - 4 * math.pi) < 1e-12\nassert abs(circle_area(0)) < 1e-12\nprint(\"circle_area(1) =\", circle_area(1))",
+  sol: "<p>Either <code>import math<\/code> then <code>math.pi<\/code>, or <code>from math import pi<\/code> then bare <code>pi<\/code> — but not a mixture. Hard-coding 3.14159 loses precision the test will notice.<\/p>",
+  solcode: "from math import pi\n\n\ndef circle_area(r):\n    \"\"\"Return the area of a circle of radius r.\"\"\"\n    return pi * r ** 2"
+ }
+];
+
+EXERCISES.t06 = [
+ {
+  q: "Write <code>min_max(sequence)<\/code> returning the smallest and largest values as a tuple.",
+  start: "def min_max(sequence):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert min_max([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) == (1, 10)\nassert isinstance(min_max([3, 1]), tuple)\nassert min_max([5]) == (5, 5)\nassert min_max([-2, 7, 0]) == (-2, 7)\nprint(min_max([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))",
+  sol: "<p>Returning two values separated by a comma gives a <strong>tuple<\/strong> — you never write the parentheses. This is why functions that \"return several things\" in Python are really returning one tuple.<\/p>",
+  solcode: "def min_max(sequence):\n    \"\"\"Return (smallest, largest) of a sequence.\"\"\"\n    return min(sequence), max(sequence)"
+ },
+ {
+  q: "Using a <strong>list comprehension<\/strong>, write <code>even_squares(xs)<\/code> returning the squares of the even values in <code>xs<\/code>, in order.",
+  start: "def even_squares(xs):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert even_squares([1,2,3,4,5,6,7,8,9,10]) == [4, 16, 36, 64, 100]\nassert even_squares([]) == []\nassert even_squares([1, 3, 5]) == []\nassert even_squares([-2, 3]) == [4]\nprint(even_squares(list(range(1, 11))))",
+  sol: "<p>The condition goes after the <code>for<\/code> clause. <code>not v % 2<\/code> and <code>v % 2 == 0<\/code> are equally correct. Remember this shape is penalised in the <em>final<\/em> exam on NumPy and pandas questions — there you want a boolean mask instead.<\/p>",
+  solcode: "def even_squares(xs):\n    \"\"\"Return the squares of the even values of xs.\"\"\"\n    return [v ** 2 for v in xs if not v % 2]"
+ }
+];
+
+EXERCISES.t07 = [
+ {
+  q: "Write <code>is_anagram(word1, word2)<\/code> returning <code>True<\/code> when one word’s letters can be rearranged to spell the other.",
+  start: "def is_anagram(word1, word2):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert is_anagram(\"listen\", \"silent\") is True or is_anagram(\"listen\", \"silent\") == True\nassert is_anagram(\"elbow\", \"below\")\nassert not is_anagram(\"hello\", \"world\")\nassert not is_anagram(\"aab\", \"ab\"), \"sets lose the letter counts - compare sorted letters\"\nassert is_anagram(\"\", \"\")\nprint(\"listen/silent:\", is_anagram(\"listen\", \"silent\"))",
+  sol: "<p>Sorting both and comparing is the one-liner. <code>Counter(word1) == Counter(word2)<\/code> works too and reads well. A <code>set<\/code> comparison does <em>not<\/em> — it would call \"aab\" and \"ab\" anagrams, because sets discard the counts.<\/p>",
+  solcode: "def is_anagram(word1, word2):\n    \"\"\"Return True if the two words are anagrams.\"\"\"\n    return sorted(word1) == sorted(word2)"
+ },
+ {
+  q: "Write <code>roman_to_integer(roman_numeral)<\/code> converting a Roman numeral string to its integer value. Handle subtractive pairs such as <code>IV<\/code> and <code>XL<\/code>.",
+  start: "def roman_to_integer(roman_numeral):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert roman_to_integer(\"XXXXX\") == 50\nassert roman_to_integer(\"IV\") == 4\nassert roman_to_integer(\"IX\") == 9\nassert roman_to_integer(\"XL\") == 40\nassert roman_to_integer(\"MCMXCIV\") == 1994\nassert roman_to_integer(\"III\") == 3\nassert isinstance(roman_to_integer(\"X\"), int)\nprint(\"MCMXCIV =\", roman_to_integer(\"MCMXCIV\"))",
+  sol: "<p>A dictionary maps each letter to its value. The subtractive rule is local: a letter is <em>subtracted<\/em> exactly when the letter after it is worth more. That single check handles IV, IX, XL, XC, CD and CM without listing them.<\/p>",
+  solcode: "VALUES = {\"I\": 1, \"V\": 5, \"X\": 10, \"L\": 50, \"C\": 100, \"D\": 500, \"M\": 1000}\n\n\ndef roman_to_integer(roman_numeral):\n    \"\"\"Return the integer value of a roman numeral string.\"\"\"\n    total = 0\n    for i, ch in enumerate(roman_numeral):\n        value = VALUES[ch]\n        nxt = roman_numeral[i + 1:i + 2]\n        if nxt and VALUES[nxt] > value:\n            total -= value\n        else:\n            total += value\n    return total"
+ }
+];
+
+EXERCISES.t08 = [
+ {
+  q: "Write <code>check_pos_int(text)<\/code> that returns the integer in <code>text<\/code> when it is a positive whole number. Raise <code>ValueError(\"Negative int not allowed!\")<\/code> for a negative integer, and return <code>None<\/code> for anything that is not an integer at all.",
+  start: "def check_pos_int(text):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "assert check_pos_int(\"42\") == 42\nassert check_pos_int(\"0\") == 0\nassert check_pos_int(\"abc\") is None\nassert check_pos_int(\"3.5\") is None\ntry:\n    check_pos_int(\"-1\")\n    raise AssertionError(\"a negative int should raise ValueError\")\nexcept ValueError as err:\n    assert \"Negative int not allowed!\" in str(err), str(err)\nprint(\"check_pos_int behaves correctly\")",
+  sol: "<p>Two different failures need two different responses, which is exactly what <code>try<\/code>/<code>except<\/code> plus an explicit <code>raise<\/code> is for. Note the ordering: you must convert first, and only then judge the sign.<\/p>",
+  solcode: "def check_pos_int(text):\n    \"\"\"Return a positive int, raise on a negative one, None otherwise.\"\"\"\n    try:\n        value = int(text)\n    except ValueError:\n        return None\n    if value < 0:\n        raise ValueError(\"Negative int not allowed!\")\n    return value"
+ },
+ {
+  q: "Write <code>top_words(text, n)<\/code> returning the <code>n<\/code> most common words in <code>text<\/code> as a list of <code>(word, count)<\/code> pairs, most common first. Compare words case-insensitively.",
+  start: "from collections import Counter\n\n\ndef top_words(text, n):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "_r = top_words(\"the cat the dog THE bird\", 2)\nassert _r[0] == (\"the\", 3), _r\nassert len(_r) == 2\nassert top_words(\"a a b\", 1) == [(\"a\", 2)]\nassert isinstance(top_words(\"a b\", 1), list)\nprint(top_words(\"the cat the dog THE bird\", 2))",
+  sol: "<p>This is the SONA exercise in miniature. <code>Counter<\/code> plus <code>most_common<\/code> does the tallying and the ranking in one step — building a dictionary by hand and sorting it by value is four lines that do the same thing.<\/p>",
+  solcode: "from collections import Counter\n\n\ndef top_words(text, n):\n    \"\"\"Return the n most common words, case-insensitively.\"\"\"\n    return Counter(text.lower().split()).most_common(n)"
+ }
+];
+
+EXERCISES.t09 = [
+ {
+  q: "Write a class <code>Dice<\/code> with an attribute <code>sides<\/code> defaulting to 6, and a method <code>roll_die()<\/code> returning a random integer from 1 to <code>sides<\/code> inclusive.",
+  start: "import random\n\n\nclass Dice:\n    ### YOUR CODE HERE\n    pass",
+  test: "d = Dice()\nassert d.sides == 6\nassert Dice(20).sides == 20\nrolls = [Dice(6).roll_die() for _ in range(400)]\nassert min(rolls) >= 1 and max(rolls) <= 6, (min(rolls), max(rolls))\nassert 6 in rolls, \"a six should be reachable - check the upper bound is inclusive\"\nassert 1 in rolls\nassert all(isinstance(r, int) for r in rolls)\nprint(\"400 rolls ranged\", min(rolls), \"to\", max(rolls))",
+  sol: "<p>The default belongs in the signature, <code>def __init__(self, sides=6)<\/code>. Watch the inclusive upper bound: <code>random.randint(1, n)<\/code> can return <code>n<\/code>, whereas <code>random.randrange(1, n)<\/code> stops at <code>n - 1<\/code> and would never roll a six.<\/p>",
+  solcode: "import random\n\n\nclass Dice:\n    \"\"\"A die with a configurable number of sides.\"\"\"\n\n    def __init__(self, sides=6):\n        self.sides = sides\n\n    def roll_die(self):\n        \"\"\"Return a random face value from 1 to self.sides.\"\"\"\n        return random.randint(1, self.sides)"
+ },
+ {
+  q: "Write <code>Point<\/code> (taking <code>x<\/code> and <code>y<\/code>) and <code>LineSegment<\/code> (taking two Points) so that <code>LineSegment(Point(1, 1), Point(3, 2)).slope()<\/code> is <code>0.5<\/code> and <code>.length()<\/code> is <code>2.236…<\/code>.",
+  start: "class Point:\n    ### YOUR CODE HERE\n    pass\n\n\nclass LineSegment:\n    ### YOUR CODE HERE\n    pass",
+  test: "seg = LineSegment(Point(1, 1), Point(3, 2))\nassert abs(seg.slope() - 0.5) < 1e-9, seg.slope()\nassert abs(seg.length() - 2.23606797749979) < 1e-9, seg.length()\nflat = LineSegment(Point(0, 0), Point(4, 0))\nassert abs(flat.slope()) < 1e-9 and abs(flat.length() - 4) < 1e-9\nprint(\"slope\", seg.slope(), \"| length\", seg.length())",
+  sol: "<p>A class whose attributes are themselves objects — <code>self.start<\/code> is a <code>Point<\/code>, so you reach through it with <code>self.start.x<\/code>. Keep the order consistent: the first Point is the start, so every difference is end minus start, or the slope comes out negated.<\/p>",
+  solcode: "class Point:\n    \"\"\"A point in the plane.\"\"\"\n\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n\n\nclass LineSegment:\n    \"\"\"A segment between two Points.\"\"\"\n\n    def __init__(self, start, end):\n        self.start = start\n        self.end = end\n\n    def slope(self):\n        \"\"\"Return the gradient of the segment.\"\"\"\n        return (self.end.y - self.start.y) / (self.end.x - self.start.x)\n\n    def length(self):\n        \"\"\"Return the Euclidean length of the segment.\"\"\"\n        return ((self.end.x - self.start.x) ** 2\n                + (self.end.y - self.start.y) ** 2) ** 0.5"
+ }
+];
+
+EXERCISES.t10 = [
+ {
+  q: "Write <code>centre_rows(m)<\/code> returning <code>m<\/code> with each row’s own mean subtracted. <strong>One line of working code, no loops.<\/strong>",
+  pkgs: ["numpy"],
+  start: "import numpy as np\n\n\ndef centre_rows(m):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import numpy as np\nm = np.arange(12).reshape(3, 4).astype(float)\n_r = centre_rows(m)\nassert _r.shape == (3, 4), _r.shape\nassert np.allclose(_r.sum(axis=1), 0), \"each row should now sum to zero\"\nassert np.allclose(_r[0], [-1.5, -0.5, 0.5, 1.5])\nassert np.allclose(m, np.arange(12).reshape(3, 4)), \"do not modify the input\"\nprint(_r)",
+  sol: "<p>Two things have to be right at once. <code>axis=1<\/code> collapses the columns and gives one mean per row; <code>[:, np.newaxis]<\/code> turns that <code>(3,)<\/code> vector into a <code>(3, 1)<\/code> column so it broadcasts down the rows. Without the second, a <code>(3, 4)<\/code> array meets a <code>(3,)<\/code> vector and raises.<\/p>",
+  solcode: "import numpy as np\n\n\ndef centre_rows(m):\n    \"\"\"Subtract each row's mean from that row.\"\"\"\n    return m - m.mean(axis=1)[:, np.newaxis]"
+ },
+ {
+  q: "Write <code>commutes(A, B, X)<\/code> returning whether two square matrices commute — that is, whether <code>AB = BA<\/code> — within absolute tolerance <code>X<\/code>. <strong>One line, vectorised.<\/strong>",
+  pkgs: ["numpy"],
+  start: "import numpy as np\n\n\ndef commutes(A, B, X):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import numpy as np\nI = np.eye(3); D = np.diag([1.0, 2.0, 3.0])\nassert commutes(I, D, 1e-8), \"anything commutes with the identity\"\nassert commutes(np.diag([1.0, 2.0]), np.diag([3.0, 4.0]), 1e-8)\nR = np.array([[0.0, 1.0], [0.0, 0.0]]); S = np.array([[0.0, 0.0], [1.0, 0.0]])\nassert not commutes(R, S, 1e-8), \"these two do not commute\"\nprint(\"identity commutes:\", commutes(I, D, 1e-8), \"| R,S commute:\", commutes(R, S, 1e-8))",
+  sol: "<p>Straight from the final exam practice set. Two traps: <code>@<\/code> is matrix multiplication while <code>*<\/code> multiplies element-wise, and floating-point matrices are essentially never <em>exactly<\/em> equal — which is why the question hands you a tolerance and why <code>==<\/code> would be the wrong tool.<\/p>",
+  solcode: "import numpy as np\n\n\ndef commutes(A, B, X):\n    \"\"\"Do A and B commute within absolute tolerance X?\"\"\"\n    return bool(np.allclose(A @ B, B @ A, atol=X))"
+ }
+];
+
+EXERCISES.t12 = [
+ {
+  q: "Write <code>count_between(x, lo, hi)<\/code> returning how many elements of <code>x<\/code> are strictly between <code>lo<\/code> and <code>hi<\/code>. <strong>One line, no loop.<\/strong>",
+  pkgs: ["numpy"],
+  start: "import numpy as np\n\n\ndef count_between(x, lo, hi):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import numpy as np\nx = np.array([3, 8, 1, 9, 5])\nassert count_between(x, 3, 9) == 2, count_between(x, 3, 9)\nassert count_between(x, 0, 100) == 5\nassert count_between(x, 100, 200) == 0\nassert isinstance(count_between(x, 3, 9), int)\nprint(\"strictly between 3 and 9:\", count_between(x, 3, 9))",
+  sol: "<p>Two masks combined with <code>&amp;<\/code>, then summed — <code>True<\/code> counts as 1. Both sets of parentheses are required, because <code>&amp;<\/code> binds more tightly than <code>&gt;<\/code>. Using <code>and<\/code> instead raises \"truth value of an array is ambiguous\", since a five-element boolean array has no single truth value.<\/p>",
+  solcode: "import numpy as np\n\n\ndef count_between(x, lo, hi):\n    \"\"\"Count elements strictly between lo and hi.\"\"\"\n    return int(((x > lo) & (x < hi)).sum())"
+ },
+ {
+  q: "Write <code>k_smallest(x, k)<\/code> returning the values of the <code>k<\/code> smallest elements of <code>x<\/code>, sorted ascending. Use a <strong>partition<\/strong>, not a full sort.",
+  pkgs: ["numpy"],
+  start: "import numpy as np\n\n\ndef k_smallest(x, k):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import numpy as np\nx = np.array([50, 10, 40, 20, 30])\nassert list(k_smallest(x, 3)) == [10, 20, 30], list(k_smallest(x, 3))\nassert list(k_smallest(x, 1)) == [10]\nbig = np.arange(1000)[::-1]\nassert list(k_smallest(big, 4)) == [0, 1, 2, 3]\nprint(\"3 smallest:\", k_smallest(x, 3))",
+  sol: "<p><code>argpartition<\/code> is O(N) where a full sort is O(N log N): it only guarantees the k smallest sit before position k, in no particular order. Sorting just those k afterwards is cheap. This is the k-nearest-neighbours pattern from the end of the notebook.<\/p>",
+  solcode: "import numpy as np\n\n\ndef k_smallest(x, k):\n    \"\"\"Return the k smallest values of x, ascending.\"\"\"\n    return np.sort(x[np.argpartition(x, k)[:k]])"
+ }
+];
+
+EXERCISES.t16 = [
+ {
+  q: "Write <code>standard_scale(df, cols)<\/code> that converts each named column to its z-score <strong>in place<\/strong>, using <code>(x - mean) / std<\/code> over the non-null entries. <strong>One line of working code.<\/strong>",
+  pkgs: ["numpy", "pandas"],
+  start: "import pandas as pd\n\n\ndef standard_scale(df, cols):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import pandas as pd, numpy as np\ndf = pd.DataFrame({\"a\": [1.0, 2.0, 3.0, 4.0], \"b\": [10.0, 20.0, 30.0, 40.0], \"c\": list(\"pqpq\")})\nout = standard_scale(df, [\"a\", \"b\"])\nassert out is None, \"the function should alter df in place, not return a new frame\"\nassert np.allclose(df[[\"a\", \"b\"]].mean(), 0), \"scaled columns should have mean 0\"\nassert np.allclose(df[[\"a\", \"b\"]].std(), 1), \"scaled columns should have std 1\"\nassert list(df[\"c\"]) == list(\"pqpq\"), \"other columns must be untouched\"\nprint(df)",
+  sol: "<p>Straight from the final practice set. Assigning back into <code>df[cols]<\/code> is what makes it in place, as the docstring demands. <code>mean()<\/code> and <code>std()<\/code> already skip nulls, which is exactly the \"over all non-null entries\" the spec asks for — so no extra handling is needed.<\/p>",
+  solcode: "import pandas as pd\n\n\ndef standard_scale(df, cols):\n    \"\"\"Standard-scale the named columns of df, in place.\"\"\"\n    df[cols] = (df[cols] - df[cols].mean()) / df[cols].std()"
+ }
+];
+
+EXERCISES.t18 = [
+ {
+  q: "Write <code>centre_within(df, key, col)<\/code> returning a Series of <code>col<\/code> with each row’s <em>group<\/em> mean subtracted, keeping one value per original row. <strong>One line, no merge.<\/strong>",
+  pkgs: ["numpy", "pandas"],
+  start: "import pandas as pd\n\n\ndef centre_within(df, key, col):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import pandas as pd, numpy as np\ndf = pd.DataFrame({\"team\": [\"A\", \"A\", \"B\", \"B\"], \"pts\": [10.0, 20.0, 30.0, 50.0]})\n_r = centre_within(df, \"team\", \"pts\")\nassert len(_r) == len(df), \"should return one value per original row, not one per group\"\nassert list(_r) == [-5.0, 5.0, -10.0, 10.0], list(_r)\nassert np.allclose(_r.groupby(df[\"team\"]).sum(), 0)\nprint(list(_r))",
+  sol: "<p>This is what <code>transform<\/code> is for. It returns one value per <em>original<\/em> row, so it lines up for a direct subtraction. <code>agg<\/code> would collapse to one row per group and then need merging back onto the frame — three lines and a chance to get the join wrong.<\/p>",
+  solcode: "import pandas as pd\n\n\ndef centre_within(df, key, col):\n    \"\"\"Subtract each row's group mean from col.\"\"\"\n    return df[col] - df.groupby(key)[col].transform(\"mean\")"
+ }
+];
+
+EXERCISES.t20 = [
+ {
+  q: "Write <code>outer_merge(left, right, key)<\/code> joining the two frames on <code>key<\/code> while keeping <strong>every<\/strong> key from both sides.",
+  pkgs: ["numpy", "pandas"],
+  start: "import pandas as pd\n\n\ndef outer_merge(left, right, key):\n    ### YOUR CODE HERE\n    raise NotImplementedError",
+  test: "import pandas as pd\nL = pd.DataFrame({\"k\": [\"a\", \"b\", \"c\"], \"v\": [1, 2, 3]})\nR = pd.DataFrame({\"k\": [\"a\", \"b\", \"d\"], \"w\": [4, 5, 6]})\n_m = outer_merge(L, R, \"k\")\nassert len(_m) == 4, f\"outer should keep a, b, c and d - got {len(_m)} rows\"\nassert set(_m[\"k\"]) == {\"a\", \"b\", \"c\", \"d\"}\nassert _m[\"w\"].isna().sum() == 1 and _m[\"v\"].isna().sum() == 1\nprint(_m.sort_values(\"k\").to_string(index=False))",
+  sol: "<p>The default is <code>how=\"inner\"<\/code>, which silently discards any key missing from the other side — the commonest way to lose rows without noticing. An outer join keeps everything and marks the gaps <code>NaN<\/code>, so you can see what failed to match.<\/p>",
+  solcode: "import pandas as pd\n\n\ndef outer_merge(left, right, key):\n    \"\"\"Join left and right on key, keeping all keys from both.\"\"\"\n    return pd.merge(left, right, on=key, how=\"outer\")"
+ }
+];
+
 /* Mock paper. Question 1 mirrors the sample midterm's password rules;
    questions 2 and 3 mirror the final practice set's vectorised
    one-liners, including its 10-points-per-question weighting. Every
@@ -4434,7 +5256,11 @@ REVIEWER.init({
   topicTitles: TOPIC_TITLES,
   banks: BANKS,
   exam: EXAM,
-  map: MAP
+  map: MAP,
+  /* Runs real CPython in the page. The runtime is fetched from the
+     CDN on the first Run of a session, because a page opened from
+     disk cannot read a local copy — see the note in reviewer.js. */
+  python: { exercises: EXERCISES }
 });
 
 })();
