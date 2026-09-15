@@ -12,12 +12,19 @@ A **reviewer** is a single-page study app for one university subject: topic note
 /
 ├── index.html                    landing page — one card per subject
 ├── HANDOVER.md                   this file
+├── build-standalone.py           generates the single-file copies
 ├── assets/
 │   ├── reviewer.css              all styling, ~295 lines
 │   └── reviewer.js               the engine, ~820 lines
+├── standalone/                   generated — one self-contained file per subject
 └── subjects/
     ├── _template/index.html      copy this to start a subject
-    └── str501/index.html         the worked reference — read it
+    ├── str501/index.html         the worked reference — read it
+    ├── act501/index.html         the second subject
+    ├── inn506/index.html         built from decks, no mock exam
+    ├── dsc512/index.html         a coding subject — uses t:'code' and .codeblock,
+    │   notebooks/                and ships the source notebooks beside it
+    └── aid503/index.html         decks disagreed with the outline — see §11
 ```
 
 **Nothing in `assets/` is subject-specific.** Do not edit it to make one subject work; if a subject needs something the engine cannot do, that is an engine feature and every subject gets it.
@@ -148,6 +155,7 @@ Every question needs `t`, `q`, `sol`, and a `c` (concept group). Ids are assigne
 {t:'ms',   c:'concept', q:'…', opts:[…], a:[0,2],          sol:'…'}    // all-or-nothing
 {t:'num',  c:'concept', q:'…', a:27.75, rtol:0.01,         sol:'…'}
 {t:'text', c:'concept', q:'…', a:['sample frame','sampling frame'], sol:'…'}
+{t:'code', c:'concept', q:'…', a:['x > 5'], sol:'…'}                   // exact, case-sensitive
 ```
 
 ### `c` — concept groups
@@ -169,7 +177,93 @@ Input accepts commas, currency symbols, unicode minus, a trailing `%` or `x`, an
 
 ### Text answers
 
+**Known limit:** the edit-distance tolerance is plain Levenshtein, so it forgives one
+*substitution, insertion or deletion* but not a **transposition** — `relaod` for
+`reload` is two edits and is rejected. Transposed letters are among the commonest
+typos, so either list the likely transposition in `a` or prefer a `mc` question where
+the exact spelling is the point.
+
+
 Matched **exactly after normalising** — case, punctuation and small words (`the`, `a`, `of`) are stripped — plus a bounded edit distance so one typo passes. There is deliberately **no substring matching**: it would score *"a sample frame is not what you need"* as correct. List real synonyms in `a` instead.
+
+### Runnable code — cells that actually execute
+
+DSC 512 runs real CPython in the page through Pyodide, so a reader can edit a
+snippet and see what it does. Two author-facing forms:
+
+```html
+<!-- a worked example the reader can run and edit -->
+<div class="pycell" data-pkgs="numpy,pandas">
+import numpy as np
+print(np.arange(6).reshape(2, 3))
+</div>
+
+<!-- a set of exercises, checked by assertions -->
+<div data-exercise="t04"></div>
+```
+
+```js
+EXERCISES.t04 = [
+  { q:       'HTML prompt',
+    start:   'def sum_digits(n):\n    ### YOUR CODE HERE\n    raise NotImplementedError',
+    test:    'assert sum_digits(1345) == 13\nassert sum_digits(0) == 0',
+    pkgs:    ['numpy'],          // optional
+    sol:     '<p>Why this works.</p>',
+    solcode: 'def sum_digits(n):\n    return sum(int(c) for c in str(n))' }
+];
+
+REVIEWER.init({ …, python: { exercises: EXERCISES } });
+```
+
+Exercises count toward the progress bar exactly as concept checks do, and
+revealing the solution first scores zero, for the same reason.
+
+**Three things about this were measured, not assumed. Do not undo them.**
+
+1. **The runtime is fetched from a CDN and cannot be vendored.** A page opened
+   by double-click has a `file://` origin, and browsers refuse to fetch one
+   local file from another — a local copy of Pyodide fails with "Failed to
+   fetch dynamically imported module". A *cross-origin* fetch from a
+   `file://` page is allowed, so the CDN works and a vendored copy does not.
+   Vendoring is only an option if you also serve the folder over `http://`.
+2. **Code runs in a Web Worker.** Beginners write `while True:`, and on the
+   main thread that freezes the tab with no way back. The worker is
+   terminated after `RUN_TIMEOUT`, the page survives, and the cell explains
+   what happened. A Blob worker inherits the page origin, which is what lets
+   it `importScripts` the CDN.
+3. **One interpreter serves the page**, so names persist between cells like a
+   notebook. Killing a runaway cell resets that, and the message says so.
+
+Offline, cells report that the runtime could not start and say the rest of the
+page still works. Nothing else depends on the runtime — a subject that does not
+set `python` never spawns one.
+
+To point at a self-hosted copy instead (only meaningful when served over
+`http://`), pass `python: { indexURL: '…/pyodide/' }`.
+
+### Code answers
+
+**Never use `t:'text'` for code.** `normText` lowercases, strips every operator
+and bracket, and forgives two characters of typo — which between them accept
+`x < 5` as an answer to `x > 5`, `range(6)` for `range(5)`, and `x != y` for
+`x == y`. This was measured, not guessed.
+
+`t:'code'` matches exactly after normalising only what is genuinely
+insignificant in Python:
+
+| Forgiven | Not forgiven |
+|---|---|
+| surrounding whitespace | case — `True` ≠ `true` |
+| spacing around operators — `x>5` = `x > 5` | any operator or identifier difference |
+| quote style — `'a'` = `"a"` | spacing *inside* a string literal |
+| | anything at all in an edit-distance sense |
+
+String literals are lifted out before the spacing rules run, so `', '.join(w)`
+and `','.join(w)` stay different — the space there is data, not formatting.
+Keyword boundaries survive too: `not x` never collapses to `notx`.
+
+List every genuinely acceptable form in `a`, exactly as you would for `text`:
+`a: ['xs.sort()', 'sorted(xs)']`.
 
 ### Solutions
 
@@ -189,6 +283,12 @@ Author-facing classes. The engine owns everything else (`.q`, `.opt`, `.sol`, `.
 | `ol.steps` | numbered procedure with circular badges |
 | `.path` | tool breadcrumb — `<span>Data</span><i>→</i><span class="last">Regression</span>` |
 | `.fx` / `.fx.ans` | monospace formula block, preserves line breaks |
+| `.codeblock` | source code. Python-highlighted automatically; scrolls sideways rather than wrapping, because a wrapped line reads as a different program. Use this, never `.fx`, for code |
+| `.codeblock.out` | what the code printed — muted, so it reads as a result not a program |
+| `.codecap` | small uppercase caption inside a code block, for a filename or a label |
+| `.nblink` | link from a topic to the source notebook it was built from |
+| `.pycell` | a code block the reader can edit and run. `data-pkgs="numpy,pandas"` loads those on first use |
+| `data-exercise="tNN"` | host for an exercise set, filled from `python.exercises` — the runnable counterpart of `data-quiz` |
 | `.ans` | inline answer badge with a small label |
 | `.verdict.rej` / `.verdict.keep` | conclusion pill |
 | `.tw > table.dt` | any table. **Always wrap in `.tw`** or it overflows on mobile. `td.s` = the answer, `td.m` = mono, `td.n` = right-aligned numeric |
@@ -213,6 +313,10 @@ Each topic follows six beats, in order:
 
 Targets per subject, calibrated from STR 501: **8–15 topics, 80–140 questions, 30–60 formula-sheet rows, 1–3 mock exams**. Per topic: 6–10 questions, with at least one conceptual, one computational where applicable, and one trap mirroring a known exam trick.
 
+These are a guide, not a ceiling — the material decides. INN 506 ran to 16 topics and DSC 512 to 20, because a 2-unit course with thirteen session notebooks genuinely has that much in it. Consolidate to roughly one topic per notebook section-group rather than splitting finely, and agree the count with the user at step 3 before writing.
+
+**Let the assessment shape the reviewer.** Check what the exam actually asks before deciding the balance of notes to drills. DSC 512's papers hand out a docstring and mark the *method* — 6 of 10 marks for being vectorised and inside a line limit, only 4 for correctness — so its topics teach the one-liner as the answer rather than as an optimisation. A reviewer built on the assumption that exams test recall would have missed that entirely.
+
 A subject can ship usefully at 60% — notes and concept checks, no mock exam, no decision map. Every part is optional except topics and banks.
 
 ---
@@ -228,6 +332,12 @@ These cost real time. They are fixed in `assets/reviewer.js`; the risk is re-cre
 5. **Revealing an answer before attempting it scores zero** and is labelled "Revealed — not scored", rather than silently inflating the total.
 6. **Print captures the active section before expanding all of them**, so printing does not navigate the reader back to page one.
 7. **`scrollRestoration = 'manual'` plus a deferred scroll on load**, or a deep-linked heading sits under the sticky top bar.
+8. **Code is graded by `codeOk`, never `textOk`.** The text matcher scores `x < 5`
+   as correct for `x > 5`. See "Code answers" in §5.
+9. **The syntax highlighter escapes before it colours.** It runs over author-supplied
+   content, so raw `<script>` in a code block must come out inert. It is also
+   idempotent — a `.lit` marker stops a second pass double-escaping a block when a
+   quiz mounts later and re-runs it.
 
 ---
 
@@ -256,6 +366,25 @@ Checklist before shipping a subject:
 7. No horizontal overflow at 360, 414 and 768 px — measure `document.documentElement.scrollWidth`.
 8. Dark mode persists across reload; print preview shows all sections once and returns you where you were.
 9. Console is clean. A failed Google Fonts request is expected offline and harmless.
+10. If the subject runs Python: a worked cell produces output; an exercise's
+    starter **fails** its tests and the reference solution **passes**; a
+    plausible-but-wrong answer is rejected; `while True:` is stopped and the
+    page survives; and with the runtime blocked, cells degrade with a message
+    instead of hanging. In this container the CDN is blocked, so redirect it
+    to a local copy in the test rather than concluding it is broken:
+
+    ```js
+    await p.route('**cdn.jsdelivr.net/pyodide/**', r => r.fulfill({
+      status: 302,
+      headers: { location: 'http://127.0.0.1:8766/' + r.request().url().split('/full/')[1] }
+    }));
+    ```
+
+**Write the tests before the page.** Keep every exercise's solution and test in
+a plain Python file and run two checks on each: the reference solution must
+pass, and the starter must **fail**. The second is the one that catches a test
+which does not actually test the reader's work — it caught one here, where the
+assertions exercised `divmod` directly and the untouched starter passed.
 
 ---
 
@@ -277,6 +406,33 @@ Checklist before shipping a subject:
 
 **State the limits in the reviewer itself.** Where a source was unusable or a mark allocation unknown, say so on the page. A student needs to know which parts are authoritative.
 
+## 11a. Lessons from AID 503
+
+**Reconcile the outline against the decks before deriving a single topic, not after.** AID 503's
+outline and its slides disagreed in four places: session 2 was listed as statistical inference but
+actually taught decision analysis and EMV; decision trees were listed in session 4 and taught in
+session 2; session 3 covered both one- and two-population inference rather than the outline's split;
+and session 10 was titled "Unsupervised Learning" while containing none. A topic list derived from
+the outline would have been wrong about a third of the course.
+
+**A deck's title is not its contents.** Check what is actually on the slides. Session 4's outline
+title promised decision trees and predictive modelling; the deck is entirely enterprise analytics.
+
+**Name the gaps on the page, by session.** Five decks were missing, covering unsupervised learning,
+model evaluation metrics, decision trees as ML, SVM, neural networks, reinforcement learning, NLP
+and interpretability. The `#start` section lists each one explicitly so a student knows what this
+reviewer does not cover rather than assuming the silence means "not examinable".
+
+**Two names for the same tool is worth a callout.** Decision-analysis trees (EMV, chance nodes) and
+CART classification trees both appear in an AI course. Say which one a topic means, in a `.note.plain`
+at the top, or students will revise the wrong thing.
+
+**Known engine gap, found here:** `reviewer.js` sets the "Revealed — not scored" label only
+`if (vd)`, and choice questions have no `.vd` element — so on `mc`, `tf` and `ms` items the label
+never appears. The *scoring* half of bug 5 is fine (revealing still records 0 of 1); only the visible
+cue is missing, on every subject. Fixing it means giving choice questions a verdict slot in the
+engine.
+
 ---
 
 ## 12. Using it
@@ -289,7 +445,41 @@ Checklist before shipping a subject:
 
 Everything works this way: navigation between subjects, every question type, the timed mock exam, dark mode, saved progress and printing. It has been tested end to end from a local folder with all network access blocked, and there is no degraded mode — the only thing that fails offline is the Google Fonts request, which falls back to system fonts.
 
+**One exception to "everything works offline":** DSC 512's **Run** buttons need
+the network the first time they are pressed in a browser, because the Python
+runtime is downloaded then (~13 MB, plus ~9 MB on first use of NumPy or
+pandas) and cached afterwards. Everything else in that subject — notes,
+concept checks, the mock exam, the syntax sheet — works with no network, and
+the other three subjects need none at all. A cell that cannot reach the
+runtime says so rather than hanging.
+
 **Keep the folder together.** `index.html` needs `assets/` and `subjects/` beside it. That is the cost of the shared engine: a single page moved somewhere on its own loses its styling.
+
+That failure is silent and looks like a rendering bug rather than a missing file: the
+page loads in Times New Roman with every section stacked on one scroll, the progress
+counter stuck at `0 / 0` and the theme button dead. If someone reports "the visuals
+broke", check the folder before reading any CSS — the console will show
+`reviewer.css` and `reviewer.js` failing and `REVIEWER is not defined`.
+
+### Standalone single-file copies
+
+For when the folder cannot be kept together — emailing one subject, a phone, a
+study folder somewhere else on disk:
+
+```
+python3 build-standalone.py            # every subject
+python3 build-standalone.py act501     # just one
+```
+
+This inlines `reviewer.css` and `reviewer.js` into the subject page, turns the two
+"back to subject index" links into plain text (there is no index to return to), and
+writes the result to `standalone/`. Roughly 265–360 KB per subject. Everything works:
+routing, every question type, the timed mock exam, the decision map, dark mode,
+printing.
+
+**These are generated files and do not update themselves.** Re-run the script after
+changing a subject page or the engine, or the standalone copy silently goes stale.
+The files under `subjects/` remain the source of truth.
 
 Links point at `…/index.html` rather than at the folder, deliberately. A bare directory URL needs a server to resolve; an explicit filename works from `file://` too. Keep that convention when adding a subject card.
 
